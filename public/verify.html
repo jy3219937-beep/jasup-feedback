@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>마이그레이션 검증 · 자습관 피드백</title>
+<style>
+  body { font-family: 'Noto Sans KR', -apple-system, sans-serif; background:#f3f4f6; padding:40px; color:#111827; }
+  .box { max-width: 760px; margin: 0 auto; background: white; padding: 32px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  h1 { font-size: 22px; margin-bottom: 14px; }
+  button { padding:12px 22px; border-radius:10px; border:none; background:#3b82f6; color:white; font-weight:700; font-size:14px; cursor:pointer; margin-right:8px; margin-bottom:8px; }
+  button.danger { background: #f43f5e; }
+  button:disabled { opacity:0.5; cursor:not-allowed; }
+  pre { background:#1f2937; color:#d1d5db; padding:14px; border-radius:8px; font-size:11px; overflow:auto; max-height:480px; }
+  .ok { color:#16a34a; font-weight:700; }
+  .err { color:#dc2626; font-weight:700; }
+  .missing-card {
+    background:#fef2f2; border: 2px solid #fecaca;
+    padding: 18px; border-radius: 12px; margin: 10px 0;
+    font-size: 13px; line-height: 1.6;
+  }
+  .missing-card strong { color: #b91c1c; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🔍 마이그레이션 검증</h1>
+  <p style="color:#6b7280; font-size:13px; margin-bottom:18px;">현재 Firestore와 migrate-data.json을 비교해서 누락된 응답을 찾습니다.</p>
+  <button id="verifyBtn">🔍 비교 분석 시작</button>
+  <button id="addMissingBtn" class="danger" style="display:none;">📥 누락된 항목만 추가</button>
+  <div id="result"></div>
+  <pre id="log" style="margin-top:16px;"></pre>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCUpVlY5al5uvH4wRv7WQxWrbV_OnvfPQg",
+    authDomain: "jasup-feedback.firebaseapp.com",
+    projectId: "jasup-feedback",
+    storageBucket: "jasup-feedback.firebasestorage.app",
+    messagingSenderId: "242775000792",
+    appId: "1:242775000792:web:78e5c222aa9d7891b479ad"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const log = (msg, cls) => {
+    const el = document.getElementById('log');
+    el.innerHTML += (cls ? `<span class="${cls}">${msg}</span>` : msg) + '\n';
+    el.scrollTop = el.scrollHeight;
+  };
+
+  let missingItems = [];
+
+  // 키 만들기: 같은 응답인지 판단할 fingerprint
+  function makeKey(r) {
+    return [
+      r.study_room || '',
+      r.student_name || '익명',
+      (r.facility_etc || '').slice(0, 30),
+      (r.noise_etc || '').slice(0, 30),
+      (r.rules_etc || '').slice(0, 30),
+      (r.condition_etc || '').slice(0, 30),
+      (r.free_text || '').slice(0, 50),
+      (r.one_wish || '').slice(0, 30),
+      (r.class_feedback || '').slice(0, 30)
+    ].join('|');
+  }
+
+  document.getElementById('verifyBtn').addEventListener('click', async () => {
+    document.getElementById('result').innerHTML = '';
+    document.getElementById('log').innerHTML = '';
+    document.getElementById('addMissingBtn').style.display = 'none';
+    missingItems = [];
+
+    log('📦 migrate-data.json 로드 중...');
+    const res = await fetch('migrate-data.json');
+    const migrateData = await res.json();
+    log(`✅ migrate-data.json: ${migrateData.length}건`, 'ok');
+
+    log('📡 Firestore 응답 조회 중...');
+    const snap = await getDocs(collection(db, 'study_room_reports'));
+    const fbData = [];
+    snap.forEach(d => fbData.push({ id: d.id, ...d.data() }));
+    log(`✅ Firestore: ${fbData.size || fbData.length}건`, 'ok');
+
+    log('\n🔍 fingerprint 비교 중...');
+    // Firestore 데이터의 키 모음
+    const fbKeys = new Set();
+    fbData.forEach(r => {
+      // Firestore 데이터의 facility 등은 JSON 문자열로 저장됨, 그대로 fingerprint
+      fbKeys.add(makeKey(r));
+    });
+
+    // migrateData 중 fbKeys에 없는 것 찾기
+    migrateData.forEach((m, idx) => {
+      const key = makeKey(m);
+      if (!fbKeys.has(key)) {
+        missingItems.push({ idx, data: m });
+      }
+    });
+
+    log(`\n🔎 누락 항목: ${missingItems.length}건`, missingItems.length > 0 ? 'err' : 'ok');
+
+    if (missingItems.length === 0) {
+      document.getElementById('result').innerHTML = `<div style="background:#f0fdf4;padding:18px;border-radius:12px;color:#16a34a;font-weight:700;">✅ 모든 응답이 정확히 import됐어요!<br><br><span style="color:#374151;font-weight:500;">현재 ${fbData.length}건 = migrate-data.json ${migrateData.length}건 + 신규 ${fbData.length - migrateData.length}건</span></div>`;
+    } else {
+      let h = '<h3 style="margin-top:20px;color:#b91c1c;">🚨 누락된 응답 (마이그레이션 중 실패)</h3>';
+      missingItems.forEach(({ idx, data }) => {
+        h += `<div class="missing-card">
+          <div><strong>📍 #${idx} · ${data.study_room || '(자습관 없음)'} · ${data.student_name || '익명'}</strong> · ${data.created_at || ''}</div>`;
+        if (data.facility?.length) h += `<div>🏫 시설: ${data.facility.join(', ')}</div>`;
+        if (data.facility_etc) h += `<div>📝 시설 의견: ${data.facility_etc}</div>`;
+        if (data.noise?.length) h += `<div>🔊 소음: ${data.noise.join(', ')}</div>`;
+        if (data.noise_etc) h += `<div>📝 소음 의견: ${data.noise_etc}</div>`;
+        if (data.rules?.length) h += `<div>📐 운영: ${data.rules.join(', ')}</div>`;
+        if (data.rules_etc) h += `<div>📝 운영 의견: ${data.rules_etc}</div>`;
+        if (data.condition?.length) h += `<div>🧠 컨디션: ${data.condition.join(', ')}</div>`;
+        if (data.free_text) h += `<div>💬 자유: ${data.free_text.slice(0, 200)}${data.free_text.length > 200 ? '...' : ''}</div>`;
+        if (data.one_wish) h += `<div>⭐ 바람: ${data.one_wish}</div>`;
+        h += `</div>`;
+      });
+      document.getElementById('result').innerHTML = h;
+      document.getElementById('addMissingBtn').style.display = '';
+    }
+  });
+
+  document.getElementById('addMissingBtn').addEventListener('click', async () => {
+    if (!missingItems.length) return;
+    if (!confirm(`누락된 ${missingItems.length}건만 추가하시겠어요?`)) return;
+    const btn = document.getElementById('addMissingBtn');
+    btn.disabled = true;
+    btn.textContent = '추가 중...';
+
+    let ok = 0, fail = 0;
+    for (const { idx, data: r } of missingItems) {
+      const doc = {
+        study_room: r.study_room || '',
+        student_name: r.student_name || '익명',
+        facility: JSON.stringify(r.facility || []),
+        facility_etc: r.facility_etc || '',
+        noise: JSON.stringify(r.noise || []),
+        noise_etc: r.noise_etc || '',
+        noise_severity: r.noise_severity || 3,
+        rules: JSON.stringify(r.rules || []),
+        rules_etc: r.rules_etc || '',
+        condition: JSON.stringify(r.condition || []),
+        condition_etc: r.condition_etc || '',
+        free_text: r.free_text || '',
+        class_feedback: r.class_feedback || '',
+        one_wish: r.one_wish || '',
+        want_talk: r.want_talk || 'no',
+        status: 'new',
+        legacy: true,
+        source: 'genspark_migration_retry',
+        created_at: r.created_at ? Timestamp.fromDate(new Date(r.created_at)) : Timestamp.now()
+      };
+      try {
+        await addDoc(collection(db, 'study_room_reports'), doc);
+        ok++;
+        log(`✅ #${idx} ${r.student_name || '익명'} 추가 성공`, 'ok');
+      } catch (e) {
+        fail++;
+        log(`❌ #${idx} 실패: ${e.message}`, 'err');
+      }
+    }
+    log(`\n🎉 완료 — 성공 ${ok}건, 실패 ${fail}건`, fail === 0 ? 'ok' : 'err');
+    btn.textContent = '✅ 추가 완료';
+  });
+</script>
+</body>
+</html>

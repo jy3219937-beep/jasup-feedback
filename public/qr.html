@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR 코드 인쇄 · 무엇이든 말해보살</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f3f4f6;
+    color: #1f2937;
+    padding: 20px;
+  }
+  .toolbar {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .toolbar h1 { font-size: 17px; font-weight: 800; }
+  .toolbar p { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .print-btn {
+    padding: 10px 22px; background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white; border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(59,130,246,0.25);
+  }
+
+  .sheet {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .qr-card {
+    border: 2px dashed #d1d5db;
+    border-radius: 18px;
+    padding: 18px 14px;
+    text-align: center;
+    background: white;
+    page-break-inside: avoid;
+    position: relative;
+    overflow: hidden;
+  }
+  .qr-card.public {
+    background: linear-gradient(135deg, #fff5f5 0%, #fce7f3 100%);
+    border-color: #f43f5e;
+  }
+  .qr-card.public::before {
+    content: '복도·공용';
+    position: absolute;
+    top: 10px; right: 10px;
+    background: #f43f5e; color: white;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 700;
+  }
+  .qr-pretitle {
+    font-size: 10px;
+    font-weight: 700;
+    color: #e11d48;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .qr-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #1a1310;
+    margin-bottom: 2px;
+    line-height: 1.2;
+  }
+  .qr-loc {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+  }
+  .qr-img-wrap {
+    background: white;
+    padding: 10px;
+    border-radius: 12px;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 10px;
+  }
+  .qr-img-wrap canvas { display: block; }
+  .qr-cta {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4b3a2c;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+  .qr-cta strong { color: #e11d48; }
+  .qr-footer {
+    margin-top: 8px;
+    font-size: 9px;
+    color: #9ca3af;
+    border-top: 1px dashed #e5e7eb;
+    padding-top: 8px;
+  }
+  .qr-url {
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 9px;
+    color: #9ca3af;
+    word-break: break-all;
+    margin-top: 4px;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .toolbar { display: none; }
+    .sheet { box-shadow: none; padding: 8px; border-radius: 0; }
+    .grid { gap: 8px; }
+    .qr-card { border: 1px dashed #999; padding: 14px 10px; }
+    @page { size: A4; margin: 8mm; }
+  }
+
+  @media (max-width: 700px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 460px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div>
+    <h1>🖨️ 자습관 QR 코드 인쇄 시트</h1>
+    <p>출력해서 가위로 자른 뒤 자습관 내부 / 복도에 붙여주세요. 공용 QR은 자습관 선택 화면이 먼저 뜹니다.</p>
+  </div>
+  <button class="print-btn" onclick="window.print()">🖨️ 인쇄하기 (⌘+P)</button>
+</div>
+
+<div class="sheet">
+  <div class="grid" id="qrGrid"></div>
+</div>
+
+<script>
+const BASE = 'https://jasup-feedback.web.app/';
+const ROOMS = [
+  { name: '1관', loc: '2층', url: BASE + '?room=1관' },
+  { name: '2관', loc: '3층', url: BASE + '?room=2관' },
+  { name: '3관', loc: '4층', url: BASE + '?room=3관' },
+  { name: '419관', loc: '4층', url: BASE + '?room=419관' },
+  { name: '블랙관', loc: '5층', url: BASE + '?room=블랙관' },
+  { name: 'B7', loc: '6층', url: BASE + '?room=B7' },
+  { name: 'B8', loc: '6층', url: BASE + '?room=B8' },
+  { name: 'B9', loc: '6층', url: BASE + '?room=B9' },
+];
+
+const grid = document.getElementById('qrGrid');
+
+// 공용 QR (먼저 배치)
+const publicCard = document.createElement('div');
+publicCard.className = 'qr-card public';
+publicCard.innerHTML = `
+  <div class="qr-pretitle">🙏 무엇이든 말해보살</div>
+  <div class="qr-title">공용 QR</div>
+  <div class="qr-loc">복도 · 정수기 · 화장실 등</div>
+  <div class="qr-img-wrap" id="qr-public"></div>
+  <div class="qr-cta">자습관 안 어떠세요?<br><strong>아무거나 편하게</strong> 말해주세요</div>
+  <div class="qr-footer">종합반 사감장 김어랑</div>
+  <div class="qr-url">${BASE}</div>
+`;
+grid.appendChild(publicCard);
+
+// 자습관별 QR
+ROOMS.forEach(room => {
+  const card = document.createElement('div');
+  card.className = 'qr-card';
+  card.innerHTML = `
+    <div class="qr-pretitle">🙏 무엇이든 말해보살</div>
+    <div class="qr-title">${room.name}</div>
+    <div class="qr-loc">${room.loc} · 자습관 내부 부착용</div>
+    <div class="qr-img-wrap" id="qr-${room.name}"></div>
+    <div class="qr-cta">${room.name} 어떠세요?<br><strong>참고 있던 거 다</strong> 말해주세요</div>
+    <div class="qr-footer">종합반 사감장 김어랑</div>
+    <div class="qr-url">?room=${room.name}</div>
+  `;
+  grid.appendChild(card);
+});
+
+// QR 생성
+const qrOpts = { width: 200, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#1a1310', light: '#ffffff' } };
+
+QRCode.toCanvas(BASE, qrOpts, (err, canvas) => {
+  if (!err) document.getElementById('qr-public').appendChild(canvas);
+});
+
+ROOMS.forEach(room => {
+  QRCode.toCanvas(room.url, qrOpts, (err, canvas) => {
+    if (!err) document.getElementById('qr-' + room.name).appendChild(canvas);
+  });
+});
+</script>
+</body>
+</html>
