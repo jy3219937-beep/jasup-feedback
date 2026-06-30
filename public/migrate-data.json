@@ -1,0 +1,309 @@
+[
+  {
+    "study_room": "1관",
+    "student_name": "윤준식",
+    "facility": ["too_hot", "stuffy_air"],
+    "facility_etc": "1관 에어컨 틀어도 공기가 습하고 환기가 안됩니다 에어컨 소리도 큰거같은데 에어컨 필터나 어딘가 문제있는거같아요",
+    "created_at": "2026-06-29T10:00:00",
+    "want_talk": "no"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "B9 이용자",
+    "noise": ["chatting_time"],
+    "rules": ["too_loose"],
+    "free_text": "안녕하세요. 윈터 시즌부터 지금까지 재원중인 학생입니다. 다름이 아니라 최근 자습관 분위기와 관련해 드리고 싶은 말씀이 있어 건의 남깁니다. 최근 들어 자습관 분위기가 윈터 시즌에 비해 많이 느슨해진 것 같다는 느낌을 받습니다. 특히 최근에는 자습 시간에 무단으로 이탈하는 학생들이 조금씩 늘어나면서 원내 분위기가 전반적으로 어수선해진 것 같습니다. 학생들이 지치고 의욕이 떨어질 수 있는 시기인 만큼, 이럴 때일수록 감독 선생님들께서 윈터 때처럼 조금 더 적극적이고 타이트하게 관리하고 감독해 주셨으면 하는 바람이 있습니다. 그리고 개인적인 의견이지만 공간적으로도 현재 사용 중인 B9 자습관보다 이전에 사용하던 B8 자습관이었을 때 자습 분위기 관리가 더 잘 되었고 집중하기에도 수월했던 것 같아 더 아쉬운 마음이 듭니다. 저 역시 요즘 학업에 다시 집중하기 위해 마음을 다잡고 있는 과정에 있습니다. 처음 이 학원에 왔을 때 학원 전체의 열정적인 분위기를 믿고 공부를 시작했던 만큼 다시 한번 윈터 때의 긴장감 있고 열띤 면학 분위기를 되찾을 수 있도록 학원 측에서 신경 써주시길 부탁드립니다. 늘 감사합니다",
+    "one_wish": "감독 선생님들이 들어오시면 자습관이 한 눈에 보일 수 있는 B8처럼 시선이 분산되지 않고 공부에만 몰입할 수 있는 환경을 조성해주세요.",
+    "created_at": "2026-06-26T20:00:00",
+    "want_talk": "no"
+  },
+  {
+    "study_room": "1관",
+    "student_name": "익명",
+    "free_text": "몇몇 학생들이 물건을 너무 세게 다루는 것 같아요 책을 놓거나 서랍을 닫거나 할 때 소음이 커서 스트레스 받습니다..",
+    "created_at": "2026-06-22T18:00:00"
+  },
+  {
+    "study_room": "1관",
+    "student_name": "익명",
+    "free_text": "자습관말고 예시바나 북카페에 자리 예약 시스템 관련 문의입니다. 예약없이 그냥 앉는 사람이 너무 많아요. 사실 그냥 거의 모두가 그런 것 같아요. 그래서 빈자린지 아닌지 헷갈려서 못앉을 때가 많고 예약을 하고 그 자리로 가면 이미 누가 예약없이 쓰고 있습니다. 예약 시스템이 왜 있는지 모르겠어요",
+    "created_at": "2026-06-03T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "익명",
+    "facility_etc": "2.3관 자습관 문 앞에 바퀴벌레 있어요 살려주세요",
+    "free_text": "바퀴벌레 개무서워요ㅠㅜㅜㅠㅠ",
+    "created_at": "2026-05-18T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "익명",
+    "facility_etc": "통로에 있는 큰 식물 치워주세요 이동에 방해됩니다",
+    "created_at": "2026-05-15T18:00:00"
+  },
+  {
+    "study_room": "420관",
+    "student_name": "익명",
+    "facility_etc": "수업이 끝나는 10시, 1학년 귀가시간인 11시 20분이 특히 시끄러워서 집중이 깨집니다.",
+    "noise_etc": "수업이 끝나는 10시, 1학년 귀가시간인 11시 20분이 특히 시끄러워서 집중이 깨집니다.",
+    "free_text": "10시나 11시 20분은 어쩔수 없이 소음이 발생할 수 밖에 없다는걸 알지만 주의를 주셨으면 좋겠습니다. 특히 420관 벽쪽에 기대서 얘기를 하면 소리가 너무 크게 들려서 집중이 되지않아요.",
+    "class_feedback": "수업시간에 휴대폰 사용은 자제해주셨으면 좋겠습니다. 학생이 수업시간에 핸드폰을 사용하지않는게 예의인것처럼 선생님들도 학생들을 존중해주시면 좋겠습니다.",
+    "one_wish": "방음이 잘 되면 좋을것같습니다.",
+    "noise_severity": 4,
+    "created_at": "2026-04-25T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "익명",
+    "free_text": "반팔인데도 너무 더워요",
+    "created_at": "2026-04-25T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "익명",
+    "free_text": "겁나 추워요 살려주세요",
+    "created_at": "2026-04-17T18:00:00"
+  },
+  {
+    "study_room": "1관",
+    "student_name": "익명",
+    "free_text": "1관 30번 유다예 자리에 없는데 구루미 키는거 단속 좀 부탁드리겠습니다 수업 가면서 구루미 키고 가면 막 세시간씩 찍혀있는데 그렇게 순위 올라가는것도 이해 안되고 켜놓고 가서 걔 화면에 제가 나와서 자꾸 신경쓰입니다 한두번도 아니고 여러번 말씀드렸는데 안 바뀌어서 다시 요청드립니다",
+    "created_at": "2026-04-13T18:00:00"
+  },
+  {
+    "study_room": "3관",
+    "student_name": "익명",
+    "noise_etc": "거의 10시 반부터 2번 자리 학생이 간식을 먹는데 쩝쩝거리는 소리가 너무 심합니다",
+    "noise_severity": 4,
+    "created_at": "2026-03-31T18:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "이원준",
+    "facility": ["too_hot"],
+    "created_at": "2026-03-31T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "익명",
+    "one_wish": "자습관 문 열고 닫을 때마다 나는 소리가 신경쓰여요 개선 부탁드립니다ㅜㅜ",
+    "created_at": "2026-03-30T18:00:00"
+  },
+  {
+    "study_room": "1관",
+    "student_name": "김로아",
+    "condition": ["worry"],
+    "created_at": "2026-03-28T18:00:00"
+  },
+  {
+    "study_room": "3관",
+    "student_name": "익명",
+    "facility_etc": "먼지가 너무많아요",
+    "created_at": "2026-03-28T18:00:00"
+  },
+  {
+    "study_room": "3관",
+    "student_name": "성시우",
+    "facility": ["too_cold"],
+    "facility_etc": "이하신이 한숨을 너무 많이 쉬어요",
+    "created_at": "2026-03-27T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "ㄱ",
+    "created_at": "2026-03-27T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "익명",
+    "one_wish": "문 닫히는것의 소리가 좀 큰것",
+    "created_at": "2026-03-27T18:00:00"
+  },
+  {
+    "study_room": "420관",
+    "student_name": "강윤우",
+    "facility": ["desk_chair"],
+    "facility_etc": "6층 자습관 의자처럼 등이 안 기울어졌으면 좋겠어요",
+    "created_at": "2026-03-26T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "임미정",
+    "facility": ["stuffy_air", "lighting"],
+    "condition": ["peer_pressure"],
+    "rules_etc": "거리가 멀면 아침 등원 8시말고 9시가 좋은것같다",
+    "free_text": "5관 다시 부활해주세요..... 종합반하면 거기로 자리 옮기려 했는데 5관이 젤 좋은데 고삼이 쓰는데 맞다고 봅니다",
+    "created_at": "2026-03-26T18:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "김윤태",
+    "facility": ["too_hot", "stuffy_air", "lighting"],
+    "noise": ["sleeping"],
+    "condition": ["dont_know_what", "burnout"],
+    "free_text": "열심히 관리해주세료",
+    "class_feedback": "충전기 사용 가능한곳이 적습니다",
+    "one_wish": "시원한 온도",
+    "created_at": "2026-03-26T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "오세림",
+    "facility": ["stuffy_air"],
+    "rules": ["seating"],
+    "condition": ["focus_drop"],
+    "created_at": "2026-03-25T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "익명",
+    "facility_etc": "자습관에 들어오고 나갈때 문 긁히는 소리가 너무 거슬립니다ㅠㅠ",
+    "created_at": "2026-03-25T18:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "익명",
+    "noise_etc": "누가 자꾸 혼잣말합니다 남자인 것 같아요 타자 소리 너무 거슬립니다",
+    "noise_severity": 4,
+    "created_at": "2026-03-24T18:00:00"
+  },
+  {
+    "study_room": "2관",
+    "student_name": "익명",
+    "one_wish": "1학년들 자습시간에도 너무 시끄러워여",
+    "created_at": "2026-03-24T18:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "박우빈",
+    "condition": ["focus_drop", "sleepy"],
+    "created_at": "2026-03-23T18:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "최시은",
+    "facility": ["too_cold"],
+    "facility_etc": "5관 48번 자리가 가끔 너무 추워요 그리고 책장이 돌려져 있어서 사용이 불편해요",
+    "rules_etc": "좌석 위치는 추운거 빼고",
+    "created_at": "2026-03-23T18:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "이한준",
+    "condition": ["focus_drop"],
+    "free_text": "없습니다",
+    "class_feedback": "없습니다",
+    "one_wish": "지금처럼 유지 되면 좋겠어요",
+    "created_at": "2026-03-23T17:30:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "이한준",
+    "created_at": "2026-03-23T17:31:00"
+  },
+  {
+    "study_room": "블랙관",
+    "student_name": "김윤호",
+    "facility": ["clock"],
+    "condition": ["worry"],
+    "rules_etc": "분위기가 너무 무서워요",
+    "created_at": "2026-03-23T17:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "전형준",
+    "facility": ["desk_chair"],
+    "condition": ["sleepy"],
+    "facility_etc": "의자가 너무 낮아요",
+    "free_text": "감사합니다",
+    "created_at": "2026-03-23T16:30:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "한승윤",
+    "facility": ["too_hot", "stuffy_air"],
+    "facility_etc": "화장실 고장난걸 안고쳐주셔요",
+    "created_at": "2026-03-23T16:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "이소윤",
+    "facility": ["stuffy_air", "corridor_noise"],
+    "noise": ["movement"],
+    "rules": ["seating", "too_strict"],
+    "condition": ["sleepy", "worry", "peer_pressure"],
+    "free_text": "다른 자리에는 수납공간이 더 많은데 5관 24번 자리에는 수납장이 뜯어져 수납공간이 부족하다",
+    "created_at": "2026-03-23T15:30:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "최서연",
+    "facility": ["too_cold", "clock"],
+    "created_at": "2026-03-23T15:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "최인서",
+    "facility": ["stuffy_air"],
+    "condition": ["dont_know_what"],
+    "facility_etc": "화장실이 안고쳐진다",
+    "created_at": "2026-03-23T14:30:00"
+  },
+  {
+    "study_room": "블랙관",
+    "student_name": "임재혁",
+    "rules": ["too_strict"],
+    "created_at": "2026-03-23T14:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "박윤건",
+    "rules": ["too_strict"],
+    "created_at": "2026-03-23T13:30:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "익명",
+    "facility_etc": "시계가 고장난것같아요",
+    "created_at": "2026-03-23T13:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "익명",
+    "facility_etc": "시계 좀 잘 맞춰주세요ㅜ 창문쪽 바람들어와서 추워요",
+    "created_at": "2026-03-23T12:30:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "익명",
+    "noise_etc": "칠판 바라보는 기준 오른쪽 뒷편에서 진동울려요",
+    "noise_severity": 3,
+    "created_at": "2026-03-23T12:00:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "익명",
+    "rules_etc": "어랑사감쌤이 5관 자습관 안에서 계속 감시해주기. 왔다갔다 10분에 한번씩 오시면 집중이 너무 안되요ㅠㅠ 그리고 1,2분 엘리베이터 때문에 늦는건데 벌점은 쫌 자제해주셨음해요..여자 사감쌤님 좀 심해요.",
+    "free_text": "5관에서 하는 전종때 티비가 너무 안보여요. 아이패드 팬촉 너무 강하게 쓰는 사람있는데 신경쓰이고, 친구 보려고 왔다갔다 하는거 막아주세요",
+    "class_feedback": "북카페, 419에 스너글 제발 뿌리지 말아주세요 머리아파요 ㅜㅜㅜㅜ",
+    "one_wish": "자리 배치",
+    "created_at": "2026-03-23T11:30:00"
+  },
+  {
+    "study_room": "5관",
+    "student_name": "익명",
+    "one_wish": "사감쌤이 5관 안에서 감시하며 분위기 조성",
+    "created_at": "2026-03-23T11:00:00"
+  },
+  {
+    "study_room": "1관",
+    "student_name": "김어랑레이스녀",
+    "facility": ["lighting", "desk_chair", "outlet", "corridor_noise"],
+    "noise": ["whispering", "chatting_time", "sleeping", "repetitive_sound", "phone_vibrate"],
+    "rules": ["study_too_long", "seating", "too_loose", "time_adjust"],
+    "condition": ["focus_drop", "dont_know_what", "sleepy", "worry", "peer_pressure"],
+    "noise_severity": 3,
+    "created_at": "2026-03-17T12:00:00"
+  }
+]

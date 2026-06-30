@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>데이터 마이그레이션 · 자습관 피드백</title>
+<style>
+  body { font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; background:#f3f4f6; padding:40px; color:#111827; }
+  .box { max-width: 720px; margin: 0 auto; background: white; padding: 32px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  h1 { font-size: 22px; margin-bottom: 14px; }
+  .warn { background:#fef3c7; padding:14px; border-radius:10px; margin: 12px 0; color:#92400e; font-size:13px; }
+  button { padding:12px 24px; border-radius:10px; border:none; background:#3b82f6; color:white; font-weight:700; font-size:14px; cursor:pointer; }
+  button:disabled { opacity:0.5; cursor:not-allowed; }
+  pre { background:#1f2937; color:#d1d5db; padding:14px; border-radius:8px; font-size:11px; overflow:auto; max-height:480px; }
+  .ok { color:#16a34a; font-weight:700; }
+  .err { color:#dc2626; font-weight:700; }
+  .progress { margin-top: 12px; font-size:13px; color:#4b5563; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🚚 기존 응답 44건 마이그레이션</h1>
+  <div class="warn">
+    ⚠️ <strong>1회만 실행</strong>해주세요. 같은 데이터가 중복 import되면 응답이 두 배가 됩니다.<br>
+    실행 후엔 이 페이지를 닫고 admin.html에서 확인하세요.
+  </div>
+  <button id="runBtn">📥 마이그레이션 시작</button>
+  <button id="checkBtn" style="background:#6b7280;">🔍 현재 응답 수 확인</button>
+  <div class="progress" id="progress"></div>
+  <pre id="log"></pre>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCUpVlY5al5uvH4wRv7WQxWrbV_OnvfPQg",
+    authDomain: "jasup-feedback.firebaseapp.com",
+    projectId: "jasup-feedback",
+    storageBucket: "jasup-feedback.firebasestorage.app",
+    messagingSenderId: "242775000792",
+    appId: "1:242775000792:web:78e5c222aa9d7891b479ad"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const log = (msg, cls) => {
+    const el = document.getElementById('log');
+    el.innerHTML += (cls ? `<span class="${cls}">${msg}</span>` : msg) + '\n';
+    el.scrollTop = el.scrollHeight;
+  };
+
+  document.getElementById('checkBtn').addEventListener('click', async () => {
+    log('현재 응답 수 조회 중...');
+    try {
+      const snap = await getDocs(collection(db, 'study_room_reports'));
+      log(`✅ 현재 study_room_reports 컬렉션: ${snap.size}건`, 'ok');
+    } catch (e) {
+      log(`❌ ${e.message}`, 'err');
+    }
+  });
+
+  document.getElementById('runBtn').addEventListener('click', async () => {
+    if (!confirm('정말 마이그레이션을 시작하시겠어요? 1회만 실행해주세요.')) return;
+    const btn = document.getElementById('runBtn');
+    btn.disabled = true;
+    btn.textContent = '진행 중...';
+
+    try {
+      const res = await fetch('migrate-data.json');
+      const data = await res.json();
+      log(`📦 총 ${data.length}건의 응답을 import합니다.`);
+
+      let ok = 0, fail = 0;
+      for (let i = 0; i < data.length; i++) {
+        const r = data[i];
+        const doc = {
+          study_room: r.study_room || '',
+          student_name: r.student_name || '익명',
+          facility: JSON.stringify(r.facility || []),
+          facility_etc: r.facility_etc || '',
+          noise: JSON.stringify(r.noise || []),
+          noise_etc: r.noise_etc || '',
+          noise_severity: r.noise_severity || 3,
+          rules: JSON.stringify(r.rules || []),
+          rules_etc: r.rules_etc || '',
+          condition: JSON.stringify(r.condition || []),
+          condition_etc: r.condition_etc || '',
+          free_text: r.free_text || '',
+          class_feedback: r.class_feedback || '',
+          one_wish: r.one_wish || '',
+          want_talk: r.want_talk || 'no',
+          status: 'new',
+          legacy: true,
+          source: 'genspark_migration',
+          created_at: r.created_at ? Timestamp.fromDate(new Date(r.created_at)) : Timestamp.now()
+        };
+        try {
+          await addDoc(collection(db, 'study_room_reports'), doc);
+          ok++;
+          document.getElementById('progress').textContent = `진행: ${i+1}/${data.length} (성공 ${ok} / 실패 ${fail})`;
+        } catch (e) {
+          fail++;
+          log(`❌ [${i}] ${r.student_name || '익명'} 실패: ${e.message}`, 'err');
+        }
+      }
+      log(`\n🎉 마이그레이션 완료 — 성공 ${ok}건, 실패 ${fail}건`, ok === data.length ? 'ok' : 'err');
+      btn.textContent = '✅ 완료';
+    } catch (e) {
+      log(`❌ 치명적 오류: ${e.message}`, 'err');
+      btn.disabled = false;
+      btn.textContent = '📥 다시 시도';
+    }
+  });
+</script>
+</body>
+</html>

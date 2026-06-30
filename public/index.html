@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f8f6f1">
+<title>무엇이든 말해보살 · 종합반 자습관</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { overflow-x: hidden; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f8f6f1;
+    min-height: 100vh;
+    color: #2d2319;
+    line-height: 1.7;
+    overflow-x: hidden;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ===== 진행률 헤더 (sticky) ===== */
+  .progress-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(248, 246, 241, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 14px 20px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .progress-brand {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e11d48;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .progress-step-label {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+  .progress-step-label strong { color: #e11d48; font-weight: 800; }
+  .progress-bar {
+    height: 6px;
+    background: #ece8de;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #fb7185, #f43f5e);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .save-indicator {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 6px;
+    text-align: right;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .save-indicator.show { opacity: 1; }
+
+  /* ===== 컨테이너 ===== */
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+
+  /* ===== 인트로 히어로 이미지 ===== */
+  .intro-hero {
+    margin-top: 28px;
+    text-align: center;
+    animation: heroFadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+  }
+  .intro-hero img {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 28px;
+    box-shadow: 0 20px 48px rgba(244, 63, 94, 0.22), 0 2px 8px rgba(0,0,0,0.08);
+    display: block;
+    margin: 0 auto;
+  }
+  @keyframes heroFadeIn {
+    from { opacity: 0; transform: scale(0.94) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* ===== 인트로 화면 (step 0) ===== */
+  .intro-card {
+    margin-top: 18px;
+    padding: 36px 28px 32px;
+    background: linear-gradient(160deg, #fff5f5 0%, #ffe4e6 50%, #fce7f3 100%);
+    border-radius: 28px;
+    text-align: center;
+    border: 2px solid rgba(244, 63, 94, 0.12);
+    box-shadow: 0 8px 28px rgba(244, 63, 94, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .intro-card::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(244,63,94,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .intro-card::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(251,113,133,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .intro-emoji {
+    font-size: 56px;
+    margin-bottom: 12px;
+    animation: bobble 2.5s ease-in-out infinite;
+    display: inline-block;
+  }
+  @keyframes bobble {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-8px) rotate(5deg); }
+  }
+  .intro-pretitle {
+    font-size: 12px;
+    font-weight: 700;
+    color: #e11d48;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .intro-title {
+    font-size: 30px;
+    font-weight: 900;
+    color: #1a1310;
+    margin-bottom: 14px;
+    line-height: 1.3;
+    position: relative;
+  }
+  .intro-title .accent { color: #e11d48; }
+  .intro-desc {
+    font-size: 14px;
+    color: #6b5847;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .intro-desc strong { color: #e11d48; font-weight: 700; }
+  .intro-promise {
+    background: rgba(255,255,255,0.7);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin: 20px 0 24px;
+    text-align: left;
+    position: relative;
+    border: 1px solid rgba(244, 63, 94, 0.1);
+  }
+  .intro-promise-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #4b3a2c;
+    line-height: 1.6;
+  }
+  .intro-promise-row:last-child { margin-bottom: 0; }
+  .intro-promise-row .icon {
+    flex-shrink: 0;
+    font-size: 16px;
+    margin-top: 1px;
+  }
+  .intro-promise-row strong { color: #1a1310; font-weight: 700; }
+  .start-btn {
+    width: 100%;
+    padding: 17px 28px;
+    background: linear-gradient(135deg, #f43f5e, #e11d48);
+    color: white;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: 'Noto Sans KR', sans-serif;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 24px rgba(244, 63, 94, 0.35);
+    position: relative;
+    z-index: 2;
+  }
+  .start-btn:active { transform: translateY(1px) scale(0.98); }
+  .intro-note {
+    margin-top: 16px;
+    font-size: 11px;
+    color: #9ca3af;
+    position: relative;
+  }
+
+  /* ===== 스텝 화면 공통 ===== */
+  .step-screen {
+    display: none;
+    animation: stepFadeIn 0.4s ease;
+  }
+  .step-screen.active { display: block; }
+  @keyframes stepFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-header {
+    padding: 24px 0 4px;
+  }
+  .step-tag {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  .step-tag.tag-room { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+  .step-tag.tag-facility { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
+  .step-tag.tag-noise { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+  .step-tag.tag-rules { background: linear-gradient(135deg, #4ade80, #22c55e); }
+  .step-tag.tag-condition { background: linear-gradient(135deg, #c084fc, #a855f7); }
+  .step-tag.tag-final { background: linear-gradient(135deg, #fb7185, #f43f5e); }
+
+  .step-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: #1a1310;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .step-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .step-subtitle strong { color: #4b3a2c; font-weight: 600; }
+
+  /* ===== 카드 (체크박스, 선택) ===== */
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-card {
+    position: relative;
+    cursor: pointer;
+    display: block;
+  }
+  .option-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .option-card .card-body {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: #fff;
+    border: 1.5px solid #ece8de;
+    border-radius: 16px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  }
+  .option-card:active .card-body { transform: scale(0.98); }
+  .option-card input:checked + .card-body {
+    border-width: 2px;
+    padding: 15px 17px;
+  }
+  .option-card .card-icon {
+    font-size: 24px;
+    width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .option-card .card-text {
+    flex: 1;
+  }
+  .option-card .card-main {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #2d2319;
+    line-height: 1.4;
+  }
+  .option-card .card-sub {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .option-card .card-check {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #d6d0c0;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: #fff;
+  }
+  .option-card .card-check::after {
+    content: '✓';
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .option-card input:checked + .card-body .card-check::after { opacity: 1; }
+
+  /* 색상 테마 */
+  .theme-facility .option-card input:checked + .card-body { background: #eff6ff; border-color: #3b82f6; }
+  .theme-facility .option-card input:checked + .card-body .card-check { background: #3b82f6; border-color: #3b82f6; }
+  .theme-noise .option-card input:checked + .card-body { background: #fffbeb; border-color: #f59e0b; }
+  .theme-noise .option-card input:checked + .card-body .card-check { background: #f59e0b; border-color: #f59e0b; }
+  .theme-rules .option-card input:checked + .card-body { background: #f0fdf4; border-color: #22c55e; }
+  .theme-rules .option-card input:checked + .card-body .card-check { background: #22c55e; border-color: #22c55e; }
+  .theme-condition .option-card input:checked + .card-body { background: #faf5ff; border-color: #a855f7; }
+  .theme-condition .option-card input:checked + .card-body .card-check { background: #a855f7; border-color: #a855f7; }
+  .theme-room .option-card input:checked + .card-body { background: #fef2f2; border-color: #f43f5e; }
+  .theme-room .option-card input:checked + .card-body .card-check { background: #f43f5e; border-color: #f43f5e; }
+
+  /* ===== 텍스트 영역 ===== */
+  .text-group {
+    margin-top: 22px;
+    padding: 18px;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #ece8de;
+  }
+  .text-group-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b3a2c;
+    margin-bottom: 4px;
+    line-height: 1.5;
+  }
+  .text-group-sub {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .text-group textarea, .text-group input[type="text"] {
+    width: 100%;
+    min-height: 80px;
+    padding: 14px;
+    background: #faf8f3;
+    border: 1.5px solid #ece8de;
+    border-radius: 12px;
+    color: #1f2937;
+    font-size: 14.5px;
+    font-family: 'Noto Sans KR', sans-serif;
+    resize: vertical;
+    outline: none;
+    transition: all 0.2s;
+    line-height: 1.6;
+  }
+  .text-group input[type="text"] { min-height: 0; }
+  .text-group textarea:focus, .text-group input[type="text"]:focus {
+    border-color: #f43f5e;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.08);
+  }
+  .text-group textarea::placeholder, .text-group input::placeholder { color: #c4b9a4; font-style: italic; }
+  .char-counter {
+    text-align: right;
+    font-size: 11px;
+    color: #c4b9a4;
+    margin-top: 6px;
+  }
+
+  /* ===== 심각도 슬라이더 ===== */
+  .severity-card {
+    margin-top: 22px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #ece8de;
+  }
+  .severity-card-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b3a2c;
+    margin-bottom: 14px;
+  }
+  .severity-display {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .severity-emoji {
+    font-size: 40px;
+    margin-bottom: 4px;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  .severity-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f59e0b;
+  }
+  .severity-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: linear-gradient(90deg, #86efac, #fde047, #f87171);
+    border-radius: 4px;
+    outline: none;
+  }
+  .severity-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #f59e0b;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .severity-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #f59e0b;
+    cursor: pointer;
+  }
+  .severity-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #c4b9a4;
+    margin-top: 8px;
+  }
+
+  /* ===== 라디오 (yes/no) ===== */
+  .radio-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .radio-card {
+    flex: 1;
+    cursor: pointer;
+    position: relative;
+  }
+  .radio-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .radio-card .radio-body {
+    text-align: center;
+    padding: 16px 10px;
+    background: #fff;
+    border: 1.5px solid #ece8de;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    transition: all 0.2s;
+  }
+  .radio-card input:checked + .radio-body {
+    background: #fef2f2;
+    border-color: #f43f5e;
+    color: #e11d48;
+    border-width: 2px;
+    padding: 15px 9px;
+  }
+
+  /* ===== 자습관 그리드 (인트로 후 첫 선택) ===== */
+  .room-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  @media (min-width: 480px) {
+    .room-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  .room-tile {
+    padding: 20px 12px;
+    background: #fff;
+    border: 1.5px solid #ece8de;
+    border-radius: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 700;
+    color: #4b3a2c;
+    font-size: 17px;
+  }
+  .room-tile:active { transform: scale(0.96); }
+  .room-tile.selected {
+    background: linear-gradient(135deg, #fef2f2, #fce7f3);
+    border-color: #f43f5e;
+    color: #e11d48;
+    box-shadow: 0 4px 16px rgba(244, 63, 94, 0.15);
+    border-width: 2px;
+    padding: 19px 11px;
+  }
+  .room-tile-loc {
+    font-size: 10px;
+    color: #9ca3af;
+    font-weight: 500;
+    margin-top: 2px;
+    letter-spacing: 0.3px;
+  }
+  .room-tile.selected .room-tile-loc { color: #f87171; }
+
+  .name-input-card {
+    margin-top: 12px;
+    padding: 18px;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #ece8de;
+  }
+  .name-input-card label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b3a2c;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .name-input-card .helper {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+    display: block;
+    line-height: 1.5;
+  }
+  .name-input-card input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #faf8f3;
+    border: 1.5px solid #ece8de;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .name-input-card input:focus {
+    border-color: #f43f5e;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.08);
+  }
+  .anon-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f0fdf4;
+    color: #16a34a;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: 8px;
+  }
+
+  /* ===== 푸터 버튼 ===== */
+  .step-footer {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(248,246,241,0.95) 30%, #f8f6f1 100%);
+    padding: 20px 0 16px;
+    margin-top: 32px;
+    display: flex;
+    gap: 10px;
+    z-index: 40;
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-btn-prev {
+    background: #fff;
+    color: #6b7280;
+    border: 1.5px solid #ece8de;
+    flex: 0 0 110px;
+  }
+  .nav-btn-prev:active { background: #f3f4f6; }
+  .nav-btn-next {
+    background: linear-gradient(135deg, #f43f5e, #e11d48);
+    color: white;
+    box-shadow: 0 6px 20px rgba(244, 63, 94, 0.3);
+  }
+  .nav-btn-next:active { transform: translateY(1px); }
+  .nav-btn-next:disabled {
+    opacity: 0.5;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .nav-btn-submit {
+    background: linear-gradient(135deg, #f43f5e, #e11d48);
+    color: white;
+    box-shadow: 0 6px 20px rgba(244, 63, 94, 0.35);
+  }
+
+  /* ===== 응원 메시지 ===== */
+  .encourage {
+    text-align: center;
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #fff5f5, #fce7f3);
+    border-radius: 14px;
+    font-size: 13px;
+    color: #be185d;
+    font-weight: 600;
+    border: 1px dashed rgba(244, 63, 94, 0.3);
+  }
+
+  /* ===== 완료 화면 ===== */
+  .done-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+    animation: stepFadeIn 0.5s ease;
+  }
+  .done-screen.active { display: block; }
+  .done-emoji {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: bounceIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes bounceIn {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .done-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #1a1310;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .done-title .accent { color: #e11d48; }
+  .done-desc {
+    font-size: 14px;
+    color: #6b5847;
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+  .done-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 22px;
+    margin: 24px 0;
+    text-align: left;
+    border: 1px solid #ece8de;
+  }
+  .done-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e11d48;
+    margin-bottom: 8px;
+  }
+  .done-card-text {
+    font-size: 13px;
+    color: #4b3a2c;
+    line-height: 1.7;
+  }
+  .done-btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #f43f5e, #e11d48);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    box-shadow: 0 6px 20px rgba(244, 63, 94, 0.3);
+  }
+
+  /* ===== 스피너 ===== */
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== 토스트 (간단한 알림) ===== */
+  .toast-mini {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1f2937;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    z-index: 999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  .toast-mini.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ===== 자습관 선택된 칩 (헤더에) ===== */
+  .room-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(244, 63, 94, 0.08);
+    color: #e11d48;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 6px;
+  }
+
+  /* ===== 키워드 칩 (자유서술 보조) ===== */
+  .keyword-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .keyword-chip {
+    padding: 5px 12px;
+    background: #faf8f3;
+    border: 1px solid #ece8de;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #6b5847;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .keyword-chip:active { transform: scale(0.95); }
+  .keyword-chip.selected {
+    background: #fef2f2;
+    border-color: #f43f5e;
+    color: #e11d48;
+  }
+</style>
+</head>
+<body>
+
+<!-- 진행률 헤더 -->
+<div class="progress-header" id="progressHeader" style="display:none;">
+  <div class="progress-top">
+    <div class="progress-brand">🙏 무엇이든 말해보살<span class="room-chip" id="roomChip" style="display:none;"></span></div>
+    <div class="progress-step-label"><strong id="curStep">1</strong>/<span id="totalSteps">6</span></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="save-indicator" id="saveIndicator">💾 자동 저장됨</div>
+</div>
+
+<div class="container">
+
+  <!-- ===== 인트로 ===== -->
+  <div class="step-screen active" id="screen-intro" data-step="0">
+    <div class="intro-hero">
+      <img src="images/intro.png" alt="종합반 사감장 김어랑" loading="eager">
+    </div>
+    <div class="intro-card">
+      <div class="intro-emoji">🙏</div>
+      <div class="intro-pretitle">종합반 사감장 김어랑의</div>
+      <h1 class="intro-title">무엇이든 <span class="accent">말해보살</span></h1>
+      <p class="intro-desc">
+        사소해서 말 못한 것, 누구한테 말해야 할지 몰랐던 것,<br>
+        그냥 참고 있던 것 <strong>전부 다 들을게요.</strong><br>
+        한 줄이어도, 두 줄이어도, 정말 괜찮아요.
+      </p>
+      <div class="intro-promise">
+        <div class="intro-promise-row">
+          <span class="icon">🔒</span>
+          <span><strong>익명이어도 됩니다.</strong> 이름은 적고 싶을 때만 적어주세요.</span>
+        </div>
+        <div class="intro-promise-row">
+          <span class="icon">👀</span>
+          <span><strong>김어랑 사감장이 직접</strong> 한 글자도 빠짐없이 읽습니다.</span>
+        </div>
+        <div class="intro-promise-row">
+          <span class="icon">✨</span>
+          <span><strong>다음 주부터 바뀝니다.</strong> 받은 의견은 실제 운영 개선에 씁니다.</span>
+        </div>
+      </div>
+      <button class="start-btn" id="startBtn">📝 시작하기 (약 2~3분)</button>
+      <div class="intro-note">중간에 닫아도 작성 중인 내용은 자동 저장돼요</div>
+    </div>
+  </div>
+
+  <!-- ===== STEP 1: 자습관 + 이름 ===== -->
+  <div class="step-screen" id="screen-room" data-step="1">
+    <div class="step-header">
+      <span class="step-tag tag-room">STEP 1</span>
+      <h2 class="step-title">어느 자습관에서 공부하나요?</h2>
+      <p class="step-subtitle">본인이 가장 자주 이용하는 자습관을 골라주세요.</p>
+    </div>
+    <div class="room-grid theme-room" id="roomGrid">
+      <div class="room-tile" data-room="1관">1관<div class="room-tile-loc">2층</div></div>
+      <div class="room-tile" data-room="2관">2관<div class="room-tile-loc">3층</div></div>
+      <div class="room-tile" data-room="3관">3관<div class="room-tile-loc">4층</div></div>
+      <div class="room-tile" data-room="419관">419관<div class="room-tile-loc">4층</div></div>
+      <div class="room-tile" data-room="블랙관">블랙관<div class="room-tile-loc">5층</div></div>
+      <div class="room-tile" data-room="B7">B7<div class="room-tile-loc">6층</div></div>
+      <div class="room-tile" data-room="B8">B8<div class="room-tile-loc">6층</div></div>
+      <div class="room-tile" data-room="B9">B9<div class="room-tile-loc">6층</div></div>
+    </div>
+
+    <div class="name-input-card">
+      <label>이름 <span style="color: #9ca3af; font-weight: 500;">(쓰고 싶을 때만)</span></label>
+      <span class="helper">적어주시면 답변을 개별적으로 드릴 수 있어요. 비워두셔도 전혀 문제없습니다.</span>
+      <input type="text" id="nameInput" placeholder="예: 김어랑 (선택)" maxlength="30">
+      <div class="anon-badge">🔒 익명으로 보내도 괜찮아요</div>
+    </div>
+
+    <div class="step-footer">
+      <button class="nav-btn nav-btn-next" id="nextBtn-1" disabled>다음으로 →</button>
+    </div>
+  </div>
+
+  <!-- ===== STEP 2: 시설 ===== -->
+  <div class="step-screen" id="screen-facility" data-step="2">
+    <div class="step-header">
+      <span class="step-tag tag-facility">STEP 2 · 시설</span>
+      <h2 class="step-title">🏫 자습관 환경, 어때요?</h2>
+      <p class="step-subtitle">덥거나, 춥거나, 의자가 불편하거나… <strong>해당되는 거 다 체크</strong>해주세요.</p>
+    </div>
+    <div class="options-grid theme-facility" data-cat="facility">
+      <label class="option-card"><input type="checkbox" name="facility" value="too_hot"><div class="card-body"><span class="card-icon">🥵</span><div class="card-text"><div class="card-main">너무 덥다</div><div class="card-sub">냉방이 부족하거나 안 되는 느낌</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="facility" value="too_cold"><div class="card-body"><span class="card-icon">🥶</span><div class="card-text"><div class="card-main">너무 춥다</div><div class="card-sub">에어컨 바람이 직접 닿거나 외풍</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="facility" value="stuffy_air"><div class="card-body"><span class="card-icon">😮‍💨</span><div class="card-text"><div class="card-main">공기가 탁해요 / 환기가 안 돼요</div><div class="card-sub">냄새, 먼지, 답답함</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="facility" value="lighting"><div class="card-body"><span class="card-icon">💡</span><div class="card-text"><div class="card-main">조명이 불편해요</div><div class="card-sub">너무 밝거나, 어둡거나, 깜빡임</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="facility" value="desk_chair"><div class="card-body"><span class="card-icon">🪑</span><div class="card-text"><div class="card-main">책상·의자가 불편해요</div><div class="card-sub">삐걱거림, 높이, 등받이 등</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="facility" value="outlet"><div class="card-body"><span class="card-icon">🔌</span><div class="card-text"><div class="card-main">콘센트가 부족해요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="facility" value="corridor_noise"><div class="card-body"><span class="card-icon">🚪</span><div class="card-text"><div class="card-main">방음이 안 돼요</div><div class="card-sub">복도·외부 소리가 들림</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="facility" value="restroom_water"><div class="card-body"><span class="card-icon">🚻</span><div class="card-text"><div class="card-main">화장실·정수기가 멀어요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="facility" value="clock"><div class="card-body"><span class="card-icon">🕐</span><div class="card-text"><div class="card-main">시계가 안 보이거나 없어요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="facility" value="facility_none"><div class="card-body"><span class="card-icon">✅</span><div class="card-text"><div class="card-main">불편한 점 없어요</div></div><span class="card-check"></span></div></label>
+    </div>
+
+    <div class="text-group">
+      <div class="text-group-label">📝 더 자세히 알려주세요</div>
+      <span class="text-group-sub">자리 번호나 시간대까지 적어주시면 정확하게 고칠 수 있어요.</span>
+      <textarea name="facility_etc" placeholder="예: 1관 30번 자리가 환기구 바로 아래라 너무 추워요" maxlength="500"></textarea>
+      <div class="char-counter"><span class="cnt">0</span>/500</div>
+    </div>
+
+    <div class="step-footer">
+      <button class="nav-btn nav-btn-prev" data-action="prev">← 이전</button>
+      <button class="nav-btn nav-btn-next" data-action="next">다음으로 →</button>
+    </div>
+  </div>
+
+  <!-- ===== STEP 3: 소음 ===== -->
+  <div class="step-screen" id="screen-noise" data-step="3">
+    <div class="step-header">
+      <span class="step-tag tag-noise">STEP 3 · 소음</span>
+      <h2 class="step-title">🔊 집중을 방해하는 게 있나요?</h2>
+      <p class="step-subtitle">사람을 특정하지 않아도 돼요. <strong>상황만 알려주시면</strong> 됩니다.</p>
+    </div>
+    <div class="options-grid theme-noise" data-cat="noise">
+      <label class="option-card"><input type="checkbox" name="noise" value="whispering"><div class="card-body"><span class="card-icon">🗣️</span><div class="card-text"><div class="card-main">속삭임·소곤거림이 계속 들려요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="noise" value="chatting_time"><div class="card-body"><span class="card-icon">📢</span><div class="card-text"><div class="card-main">특정 시간대에 떠드는 분위기가 있어요</div><div class="card-sub">자습 시작 직후, 쉬는 시간 전후 등</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="noise" value="sleeping"><div class="card-body"><span class="card-icon">😴</span><div class="card-text"><div class="card-main">잠자는 학생이 많아 분위기가 흐려져요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="noise" value="snack_noise"><div class="card-body"><span class="card-icon">🍫</span><div class="card-text"><div class="card-main">간식·음식 먹는 소리가 신경 쓰여요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="noise" value="repetitive_sound"><div class="card-body"><span class="card-icon">🖊️</span><div class="card-text"><div class="card-main">펜 돌리기·다리 떨기 등 반복적 소리</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="noise" value="movement"><div class="card-body"><span class="card-icon">🚶</span><div class="card-text"><div class="card-main">자리 이동·출입이 잦아 산만해요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="noise" value="phone_vibrate"><div class="card-body"><span class="card-icon">📱</span><div class="card-text"><div class="card-main">휴대폰 진동·알림 소리가 들려요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="noise" value="noise_none"><div class="card-body"><span class="card-icon">✅</span><div class="card-text"><div class="card-main">해당 없어요</div></div><span class="card-check"></span></div></label>
+    </div>
+
+    <div class="text-group">
+      <div class="text-group-label">📝 가장 심한 시간대나 구체적인 상황</div>
+      <span class="text-group-sub">언제, 어디서, 어떤 식으로 — 자세할수록 좋아요.</span>
+      <textarea name="noise_etc" placeholder="예: 야자 2교시 시작할 때 복도에서 소리가 많이 들려요" maxlength="500"></textarea>
+      <div class="char-counter"><span class="cnt">0</span>/500</div>
+    </div>
+
+    <div class="severity-card">
+      <div class="severity-card-label">소음·분위기 문제, 얼마나 심각해요?</div>
+      <div class="severity-display">
+        <div class="severity-emoji" id="sevEmoji">😊</div>
+        <div class="severity-text" id="sevText">괜찮은 편</div>
+      </div>
+      <input type="range" class="severity-slider" name="noise_severity" min="1" max="5" value="3" id="severitySlider">
+      <div class="severity-labels"><span>1 괜찮음</span><span>3 보통</span><span>5 심각</span></div>
+      <div style="text-align:center;font-size:11px;color:#9ca3af;margin-top:8px;" id="sevTouched">슬라이더를 움직여야 응답이 기록돼요</div>
+    </div>
+
+    <div class="step-footer">
+      <button class="nav-btn nav-btn-prev" data-action="prev">← 이전</button>
+      <button class="nav-btn nav-btn-next" data-action="next">다음으로 →</button>
+    </div>
+  </div>
+
+  <!-- ===== STEP 4: 운영·규칙 ===== -->
+  <div class="step-screen" id="screen-rules" data-step="4">
+    <div class="step-header">
+      <span class="step-tag tag-rules">STEP 4 · 운영</span>
+      <h2 class="step-title">📐 운영 방식, 어때요?</h2>
+      <p class="step-subtitle">자습관 규칙이나 운영 방식에서 <strong>아쉬운 점</strong>이 있나요?</p>
+    </div>
+    <div class="options-grid theme-rules" data-cat="rules">
+      <label class="option-card"><input type="checkbox" name="rules" value="study_too_long"><div class="card-body"><span class="card-icon">⏰</span><div class="card-text"><div class="card-main">자습 시간이 너무 길어요 / 쉬는 시간이 짧아요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="rules" value="seating"><div class="card-body"><span class="card-icon">💺</span><div class="card-text"><div class="card-main">좌석 배치·자리 선택에 불만이 있어요</div><div class="card-sub">자리 고정, 랜덤 배정 등</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="rules" value="too_strict"><div class="card-body"><span class="card-icon">🔒</span><div class="card-text"><div class="card-main">규칙이 너무 엄격해요</div><div class="card-sub">화장실, 물 마시기, 간식 등</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="rules" value="too_loose"><div class="card-body"><span class="card-icon">🔓</span><div class="card-text"><div class="card-main">규칙이 너무 느슨해서 집중이 안 돼요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="rules" value="teacher_diff"><div class="card-body"><span class="card-icon">👨‍🏫</span><div class="card-text"><div class="card-main">감독 선생님에 따라 분위기가 너무 달라요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="rules" value="time_adjust"><div class="card-body"><span class="card-icon">🌙</span><div class="card-text"><div class="card-main">야간자습 시간을 조정했으면 좋겠어요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="rules" value="rules_none"><div class="card-body"><span class="card-icon">✅</span><div class="card-text"><div class="card-main">불편한 점 없어요</div></div><span class="card-check"></span></div></label>
+    </div>
+
+    <div class="text-group">
+      <div class="text-group-label">📝 운영에 대해 바라는 점</div>
+      <span class="text-group-sub">구체적인 제안이 있다면 환영입니다.</span>
+      <textarea name="rules_etc" placeholder="예: 시간표가 잘 보이는 곳에 더 붙어있으면 좋겠어요" maxlength="500"></textarea>
+      <div class="char-counter"><span class="cnt">0</span>/500</div>
+    </div>
+
+    <div class="step-footer">
+      <button class="nav-btn nav-btn-prev" data-action="prev">← 이전</button>
+      <button class="nav-btn nav-btn-next" data-action="next">다음으로 →</button>
+    </div>
+  </div>
+
+  <!-- ===== STEP 5: 컨디션 ===== -->
+  <div class="step-screen" id="screen-condition" data-step="5">
+    <div class="step-header">
+      <span class="step-tag tag-condition">STEP 5 · 컨디션</span>
+      <h2 class="step-title">🧠 요즘 본인은 어때요?</h2>
+      <p class="step-subtitle">환경 탓만이 아니라 <strong>나 자신도 중요해요.</strong> 솔직하게 골라주세요.</p>
+    </div>
+    <div class="options-grid theme-condition" data-cat="condition">
+      <label class="option-card"><input type="checkbox" name="condition" value="focus_drop"><div class="card-body"><span class="card-icon">🎯</span><div class="card-text"><div class="card-main">집중력이 금방 떨어져요</div><div class="card-sub">자습이 비효율적으로 느껴짐</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="condition" value="dont_know_what"><div class="card-body"><span class="card-icon">❓</span><div class="card-text"><div class="card-main">뭘 공부해야 할지 모르겠어요</div><div class="card-sub">시간만 흘러가는 느낌</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="condition" value="sleepy"><div class="card-body"><span class="card-icon">😪</span><div class="card-text"><div class="card-main">졸음을 참기 힘들어요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="condition" value="burnout"><div class="card-body"><span class="card-icon">🔥</span><div class="card-text"><div class="card-main">번아웃이 온 것 같아요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="condition" value="worry"><div class="card-body"><span class="card-icon">💭</span><div class="card-text"><div class="card-main">고민이 많아져 공부에 손이 안 가요</div><div class="card-sub">개인적인 걱정, 스트레스</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="condition" value="peer_pressure"><div class="card-body"><span class="card-icon">📊</span><div class="card-text"><div class="card-main">주변 친구들과 비교되어 불안해요</div></div><span class="card-check"></span></div></label>
+      <label class="option-card"><input type="checkbox" name="condition" value="condition_none"><div class="card-body"><span class="card-icon">✅</span><div class="card-text"><div class="card-main">특별히 어려운 점 없어요</div></div><span class="card-check"></span></div></label>
+    </div>
+
+    <div class="text-group">
+      <div class="text-group-label">📝 자습 컨디션 관련 하고 싶은 말</div>
+      <span class="text-group-sub">힘든 점, 도움이 필요한 점 무엇이든 좋아요.</span>
+      <textarea name="condition_etc" placeholder="예: 점심 먹고 나면 너무 졸려서 1교시 자습은 거의 못 해요" maxlength="500"></textarea>
+      <div class="char-counter"><span class="cnt">0</span>/500</div>
+    </div>
+
+    <div class="encourage">🌿 거의 다 왔어요! 마지막 한 걸음만 더</div>
+
+    <div class="step-footer">
+      <button class="nav-btn nav-btn-prev" data-action="prev">← 이전</button>
+      <button class="nav-btn nav-btn-next" data-action="next">다음으로 →</button>
+    </div>
+  </div>
+
+  <!-- ===== STEP 6: 자유서술 + 면담 ===== -->
+  <div class="step-screen" id="screen-final" data-step="6">
+    <div class="step-header">
+      <span class="step-tag tag-final">마지막 · 하고 싶은 말</span>
+      <h2 class="step-title">💬 진짜로 하고 싶은 말을 들려주세요</h2>
+      <p class="step-subtitle">위에 없는 내용, 사소한 거 — <strong>아무거나, 한 줄이라도</strong> 괜찮아요.</p>
+    </div>
+
+    <div class="text-group">
+      <div class="text-group-label">💬 자유롭게 적어주세요</div>
+      <span class="text-group-sub">사소한 불편함, 바라는 점, 칭찬, 뭐든 환영입니다.</span>
+      <textarea name="free_text" rows="5" placeholder="예: 옆자리 학생이 계속 말을 걸어서 곤란한데 직접 말하기가 어려워요" maxlength="2000" style="min-height: 110px;"></textarea>
+      <div class="char-counter"><span class="cnt">0</span>/2000</div>
+    </div>
+
+    <div class="text-group">
+      <div class="text-group-label">🏫 수업시간 피드백</div>
+      <span class="text-group-sub">수업해주시는 선생님에게 말하기 힘든 게 있나요?</span>
+      <textarea name="class_feedback" placeholder="예: 수업 중에 칠판 글씨가 잘 안 보여요" maxlength="1000"></textarea>
+      <div class="char-counter"><span class="cnt">0</span>/1000</div>
+    </div>
+
+    <div class="text-group">
+      <div class="text-group-label">⭐ 자습관 환경이 개선된다면 가장 바라는 한 가지는?</div>
+      <span class="text-group-sub">이거 하나만 좋아져도 좋겠다 싶은 거.</span>
+      <textarea name="one_wish" placeholder="예: 조용한 분위기만 유지되면 좋겠어요" maxlength="500"></textarea>
+      <div class="char-counter"><span class="cnt">0</span>/500</div>
+    </div>
+
+    <div class="text-group">
+      <div class="text-group-label">🙋 선생님과 직접 이야기하고 싶으세요?</div>
+      <span class="text-group-sub">원하시면 <strong style="color:#e11d48;">개별 면담</strong>을 잡아드릴게요.</span>
+      <div class="radio-row">
+        <label class="radio-card"><input type="radio" name="want_talk" value="yes"><div class="radio-body">🙋 네, 이야기하고 싶어요</div></label>
+        <label class="radio-card"><input type="radio" name="want_talk" value="no"><div class="radio-body">🙅 아니요, 괜찮아요</div></label>
+      </div>
+    </div>
+
+    <div class="encourage">✨ 솔직하게 들려주셔서 감사해요</div>
+
+    <div class="step-footer">
+      <button class="nav-btn nav-btn-prev" data-action="prev">← 이전</button>
+      <button class="nav-btn nav-btn-submit" id="submitBtn">📨 제출하기</button>
+    </div>
+  </div>
+
+  <!-- ===== 완료 화면 ===== -->
+  <div class="done-screen" id="screen-done">
+    <div class="done-emoji">🙏</div>
+    <h2 class="done-title">소중한 의견<br><span class="accent">감사합니다.</span></h2>
+    <p class="done-desc">
+      여러분이 들려주신 이야기는<br>
+      <strong>김어랑 사감장이 한 글자도 빠짐없이 읽고</strong><br>
+      다음 주 운영 회의에서 직접 다뤄집니다.
+    </p>
+    <div class="done-card" id="talkPromise" style="display:none;">
+      <div class="done-card-title">🙋 면담 신청 접수됨</div>
+      <div class="done-card-text">
+        조만간 김어랑 사감장이 직접 면담을 잡아드릴게요.<br>
+        조용히 그리고 안전하게 이야기 나눠요.
+      </div>
+    </div>
+    <p class="done-desc" style="margin: 28px 0 20px;">정말 감사합니다. 더 나은 자습관을 만들게요. 💛</p>
+    <button class="done-btn" id="restartBtn">하나 더 적기</button>
+  </div>
+
+</div>
+
+<div class="toast-mini" id="toastMini"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCUpVlY5al5uvH4wRv7WQxWrbV_OnvfPQg",
+    authDomain: "jasup-feedback.firebaseapp.com",
+    projectId: "jasup-feedback",
+    storageBucket: "jasup-feedback.firebasestorage.app",
+    messagingSenderId: "242775000792",
+    appId: "1:242775000792:web:78e5c222aa9d7891b479ad"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window.__fb = { db, collection, addDoc, serverTimestamp };
+</script>
+
+<script>
+const VALID_ROOMS = ['1관','2관','3관','419관','블랙관','B7','B8','B9'];
+const STORAGE_KEY = 'jasupFeedback_draft_v1';
+const SCREENS = ['room','facility','noise','rules','condition','final'];
+const TOTAL = SCREENS.length;
+let currentStep = 0;
+let selectedRoom = null;
+let severityTouched = false;
+
+// --- URL 파라미터로 자습관 자동 선택 ---
+function detectRoomFromURL() {
+  const params = new URLSearchParams(location.search);
+  const room = params.get('room');
+  if (room && VALID_ROOMS.includes(room)) return room;
+  return null;
+}
+
+// --- 초기화 (저장된 임시 데이터 불러오기) ---
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    if (d._t && Date.now() - d._t > 7 * 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return d;
+  } catch { return null; }
+}
+
+function saveDraft() {
+  const data = collectData();
+  data._t = Date.now();
+  data._step = currentStep;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    showSaveIndicator();
+  } catch (e) { console.warn('저장 실패', e); }
+}
+
+function showSaveIndicator() {
+  const el = document.getElementById('saveIndicator');
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 1500);
+}
+
+function applyDraft(d) {
+  if (!d) return;
+  if (d.study_room && VALID_ROOMS.includes(d.study_room)) {
+    selectedRoom = d.study_room;
+    markRoomTile(d.study_room);
+  }
+  if (d.student_name) document.getElementById('nameInput').value = d.student_name;
+  ['facility','noise','rules','condition'].forEach(cat => {
+    let arr = [];
+    try { arr = JSON.parse(d[cat] || '[]'); } catch {}
+    arr.forEach(v => {
+      const cb = document.querySelector(`input[name="${cat}"][value="${v}"]`);
+      if (cb) cb.checked = true;
+    });
+  });
+  ['facility_etc','noise_etc','rules_etc','condition_etc','free_text','class_feedback','one_wish'].forEach(f => {
+    const el = document.querySelector(`textarea[name="${f}"]`);
+    if (el && d[f]) { el.value = d[f]; updateCharCounter(el); }
+  });
+  if (d.noise_severity) {
+    document.getElementById('severitySlider').value = d.noise_severity;
+    updateSeverityDisplay(d.noise_severity);
+    severityTouched = true;
+    const hint = document.getElementById('sevTouched');
+    if (hint) hint.style.display = 'none';
+  }
+  if (d.want_talk) {
+    const r = document.querySelector(`input[name="want_talk"][value="${d.want_talk}"]`);
+    if (r) r.checked = true;
+  }
+  updateNextBtnRoom();
+}
+
+// --- 자습관 선택 ---
+function markRoomTile(room) {
+  document.querySelectorAll('.room-tile').forEach(t => {
+    t.classList.toggle('selected', t.dataset.room === room);
+  });
+  const chip = document.getElementById('roomChip');
+  chip.textContent = '📍 ' + room;
+  chip.style.display = '';
+}
+
+function setupRoomGrid() {
+  document.querySelectorAll('.room-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      selectedRoom = tile.dataset.room;
+      markRoomTile(selectedRoom);
+      updateNextBtnRoom();
+      saveDraft();
+    });
+  });
+}
+
+function updateNextBtnRoom() {
+  const btn = document.getElementById('nextBtn-1');
+  btn.disabled = !selectedRoom;
+}
+
+// --- 상호배제 (None 옵션) ---
+function setupExclusion() {
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const name = this.name;
+      const isNone = this.value.endsWith('_none');
+      if (isNone && this.checked) {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(o => { if (o !== this) o.checked = false; });
+      } else if (!isNone && this.checked) {
+        const none = document.querySelector(`input[name="${name}"][value$="_none"]`);
+        if (none) none.checked = false;
+      }
+      saveDraft();
+    });
+  });
+}
+
+// --- 심각도 슬라이더 ---
+const SEV_EMOJI = ['😊','🙂','😐','😟','😩'];
+const SEV_TEXT  = ['괜찮은 편', '조금 신경 쓰여요', '보통이에요', '꽤 거슬려요', '매우 심각해요'];
+const SEV_COLOR = ['#22c55e','#84cc16','#f59e0b','#f97316','#ef4444'];
+
+function updateSeverityDisplay(v) {
+  const n = parseInt(v) - 1;
+  document.getElementById('sevEmoji').textContent = SEV_EMOJI[n];
+  const t = document.getElementById('sevText');
+  t.textContent = SEV_TEXT[n];
+  t.style.color = SEV_COLOR[n];
+}
+
+// --- 문자 카운터 ---
+function updateCharCounter(textarea) {
+  const card = textarea.closest('.text-group');
+  if (!card) return;
+  const cnt = card.querySelector('.cnt');
+  if (cnt) cnt.textContent = textarea.value.length;
+}
+
+// --- 데이터 수집 ---
+function getChecked(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
+}
+
+function val(sel) {
+  const el = document.querySelector(sel);
+  return el ? el.value.trim() : '';
+}
+
+function collectData() {
+  return {
+    study_room: selectedRoom || '',
+    student_name: document.getElementById('nameInput').value.trim() || '익명',
+    facility: JSON.stringify(getChecked('facility')),
+    facility_etc: val('textarea[name="facility_etc"]'),
+    noise: JSON.stringify(getChecked('noise')),
+    noise_etc: val('textarea[name="noise_etc"]'),
+    noise_severity: severityTouched ? parseInt(document.getElementById('severitySlider').value) : null,
+    rules: JSON.stringify(getChecked('rules')),
+    rules_etc: val('textarea[name="rules_etc"]'),
+    condition: JSON.stringify(getChecked('condition')),
+    condition_etc: val('textarea[name="condition_etc"]'),
+    free_text: val('textarea[name="free_text"]'),
+    class_feedback: val('textarea[name="class_feedback"]'),
+    one_wish: val('textarea[name="one_wish"]'),
+    want_talk: document.querySelector('input[name="want_talk"]:checked')?.value || ''
+  };
+}
+
+// --- 스텝 전환 ---
+function gotoStep(step) {
+  document.querySelectorAll('.step-screen').forEach(s => s.classList.remove('active'));
+  document.querySelector('.done-screen').classList.remove('active');
+  if (step === 0) {
+    document.getElementById('screen-intro').classList.add('active');
+    document.getElementById('progressHeader').style.display = 'none';
+  } else if (step >= 1 && step <= TOTAL) {
+    document.getElementById('screen-' + SCREENS[step - 1]).classList.add('active');
+    document.getElementById('progressHeader').style.display = '';
+    document.getElementById('curStep').textContent = step;
+    document.getElementById('totalSteps').textContent = TOTAL;
+    document.getElementById('progressFill').style.width = (step / TOTAL * 100) + '%';
+  }
+  currentStep = step;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext() {
+  if (currentStep === 1 && !selectedRoom) {
+    toast('자습관을 먼저 골라주세요');
+    return;
+  }
+  saveDraft();
+  if (currentStep < TOTAL) gotoStep(currentStep + 1);
+}
+
+function goPrev() {
+  if (currentStep > 1) gotoStep(currentStep - 1);
+}
+
+// --- 토스트 ---
+function toast(msg) {
+  const t = document.getElementById('toastMini');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// --- 제출 ---
+async function submit() {
+  if (!selectedRoom) {
+    toast('자습관 선택이 누락되었어요');
+    gotoStep(1);
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>제출 중...';
+
+  const data = collectData();
+
+  try {
+    if (!window.__fb) throw new Error('Firebase 로딩 중');
+    const payload = { ...data, created_at: window.__fb.serverTimestamp(), status: 'new', client_t: Date.now() };
+    await window.__fb.addDoc(window.__fb.collection(window.__fb.db, 'study_room_reports'), payload);
+
+    localStorage.removeItem(STORAGE_KEY);
+    document.getElementById('talkPromise').style.display = data.want_talk === 'yes' ? '' : 'none';
+    document.querySelectorAll('.step-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('progressHeader').style.display = 'none';
+    document.getElementById('screen-done').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) {
+    console.error(e);
+    toast('제출 실패. 잠시 후 다시 시도해주세요');
+    btn.disabled = false;
+    btn.innerHTML = '📨 제출하기';
+  }
+}
+
+// --- 시작 ---
+document.addEventListener('DOMContentLoaded', () => {
+  setupRoomGrid();
+  setupExclusion();
+
+  // 자동 자습관 선택 (URL ?room=)
+  const urlRoom = detectRoomFromURL();
+  if (urlRoom) {
+    selectedRoom = urlRoom;
+    markRoomTile(urlRoom);
+  }
+
+  // 임시 저장 복원
+  const draft = loadDraft();
+  if (draft) {
+    applyDraft(draft);
+    if (draft._step && draft._step > 0 && draft._step <= TOTAL) {
+      // 인트로는 건너뛰고 작성 중이던 위치로
+      setTimeout(() => {
+        if (confirm('작성 중이던 내용이 있어요. 이어서 작성할까요?')) {
+          gotoStep(draft._step);
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+          location.reload();
+        }
+      }, 300);
+    }
+  }
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    if (urlRoom) {
+      gotoStep(2); // 자습관 이미 선택되어 있으면 STEP 2부터
+    } else {
+      gotoStep(1);
+    }
+  });
+
+  document.querySelectorAll('[data-action="next"]').forEach(b => b.addEventListener('click', goNext));
+  document.querySelectorAll('[data-action="prev"]').forEach(b => b.addEventListener('click', goPrev));
+  document.getElementById('nextBtn-1').addEventListener('click', goNext);
+
+  // 슬라이더
+  const slider = document.getElementById('severitySlider');
+  slider.addEventListener('input', () => {
+    severityTouched = true;
+    const hint = document.getElementById('sevTouched');
+    if (hint) hint.style.display = 'none';
+    updateSeverityDisplay(slider.value);
+    saveDraft();
+  });
+  updateSeverityDisplay(slider.value);
+
+  // 텍스트 입력 자동 저장 + 카운터
+  document.querySelectorAll('textarea').forEach(ta => {
+    ta.addEventListener('input', () => { updateCharCounter(ta); });
+    ta.addEventListener('blur', saveDraft);
+  });
+  document.getElementById('nameInput').addEventListener('blur', saveDraft);
+  document.querySelectorAll('input[name="want_talk"]').forEach(r => r.addEventListener('change', saveDraft));
+
+  document.getElementById('submitBtn').addEventListener('click', submit);
+  document.getElementById('restartBtn').addEventListener('click', () => location.reload());
+
+  // 이름 입력 후 다음 버튼 활성화 체크
+  updateNextBtnRoom();
+});
+</script>
+</body>
+</html>
