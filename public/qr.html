@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QR 코드 인쇄 · 무엇이든 말해보살</title>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -99,8 +98,20 @@
     display: inline-block;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     margin-bottom: 10px;
+    position: relative;
   }
-  .qr-img-wrap canvas { display: block; }
+  .qr-img-wrap > img.qr { display: block; width: 200px; height: 200px; }
+  .qr-img-wrap > img.face {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 3px solid white;
+    background: white;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
   .qr-cta {
     font-size: 12px;
     font-weight: 700;
@@ -147,7 +158,11 @@
     .qr-title { font-size: 64px; margin-bottom: 6px; }
     .qr-loc { font-size: 18px; margin-bottom: 28px; }
     .qr-img-wrap { padding: 18px; border-radius: 18px; margin-bottom: 22px; }
-    .qr-img-wrap canvas { width: 90mm !important; height: 90mm !important; }
+    .qr-img-wrap > img.qr { width: 90mm !important; height: 90mm !important; }
+    .qr-img-wrap > img.face {
+      width: 24mm !important; height: 24mm !important;
+      border-width: 5px !important;
+    }
     .qr-cta { font-size: 22px; line-height: 1.7; margin-bottom: 14px; }
     .qr-footer { font-size: 14px; padding-top: 14px; margin-top: 14px; }
     .qr-url { font-size: 12px; margin-top: 6px; }
@@ -191,6 +206,12 @@ const ROOMS = [
 
 const grid = document.getElementById('qrGrid');
 
+// QR 이미지 API (에러 정정 레벨 H = 30% 가림 허용, 얼굴 오버레이용)
+function qrSrc(text) {
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=10&ecc=H&data=' + encodeURIComponent(text);
+}
+const FACE = 'master.png';
+
 // 공용 QR (먼저 배치)
 const publicCard = document.createElement('div');
 publicCard.className = 'qr-card public';
@@ -198,7 +219,7 @@ publicCard.innerHTML = `
   <div class="qr-pretitle">🙏 무엇이든 말해보살</div>
   <div class="qr-title">공용 QR</div>
   <div class="qr-loc">복도 · 정수기 · 화장실 등</div>
-  <div class="qr-img-wrap" id="qr-public"></div>
+  <div class="qr-img-wrap"><img class="qr" src="${qrSrc(BASE)}" alt="공용 QR"><img class="face" src="${FACE}" alt=""></div>
   <div class="qr-cta">자습관 안 어떠세요?<br><strong>아무거나 편하게</strong> 말해주세요</div>
   <div class="qr-footer">종합반 사감장 김어랑</div>
   <div class="qr-url">${BASE}</div>
@@ -213,25 +234,12 @@ ROOMS.forEach(room => {
     <div class="qr-pretitle">🙏 무엇이든 말해보살</div>
     <div class="qr-title">${room.name}</div>
     <div class="qr-loc">${room.loc} · 자습관 내부 부착용</div>
-    <div class="qr-img-wrap" id="qr-${room.name}"></div>
+    <div class="qr-img-wrap"><img class="qr" src="${qrSrc(room.url)}" alt="${room.name} QR"><img class="face" src="${FACE}" alt=""></div>
     <div class="qr-cta">${room.name} 어떠세요?<br><strong>참고 있던 거 다</strong> 말해주세요</div>
     <div class="qr-footer">종합반 사감장 김어랑</div>
     <div class="qr-url">?room=${room.name}</div>
   `;
   grid.appendChild(card);
-});
-
-// QR 생성
-const qrOpts = { width: 200, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#1a1310', light: '#ffffff' } };
-
-QRCode.toCanvas(BASE, qrOpts, (err, canvas) => {
-  if (!err) document.getElementById('qr-public').appendChild(canvas);
-});
-
-ROOMS.forEach(room => {
-  QRCode.toCanvas(room.url, qrOpts, (err, canvas) => {
-    if (!err) document.getElementById('qr-' + room.name).appendChild(canvas);
-  });
 });
 </script>
 </body>
