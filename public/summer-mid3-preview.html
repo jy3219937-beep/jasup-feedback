@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정율사관 2026 Summer Hot습 · 예비고1 · 크리에이터 링크 시안</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* ==============================================
+     정율사관 브랜드 컬러 팔레트 (크리에이터 링크 HTML/CSS 편집에 그대로 사용)
+     ============================================== */
+  :root {
+    --primary:  #1a3a6e;   /* 정율사관 진남색 - 메인 브랜드 */
+    --accent:   #d4a24c;   /* 골드 - 포인트 / 버튼 / 강조 */
+    --danger:   #c0392b;   /* 붉은 강조 - 마감/혜택 */
+    --bg:       #f5f3ee;   /* 아이보리 배경 */
+    --white:    #ffffff;
+    --text:     #1a1a1a;   /* 본문 텍스트 */
+    --sub:      #666666;   /* 부가 텍스트 */
+    --border:   #e8e4dc;   /* 테두리 */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    background: #e5e5e5;
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: 24px 0;
+  }
+
+  /* 크리에이터 링크 페이지 컨테이너 (실제 폭 흉내) */
+  .cl-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--white);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+  }
+
+  /* 블록 라벨 (실제 사이트에는 안 보임 - 참고용) */
+  .block-label {
+    background: #333;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    letter-spacing: 0.5px;
+    font-family: 'SF Mono', Menlo, monospace;
+  }
+  .block-label span { color: var(--accent); }
+
+  /* ========== 색상 팔레트 안내 (편집용) ========== */
+  .palette {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    padding: 16px 20px;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    font-size: 12px;
+  }
+  .palette strong { margin-right: 8px; }
+  .swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'SF Mono', Menlo, monospace;
+  }
+  .swatch::before {
+    content: '';
+    width: 14px; height: 14px;
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .swatch.p1::before { background: #1a3a6e; }
+  .swatch.p2::before { background: #d4a24c; }
+  .swatch.p3::before { background: #c0392b; }
+  .swatch.p4::before { background: #f5f3ee; }
+  .swatch.p5::before { background: #666666; }
+
+  /* ============================================
+     1. 메뉴 블록 (Menu Block)
+     ============================================ */
+  .cl-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 32px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .cl-menu .logo {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+  }
+  .cl-menu nav { display: flex; gap: 28px; }
+  .cl-menu nav a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .cl-menu nav a.active { color: var(--primary); }
+
+  /* ============================================
+     2. 카운트다운 블록 (Countdown Block)
+     ============================================ */
+  .cl-countdown {
+    background: var(--primary);
+    color: var(--white);
+    text-align: center;
+    padding: 20px 24px;
+  }
+  .cl-countdown .label {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .cl-countdown .timer {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  .cl-countdown .timer div {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(212,162,76,0.4);
+    padding: 10px 16px;
+    border-radius: 6px;
+    min-width: 64px;
+  }
+  .cl-countdown .num {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--accent);
+    display: block;
+  }
+  .cl-countdown .unit {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ============================================
+     3. 슬라이드쇼 블록 (Slideshow - Background Image Type)
+     ============================================ */
+  .cl-slideshow {
+    position: relative;
+    background:
+      linear-gradient(rgba(26,58,110,0.75), rgba(13,37,71,0.85)),
+      #2a4a7a;
+    color: var(--white);
+    padding: 100px 32px;
+    text-align: center;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .cl-slideshow::before {
+    content: '[ 배경 이미지: 자습관 1인 지정석 전경 사진 업로드 ]';
+    position: absolute;
+    top: 20px; left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 14px;
+    border: 1px dashed rgba(255,255,255,0.4);
+    border-radius: 4px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+  .cl-slideshow .eyebrow {
+    color: var(--accent);
+    font-size: 14px;
+    letter-spacing: 4px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .cl-slideshow h1 {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+  }
+  .cl-slideshow h1 .accent { color: var(--accent); }
+  .cl-slideshow .sub {
+    font-size: 18px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.7;
+    margin-bottom: 28px;
+    max-width: 560px;
+  }
+  .cl-slideshow .date-pill {
+    display: inline-block;
+    padding: 10px 24px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(212,162,76,0.5);
+    border-radius: 100px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 36px;
+  }
+  .cl-slideshow .buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .cl-slideshow .btn {
+    padding: 16px 32px;
+    background: var(--accent);
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(212,162,76,0.35);
+  }
+  .cl-slideshow .btn.outline {
+    background: transparent;
+    border: 2px solid var(--white);
+    color: var(--white);
+    box-shadow: none;
+  }
+
+  /* ============================================
+     4~13. 공통 텍스트 블록 (Text Block)
+     ============================================ */
+  .cl-text {
+    padding: 80px 40px;
+    background: var(--white);
+  }
+  .cl-text.gray { background: var(--bg); }
+  .cl-text.dark { background: var(--primary); color: var(--white); }
+  .cl-text .eyebrow {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .cl-text h2 {
+    font-size: 38px;
+    font-weight: 900;
+    line-height: 1.3;
+    letter-spacing: -1px;
+    margin-bottom: 28px;
+  }
+  .cl-text .body {
+    max-width: 720px;
+  }
+  .cl-text p {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .cl-text.dark p { color: rgba(255,255,255,0.9); }
+
+  /* 표 (크리에이터 링크 텍스트 블록 - 표 삽입) */
+  .cl-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 16px;
+  }
+  .cl-table th, .cl-table td {
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .cl-table th {
+    background: var(--primary);
+    color: var(--white);
+    font-weight: 700;
+    width: 100px;
+    font-size: 15px;
+  }
+  .cl-table td { background: var(--white); }
+
+  /* 인용 강조 박스 (텍스트 블록 안 배경색 지정) */
+  .cl-callout {
+    background: var(--bg);
+    border-left: 4px solid var(--primary);
+    padding: 22px 24px;
+    margin: 24px 0;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .cl-callout strong { color: var(--primary); font-weight: 800; }
+
+  /* ============================================
+     6. 탭 블록 (Tab Block)
+     ============================================ */
+  .cl-tab {
+    padding: 80px 40px;
+    background: var(--white);
+  }
+  .cl-tab .tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 32px;
+    gap: 4px;
+  }
+  .cl-tab .tab {
+    padding: 16px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sub);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .cl-tab .tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--accent);
+  }
+  .cl-tab .tab-content {
+    padding: 24px 8px;
+    display: none;
+  }
+  .cl-tab .tab-content.active { display: block; }
+  .cl-tab .tab-content h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+  .cl-tab .tab-content .tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--bg);
+    color: var(--sub);
+    font-size: 13px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  .cl-tab .tab-content ul {
+    list-style: none;
+    padding: 0;
+  }
+  .cl-tab .tab-content li {
+    padding: 10px 0 10px 24px;
+    position: relative;
+    font-size: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cl-tab .tab-content li:last-child { border-bottom: none; }
+  .cl-tab .tab-content li::before {
+    content: '';
+    position: absolute;
+    left: 4px; top: 18px;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  /* ============================================
+     이미지 블록 (Image Block)
+     ============================================ */
+  .cl-image {
+    padding: 0;
+    background: var(--bg);
+  }
+  .cl-image .img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #eeeae2;
+    border: 2px dashed #c8c2b3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+  }
+  .cl-image .caption {
+    padding: 16px 32px;
+    font-size: 14px;
+    color: var(--sub);
+    text-align: center;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+  }
+
+  /* 혜택 배너 (이미지 블록으로 만들 배너 시안) */
+  .cl-image.benefit .img {
+    aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #d4a24c 0%, #b8862d 100%);
+    border: none;
+    color: var(--white);
+    flex-direction: column;
+    padding: 40px;
+  }
+  .cl-image.benefit .img .banner-tag {
+    font-size: 14px;
+    letter-spacing: 3px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .cl-image.benefit .img .banner-h {
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1.3;
+    margin-bottom: 24px;
+    letter-spacing: -1px;
+  }
+  .cl-image.benefit .img .banner-items {
+    background: rgba(255,255,255,0.2);
+    padding: 20px 32px;
+    border-radius: 8px;
+    text-align: left;
+    max-width: 500px;
+    margin-bottom: 20px;
+  }
+  .cl-image.benefit .img .banner-items div {
+    font-size: 15px;
+    padding: 6px 0;
+  }
+  .cl-image.benefit .img .banner-items s { opacity: 0.6; }
+  .cl-image.benefit .img .banner-total {
+    font-size: 20px;
+    font-weight: 900;
+    padding-top: 12px;
+    border-top: 2px solid rgba(255,255,255,0.4);
+  }
+
+  /* ============================================
+     갤러리 블록 (Gallery Block - Single Image Type)
+     ============================================ */
+  .cl-gallery {
+    padding: 80px 40px;
+    background: var(--white);
+  }
+  .cl-gallery .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .cl-gallery .item {
+    aspect-ratio: 3/4;
+    background: #eeeae2;
+    border: 2px dashed #c8c2b3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 13px;
+    text-align: center;
+    padding: 12px;
+    cursor: pointer;
+    position: relative;
+  }
+  .cl-gallery .item .badge {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: var(--primary);
+    color: var(--white);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .cl-gallery .item .badge.after { background: var(--accent); }
+
+  /* ============================================
+     차별점 3 (텍스트+이미지 반복)
+     ============================================ */
+  .cl-feature-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--white);
+    align-items: center;
+  }
+  .cl-feature-row.reverse { direction: rtl; }
+  .cl-feature-row.reverse > * { direction: ltr; }
+  .cl-feature-row .text {
+    padding: 60px 40px;
+  }
+  .cl-feature-row .img {
+    aspect-ratio: 4/3;
+    background: #eeeae2;
+    border: 2px dashed #c8c2b3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 13px;
+    padding: 20px;
+    text-align: center;
+  }
+  .cl-feature-row .num {
+    font-size: 60px;
+    font-weight: 900;
+    color: var(--accent);
+    font-family: Georgia, serif;
+    font-style: italic;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .cl-feature-row h3 {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    color: var(--primary);
+  }
+  .cl-feature-row p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  /* ============================================
+     동영상 블록 (Video Block)
+     ============================================ */
+  .cl-video {
+    padding: 60px 40px;
+    background: var(--bg);
+  }
+  .cl-video .frame {
+    aspect-ratio: 16/9;
+    background: #000;
+    color: rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  /* ============================================
+     게시판 블록 (Board Block)
+     ============================================ */
+  .cl-board {
+    padding: 80px 40px;
+    background: var(--white);
+  }
+  .cl-board table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+  }
+  .cl-board thead {
+    background: var(--bg);
+  }
+  .cl-board th, .cl-board td {
+    padding: 16px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    text-align: center;
+  }
+  .cl-board th {
+    font-weight: 700;
+    color: var(--sub);
+    font-size: 13px;
+  }
+  .cl-board td.title { text-align: left; font-weight: 600; }
+
+  /* ============================================
+     폼 블록 (Form Block)
+     ============================================ */
+  .cl-form {
+    padding: 80px 40px;
+    background: var(--primary);
+    color: var(--white);
+  }
+  .cl-form h2 { color: var(--white); }
+  .cl-form .eyebrow { color: var(--accent); }
+  .cl-form .form-body {
+    background: var(--white);
+    color: var(--text);
+    max-width: 640px;
+    margin: 32px auto 0;
+    padding: 40px;
+    border-radius: 12px;
+  }
+  .cl-form .field {
+    margin-bottom: 20px;
+  }
+  .cl-form label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .cl-form label .req { color: var(--danger); }
+  .cl-form input, .cl-form select, .cl-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  .cl-form textarea { min-height: 90px; resize: vertical; }
+  .cl-form button {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 8px;
+    font-family: inherit;
+  }
+
+  /* ============================================
+     컨택트 블록 (Contact Block)
+     ============================================ */
+  .cl-contact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--white);
+  }
+  .cl-contact .info { padding: 60px 40px; }
+  .cl-contact .info h3 {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 24px;
+  }
+  .cl-contact .info .row {
+    display: flex;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+  }
+  .cl-contact .info .row .k {
+    width: 100px;
+    color: var(--sub);
+    font-weight: 600;
+  }
+  .cl-contact .info .row .v { font-weight: 600; }
+  .cl-contact .map {
+    background: #d9e4ec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7f8f;
+    font-size: 14px;
+    min-height: 400px;
+  }
+
+  /* ============================================
+     푸터 블록 (Footer Block)
+     ============================================ */
+  .cl-footer {
+    background: #111;
+    color: rgba(255,255,255,0.5);
+    padding: 40px;
+    text-align: center;
+    font-size: 13px;
+  }
+  .cl-footer strong { color: var(--white); font-size: 15px; display: block; margin-bottom: 8px; }
+
+  /* 모바일 반응형 */
+  @media (max-width: 720px) {
+    body { padding: 0; }
+    .palette { border-radius: 0; }
+    .cl-menu { padding: 14px 20px; }
+    .cl-menu nav { gap: 16px; }
+    .cl-menu nav a { font-size: 14px; }
+    .cl-slideshow { padding: 60px 20px; min-height: 400px; }
+    .cl-slideshow h1 { font-size: 34px; }
+    .cl-slideshow .sub { font-size: 15px; }
+    .cl-text, .cl-tab, .cl-gallery, .cl-board, .cl-form { padding: 48px 20px; }
+    .cl-text h2 { font-size: 26px; }
+    .cl-feature-row { grid-template-columns: 1fr; }
+    .cl-feature-row.reverse { direction: ltr; }
+    .cl-feature-row .text { padding: 40px 20px; }
+    .cl-gallery .grid { grid-template-columns: 1fr 1fr; }
+    .cl-contact { grid-template-columns: 1fr; }
+    .cl-image.benefit .img { padding: 30px 20px; }
+    .cl-image.benefit .img .banner-h { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     🎨 색상 팔레트 (크리에이터 링크 HTML/CSS 편집에 사용할 값)
+     ═══════════════════════════════════════════════ -->
+<div class="palette">
+  <strong>🎨 브랜드 컬러 (이 hex 값 그대로 크리에이터 링크에 입력):</strong>
+  <span class="swatch p1">#1a3a6e 진남색(메인)</span>
+  <span class="swatch p2">#d4a24c 골드(포인트)</span>
+  <span class="swatch p3">#c0392b 강조빨강</span>
+  <span class="swatch p4">#f5f3ee 아이보리 배경</span>
+  <span class="swatch p5">#666666 부가텍스트</span>
+</div>
+
+<div class="cl-page">
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 1] 메뉴 블록 (Menu Block)
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 1]</span> 메뉴 블록 (Menu Block) · 로고 + 메뉴 3개</div>
+  <div class="cl-menu">
+    <div class="logo">정율사관학원</div>
+    <nav>
+      <a href="#">홈</a>
+      <a href="#" class="active">2026 Summer Hot습</a>
+      <a href="#">상담문의</a>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 2] 카운트다운 블록 (Countdown Block)
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 2]</span> 카운트다운 블록 (Countdown Block) · 목표일 2026-07-20 00:00</div>
+  <div class="cl-countdown">
+    <div class="label">정율사관 2026 SUMMER HOT습 개강까지</div>
+    <div class="timer">
+      <div><span class="num">13</span><span class="unit">DAYS</span></div>
+      <div><span class="num">05</span><span class="unit">HOURS</span></div>
+      <div><span class="num">42</span><span class="unit">MIN</span></div>
+      <div><span class="num">18</span><span class="unit">SEC</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 3] 슬라이드쇼 블록 (Slideshow · 배경 이미지형)
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 3]</span> 슬라이드쇼 블록 · 유형: 배경 이미지형 · 슬라이드 1장</div>
+  <div class="cl-slideshow">
+    <div class="eyebrow">2026 SUMMER HOT습</div>
+    <h1>예비고1,<br><span class="accent">여름이 승부다.</span></h1>
+    <div class="sub">
+      고교학점제 · 수능 · 내신 —<br>
+      고1의 3년은 이 여름 4주로 결정됩니다.
+    </div>
+    <div class="date-pill">7.20(월) ~ 8.16(일) · 4주 완성</div>
+    <div class="buttons">
+      <a href="https://pf.kakao.com/_xiqxhxlxb/chat" class="btn">카톡으로 상담 신청하기</a>
+      <a href="tel:0323219937" class="btn outline">전화 032-321-9937</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 4] 텍스트 블록 (Why Now)
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 4]</span> 텍스트 블록 · 표(2행 2열) + 배경색 지정 인용박스</div>
+  <div class="cl-text gray">
+    <div class="body">
+      <div class="eyebrow">WHY NOW</div>
+      <h2>아이의 공부,<br>어디까지 보고 계신가요?</h2>
+      <table class="cl-table">
+        <tr>
+          <th>Q.</th>
+          <td>고등학교 입학 전, 아이들이 하는 질문을 점검해보셨나요?</td>
+        </tr>
+        <tr>
+          <th>Q.</th>
+          <td>아이가 틀린 문제를 어떻게 해결해 나가는지 본 적 있으신가요?</td>
+        </tr>
+      </table>
+      <div class="cl-callout">
+        아이가 <strong>어떤 질문에서 막히고</strong>, <strong>어떤 오답을 반복하는지</strong> —<br>
+        정율사관 자습관은 이 모든 것을 <strong>30분 단위로 기록</strong>합니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 5] 텍스트 블록 (4주 로드맵)
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 5]</span> 텍스트 블록 · 표(4행 2열)로 로드맵 표현</div>
+  <div class="cl-text">
+    <div class="body">
+      <div class="eyebrow">4-WEEK ROADMAP</div>
+      <h2>진단부터 증명까지, 4주 완성</h2>
+      <table class="cl-table">
+        <tr>
+          <th>1주차</th>
+          <td><strong>진단</strong> — 레벨테스트로 현재 위치 파악, 개인 학습 루틴 세팅</td>
+        </tr>
+        <tr>
+          <th>2주차</th>
+          <td><strong>집중</strong> — 약점 영역 파고들기, 데이터로 매일 피드백</td>
+        </tr>
+        <tr>
+          <th>3주차</th>
+          <td><strong>보완</strong> — 반복과 정착, 근성 문항으로 끝까지 재도전</td>
+        </tr>
+        <tr>
+          <th>4주차</th>
+          <td><strong>증명</strong> — Before &amp; After 비교로 변화 확인</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 6] 탭 블록 (Tab Block · 커리큘럼)
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 6]</span> 탭 블록 · 탭 4개 (수학·국어·영어·과학)</div>
+  <div class="cl-tab">
+    <div class="body" style="max-width:720px;margin-bottom:24px;">
+      <div class="eyebrow" style="color:#d4a24c;font-size:13px;letter-spacing:3px;font-weight:700;margin-bottom:16px;">CURRICULUM</div>
+      <h2 style="font-size:38px;font-weight:900;line-height:1.3;letter-spacing:-1px;">고1 3년의 기초, 4과목 완성</h2>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab(event, 'math')">수학</button>
+      <button class="tab" onclick="showTab(event, 'kor')">국어</button>
+      <button class="tab" onclick="showTab(event, 'eng')">영어</button>
+      <button class="tab" onclick="showTab(event, 'sci')">과학</button>
+    </div>
+    <div id="math" class="tab-content active">
+      <h3>수학</h3>
+      <div class="tag">중3 현행 + 고1 필수공통수학 선행</div>
+      <ul>
+        <li>삼각비 · 원 · 통계 (중3 현행 마무리)</li>
+        <li>필수공통수학1 탐구기반 특강 (화·금 12:00~15:00)</li>
+        <li>대수 특강 (월·목 12:00~15:00)</li>
+      </ul>
+    </div>
+    <div id="kor" class="tab-content">
+      <h3>국어</h3>
+      <div class="tag">문학 × 문법 통합</div>
+      <ul>
+        <li>현대시 · 시조 · 현대소설 · 고전소설</li>
+        <li>문장 성분 · 품사 · 어휘 정리</li>
+        <li>고전시가 특강 (월 12:00~15:00)</li>
+      </ul>
+    </div>
+    <div id="eng" class="tab-content">
+      <h3>영어</h3>
+      <div class="tag">수능형 독해 유형 완성</div>
+      <ul>
+        <li>주제 · 요지 · 빈칸 · 순서 · 문장삽입 추론</li>
+        <li>5형식 · 능동/수동 · 시제 · 조동사</li>
+        <li>독해 어법 특강 (수 또는 토)</li>
+      </ul>
+    </div>
+    <div id="sci" class="tab-content">
+      <h3>과학</h3>
+      <div class="tag">통합과학 선행</div>
+      <ul>
+        <li>생식과 유전</li>
+        <li>에너지 전환과 보존</li>
+        <li>별과 우주</li>
+        <li>통합과학 특강 (목 12:00~15:00)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 7] 텍스트 블록 · WHY JUNGYOUL 인트로
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 7]</span> 텍스트 블록 · 차별점 3가지 도입부</div>
+  <div class="cl-text gray">
+    <div class="body">
+      <div class="eyebrow">WHY JUNGYOUL</div>
+      <h2>정율사관만의 3가지 차별점</h2>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 8~13] 차별점 3세트 = 이미지 블록 + 텍스트 블록 × 3
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 8+9]</span> 이미지 블록 + 텍스트 블록 · 차별점 01</div>
+  <div class="cl-feature-row">
+    <div class="img">[ 이미지: 자습관 좌석 + 학습이력 기록표 ]</div>
+    <div class="text">
+      <div class="num">01</div>
+      <h3>1인 지정석 자습관</h3>
+      <p>4주 내내 같은 자리. 30분 단위 블록으로 학습 이력을 기록하고, 담당 선생님이 매일 점검하고 조정합니다.</p>
+    </div>
+  </div>
+
+  <div class="block-label">📦 <span>[블록 10+11]</span> 텍스트 블록 + 이미지 블록 · 차별점 02 (좌우 반전)</div>
+  <div class="cl-feature-row reverse">
+    <div class="img">[ 이미지: IN-STUDY 대시보드 스크린샷 · 단원×행동영역 매트릭스 ]</div>
+    <div class="text">
+      <div class="num">02</div>
+      <h3>IN-STUDY 데이터 피드백</h3>
+      <p>회차별 점수·풀이시간·오답을 전부 데이터로 기록. "감"이 아니라 "근거"로 피드백합니다.</p>
+    </div>
+  </div>
+
+  <div class="block-label">📦 <span>[블록 12+13]</span> 이미지 블록 + 텍스트 블록 · 차별점 03</div>
+  <div class="cl-feature-row">
+    <div class="img">[ 이미지: 코칭 현장 사진 ]</div>
+    <div class="text">
+      <div class="num">03</div>
+      <h3>20년 전통의 학습 사이클</h3>
+      <p>수업(배우기) → 자습관(익히기) → 코칭(점검)으로 이어지는 20년간 다듬어 온 검증된 시스템.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 14] 이미지 블록 (혜택 배너 - 캔바로 만들어서 업로드)
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 14]</span> 이미지 블록 · 혜택 배너 (아래 시안대로 캔바에서 제작 후 업로드) · 이미지 링크: 카톡 상담</div>
+  <div class="cl-image benefit">
+    <div class="img">
+      <div class="banner-tag">SPECIAL BENEFIT</div>
+      <div class="banner-h">예비고1 수강생 한정<br>무료 혜택 2종</div>
+      <div class="banner-items">
+        <div>✓ 융합탐구 비교과 <s>200,000원</s> → <strong>무료</strong></div>
+        <div>✓ 앱티핏 진로적성검사 <s>100,000원</s> → <strong>무료</strong></div>
+      </div>
+      <div class="banner-total">합계 300,000원 상당 무료</div>
+    </div>
+    <div class="caption">↑ 이 디자인 그대로 캔바에서 제작 → 이미지 블록에 업로드 → 링크: 카톡 상담채널</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 15] 텍스트 블록 · Before After 인트로
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 15]</span> 텍스트 블록 · Before &amp; After 인트로</div>
+  <div class="cl-text">
+    <div class="body">
+      <div class="eyebrow">REAL CHANGE</div>
+      <h2>4주 뒤, 노트가 달라집니다</h2>
+      <p>실제 정율사관 자습관에서 4주를 보낸 예비고1 학생들의 학습 노트 변화입니다. 손글씨·필기 밀도·풀이 과정 — 모든 것이 바뀝니다.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 16] 갤러리 블록 (Single Image Type)
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 16]</span> 갤러리 블록 · 유형: 단일 이미지형 · 6장 (Before 3장 + After 3장)</div>
+  <div class="cl-gallery">
+    <div class="grid">
+      <div class="item"><div class="badge">BEFORE</div>학생 A · 입원 첫날 노트</div>
+      <div class="item"><div class="badge after">AFTER</div>학생 A · 4주 후 노트</div>
+      <div class="item"><div class="badge">BEFORE</div>학생 B · 입원 첫날 노트</div>
+      <div class="item"><div class="badge after">AFTER</div>학생 B · 4주 후 노트</div>
+      <div class="item"><div class="badge">BEFORE</div>학생 C · 입원 첫날 노트</div>
+      <div class="item"><div class="badge after">AFTER</div>학생 C · 4주 후 노트</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 17] 텍스트 블록 · 학부모 인용
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 17]</span> 텍스트 블록 · 학부모 인용문 (배경색 지정)</div>
+  <div class="cl-text gray">
+    <div class="body">
+      <div class="cl-callout" style="border-left-color:#d4a24c;font-style:italic;font-size:19px;">
+        "손글씨만 봐도 아이가 얼마나 달라졌는지 보입니다."
+        <br><span style="font-style:normal;font-size:14px;color:#666;font-weight:600;">— 예비고1 학부모 후기</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 18] 게시판 블록 · 학생 후기
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 18]</span> 게시판 블록 · 일반 게시판 · 읽기 공개 / 쓰기 관리자 전용</div>
+  <div class="cl-board">
+    <div class="body" style="max-width:720px;">
+      <div class="eyebrow" style="color:#d4a24c;font-size:13px;letter-spacing:3px;font-weight:700;margin-bottom:16px;">STUDENT VOICE</div>
+      <h2 style="font-size:38px;font-weight:900;line-height:1.3;letter-spacing:-1px;">먼저 경험한 선배들의 이야기</h2>
+    </div>
+    <table>
+      <thead>
+        <tr><th style="width:60px;">No.</th><th>제목</th><th style="width:140px;">작성자</th><th style="width:120px;">등록일</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>5</td><td class="title">여름방학 4주로 고1 첫 중간고사를 뒤집었습니다</td><td>ㅇㅇ고 1학년</td><td>2026-03-15</td></tr>
+        <tr><td>4</td><td class="title">자습관에서 매일 같은 자리에 앉는 것의 힘</td><td>ㅁㅁ고 1학년</td><td>2026-02-28</td></tr>
+        <tr><td>3</td><td class="title">IN-STUDY로 진짜 약점만 골라 공부했습니다</td><td>예비고1 수강생</td><td>2026-01-20</td></tr>
+        <tr><td>2</td><td class="title">앱티핏 결과로 계열 결정에 확신이 생겼어요</td><td>학부모</td><td>2025-12-15</td></tr>
+        <tr><td>1</td><td class="title">고교학점제 대비, 융합탐구가 진짜 도움됐어요</td><td>학부모</td><td>2025-11-30</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 19] 동영상 블록 · 유튜브 임베드
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 19]</span> 동영상 블록 · 유튜브 URL 붙여넣기</div>
+  <div class="cl-video">
+    <div class="frame">▶ [ 유튜브 후기 영상 임베드 자리 ]</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 20] 폼 블록 · 상담 신청
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 20]</span> 폼 블록 · 필드 5개 · 이메일 알림 + 엑셀 다운로드 설정</div>
+  <div class="cl-form">
+    <div class="body" style="max-width:720px;margin:0 auto;text-align:center;">
+      <div class="eyebrow">CONSULTATION</div>
+      <h2>정원 마감 전, 지금 신청하세요</h2>
+      <p style="color:rgba(255,255,255,0.85);">평일 09:00~18:00 사이 담당자가 연락드립니다.</p>
+    </div>
+    <div class="form-body">
+      <div class="field">
+        <label>학부모 성함 <span class="req">*</span></label>
+        <input type="text" placeholder="김OO">
+      </div>
+      <div class="field">
+        <label>연락처 <span class="req">*</span></label>
+        <input type="tel" placeholder="010-0000-0000">
+      </div>
+      <div class="field">
+        <label>학생 학교 / 학년 <span class="req">*</span></label>
+        <input type="text" placeholder="OO중 3학년">
+      </div>
+      <div class="field">
+        <label>상담 희망 시간대</label>
+        <select>
+          <option>선택해주세요</option>
+          <option>오전 (09:00~12:00)</option>
+          <option>오후 (13:00~17:00)</option>
+          <option>저녁 (17:00~19:00)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>문의 내용</label>
+        <textarea placeholder="궁금하신 점을 자유롭게 남겨주세요"></textarea>
+      </div>
+      <button>상담 신청하기</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 21] 컨택트 블록 · 지도 + 지점 정보
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 21]</span> 컨택트 블록 · 지점 블록 + 카카오 지도 연동</div>
+  <div class="cl-contact">
+    <div class="info">
+      <h3>정율사관학원</h3>
+      <div class="row"><span class="k">주소</span><span class="v">인천광역시 ○○구 ○○동 (실제 주소 입력)</span></div>
+      <div class="row"><span class="k">대표전화</span><span class="v">032-321-9937</span></div>
+      <div class="row"><span class="k">카카오톡</span><span class="v">@정율사관학원</span></div>
+      <div class="row"><span class="k">운영시간</span><span class="v">월~토 09:00~22:00</span></div>
+      <div class="row"><span class="k">이메일</span><span class="v">jung2@jungyoul.co.kr</span></div>
+    </div>
+    <div class="map">[ 카카오 지도 임베드 자리 - 학원 위치 마커 ]</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       [블록 22] 푸터 블록
+       ═══════════════════════════════════════════════ -->
+  <div class="block-label">📦 <span>[블록 22]</span> 푸터 블록 · 학원 정보 / 저작권</div>
+  <div class="cl-footer">
+    <strong>정율사관학원</strong>
+    032-321-9937 · jung2@jungyoul.co.kr<br>
+    © 2026 Jungyoul Academy. All rights reserved.
+  </div>
+
+</div>
+
+<script>
+  function showTab(event, id) {
+    document.querySelectorAll('.cl-tab .tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.cl-tab .tab-content').forEach(c => c.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>

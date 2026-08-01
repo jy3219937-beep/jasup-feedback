@@ -1,0 +1,14 @@
+{
+  "name": "malhaebosal-functions",
+  "description": "무엇이든 말해보살 알림 함수 (텔레그램 + 이메일)",
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^13.0.2",
+    "firebase-functions": "^6.1.1",
+    "resend": "^4.0.1"
+  },
+  "private": true
+}

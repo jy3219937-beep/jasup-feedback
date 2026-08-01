@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "jasup-feedback"
-  }
+  },
+  "targets": {
+    "jasup-feedback": {
+      "hosting": {
+        "aha-ranking": [
+          "aha-ranking"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

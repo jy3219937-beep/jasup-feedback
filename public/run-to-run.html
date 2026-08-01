@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>런투런 Run To Learn · 통합사회2 루틴 관리 · 정율사관 종합반</title>
+<meta name="description" content="고1 여름방학 4주, 루틴이 통합사회2를 끝냅니다. 정율사관 종합반 런투런.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root {
+    --primary: #1a3a6e;
+    --primary-dark: #12294d;
+    --accent:  #d4a24c;
+    --accent-soft: #f4e6c8;
+    --accent-dark: #a67d38;
+    --danger:  #c0392b;
+    --bg:      #f5f3ee;
+    --white:   #ffffff;
+    --text:    #1a1a1a;
+    --sub:     #5c5c5c;
+    --border:  #e8e4dc;
+    --highlight: #fff59d;
+
+    /* week season colors */
+    --w1: #4a7bc8;
+    --w2: #4ba884;
+    --w3: #e08a3c;
+    --w4: #c05a4a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    background: var(--white);
+    box-shadow: 0 4px 30px rgba(26,58,110,0.08);
+  }
+
+  /* ============ HEADER ============ */
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 40px;
+    background: var(--primary);
+    color: var(--white);
+  }
+  .brand { font-weight: 700; letter-spacing: 0.5px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .brand-icon {
+    width: 22px; height: 22px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    color: var(--primary-dark);
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .brand span { color: var(--accent); }
+
+  /* ============ HERO ============ */
+  .hero {
+    padding: 72px 40px 64px;
+    background: var(--bg);
+    position: relative;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--white);
+    color: var(--primary);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .hero-badge .dot { color: var(--accent); font-size: 16px; line-height: 1; }
+  .hero-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .hero-title-row .k {
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--primary);
+    background: var(--highlight);
+    padding: 0 8px;
+    line-height: 1.1;
+  }
+  .hero-title-row .e {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--sub);
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--sub);
+    margin-bottom: 40px;
+  }
+  .hero-copy {
+    font-size: 46px;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1.28;
+    letter-spacing: -1.2px;
+    margin-bottom: 28px;
+  }
+  .hero-copy .em {
+    color: var(--accent);
+    background: var(--highlight);
+    padding: 0 6px;
+  }
+  .hero-lead {
+    font-size: 16px;
+    color: var(--text);
+    max-width: 680px;
+    line-height: 1.8;
+    margin-bottom: 10px;
+  }
+  .hero-lead b { color: var(--primary); font-weight: 700; }
+  .hero-lead mark {
+    background: var(--highlight);
+    padding: 0 4px;
+    font-weight: 700;
+    color: var(--primary-dark);
+  }
+  .hero-info-badges {
+    display: flex;
+    gap: 10px;
+    margin-top: 36px;
+    flex-wrap: wrap;
+  }
+  .hero-info-badges .pill {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+  }
+  .hero-info-badges .pill b { color: var(--accent-dark); font-weight: 800; }
+  .hero-info-badges .pill.accent {
+    background: var(--primary);
+    color: var(--accent-soft);
+    border-color: var(--primary);
+  }
+  .hero-info-badges .pill.accent b { color: var(--accent); }
+
+  /* ============ SECTION ============ */
+  section { padding: 72px 40px; border-bottom: 1px solid var(--border); }
+  section:last-of-type { border-bottom: 0; }
+  .sec-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent-dark);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .sec-title {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+  }
+  .sec-desc {
+    color: var(--sub);
+    font-size: 16px;
+    margin-bottom: 40px;
+    max-width: 640px;
+  }
+  .sec-desc b { color: var(--primary); font-weight: 700; }
+  .sec-head-center { text-align: center; }
+  .sec-head-center .sec-desc { margin-left: auto; margin-right: auto; }
+
+  /* ============ PROGRAM OVERVIEW (3-card) ============ */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .ov-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .ov-card .ov-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--white);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+  }
+  .ov-card h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.3px;
+    margin-top: 8px;
+  }
+  .ov-card p {
+    font-size: 14.5px;
+    color: var(--sub);
+    line-height: 1.65;
+  }
+  .ov-card p b { color: var(--primary); font-weight: 700; }
+  .ov-card.highlight {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--primary-dark);
+    box-shadow: 0 6px 30px rgba(212,162,76,0.35);
+    transform: translateY(-6px);
+  }
+  .ov-card.highlight .ov-icon { background: rgba(255,255,255,0.35); color: var(--primary-dark); }
+  .ov-card.highlight h3 { color: var(--primary-dark); }
+  .ov-card.highlight p { color: var(--primary-dark); }
+  .ov-card.highlight p b { color: var(--primary-dark); font-weight: 800; }
+
+  /* ============ WEEKLY CHECK (Left + Right Parts) ============ */
+  .wc-split {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 32px;
+    align-items: start;
+  }
+  .wc-left { padding-right: 8px; }
+  .wc-left .wc-eyebrow {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent-dark);
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .wc-left h2 {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+  }
+  .wc-left h2 .k { color: var(--primary); }
+  .wc-left h2 b { color: var(--accent-dark); }
+  .wc-left p {
+    font-size: 14.5px;
+    color: var(--sub);
+    line-height: 1.75;
+  }
+  .wc-left p b { color: var(--primary); font-weight: 700; }
+  .wc-left .wc-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 22px;
+    padding: 12px 18px;
+    background: var(--bg);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .wc-left .wc-tag svg { color: var(--accent); }
+  .wc-parts { display: flex; flex-direction: column; gap: 18px; }
+  .wc-part {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 26px;
+    position: relative;
+  }
+  .wc-part.p1 { border-left: 4px solid var(--primary); }
+  .wc-part.p2 { border-left: 4px solid var(--accent); }
+  .wc-part-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .wc-part-tag {
+    background: var(--primary);
+    color: var(--white);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .wc-part.p2 .wc-part-tag { background: var(--accent); color: var(--primary-dark); }
+  .wc-part-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .wc-part-meta {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--sub);
+    font-weight: 600;
+  }
+  .wc-part ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .wc-part li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 14.5px;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .wc-part li b { color: var(--primary); font-weight: 700; }
+  .wc-part li::before {
+    content: '';
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--primary);
+    flex-shrink: 0;
+    margin-top: 3px;
+    position: relative;
+  }
+  .wc-part.p2 li::before { border-color: var(--accent); }
+  .wc-part li::after {
+    content: '';
+    width: 6px; height: 3px;
+    border-left: 2px solid var(--primary);
+    border-bottom: 2px solid var(--primary);
+    transform: rotate(-45deg);
+    position: absolute;
+    left: 6px;
+    top: 8px;
+  }
+  .wc-part.p2 li::after { border-color: var(--accent); }
+
+  /* ============ DAILY ROUTINE ============ */
+  .daily-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .daily-card {
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .daily-card .d-icon {
+    width: 44px; height: 44px;
+    background: var(--white);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+  }
+  .daily-card h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-top: 6px;
+    letter-spacing: -0.2px;
+  }
+  .daily-card .d-sub {
+    font-size: 13px;
+    color: var(--accent-dark);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .daily-card p, .daily-card li {
+    font-size: 14.5px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .daily-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .daily-card li { padding-left: 18px; position: relative; }
+  .daily-card li::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: absolute;
+    left: 4px;
+    top: 10px;
+  }
+  .daily-card b { color: var(--primary); font-weight: 700; }
+  .daily-quote {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: var(--white);
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: var(--sub);
+    line-height: 1.6;
+    border-left: 3px solid var(--accent);
+  }
+  .daily-quote b { color: var(--primary); }
+
+  .highlight-strip {
+    margin-top: 28px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 18px 22px;
+    font-size: 15px;
+    color: var(--primary-dark);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .highlight-strip .hs-tag {
+    background: var(--accent);
+    color: var(--primary-dark);
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .highlight-strip b { color: var(--primary); font-weight: 800; }
+
+  /* ============ ROADMAP ============ */
+  .roadmap-warn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    font-size: 13.5px;
+    color: var(--primary-dark);
+    margin: 12px 0 40px;
+  }
+  .roadmap-warn b { color: var(--accent-dark); font-weight: 800; }
+
+  .roadmap-timeline {
+    position: relative;
+    padding: 12px 0;
+  }
+  .roadmap-timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+    transform: translateX(-50%);
+  }
+  .rm-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    align-items: center;
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .rm-row:last-child { margin-bottom: 0; }
+  .rm-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--w1);
+    border-radius: 12px;
+    padding: 22px 24px;
+    position: relative;
+  }
+  .rm-row.w1 .rm-card { border-top-color: var(--w1); }
+  .rm-row.w2 .rm-card { border-top-color: var(--w2); }
+  .rm-row.w3 .rm-card { border-top-color: var(--w3); }
+  .rm-row.w4 .rm-card { border-top-color: var(--w4); }
+  .rm-tag {
+    position: absolute;
+    top: -14px;
+    right: 20px;
+    background: var(--w1);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+  }
+  .rm-row.w2 .rm-tag { background: var(--w2); }
+  .rm-row.w3 .rm-tag { background: var(--w3); }
+  .rm-row.w4 .rm-tag { background: var(--w4); }
+  .rm-card h3 {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 2px;
+    letter-spacing: -0.3px;
+  }
+  .rm-card .rm-sub {
+    font-size: 13px;
+    color: var(--sub);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .rm-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rm-card li {
+    font-size: 14px;
+    color: var(--text);
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.55;
+  }
+  .rm-card li::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--w1);
+    position: absolute;
+    left: 0;
+    top: 9px;
+  }
+  .rm-row.w2 .rm-card li::before { background: var(--w2); }
+  .rm-row.w3 .rm-card li::before { background: var(--w3); }
+  .rm-row.w4 .rm-card li::before { background: var(--w4); }
+  .rm-card li b { color: var(--primary); font-weight: 700; }
+  .rm-node {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+  }
+  .rm-node::before {
+    content: '';
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 3px solid var(--w1);
+  }
+  .rm-row.w2 .rm-node::before { border-color: var(--w2); }
+  .rm-row.w3 .rm-node::before { border-color: var(--w3); }
+  .rm-row.w4 .rm-node::before { border-color: var(--w4); background: var(--w4); }
+  .rm-blank { }
+
+  /* ============ FAQ ============ */
+  .faq details {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 0;
+  }
+  .faq details:first-of-type { border-top: 1px solid var(--border); }
+  .faq summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 16px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .faq summary::after {
+    content: '＋';
+    color: var(--accent);
+    font-weight: 400;
+    font-size: 20px;
+  }
+  .faq details[open] summary::after { content: '−'; }
+  .faq p {
+    color: var(--sub);
+    font-size: 14.5px;
+    padding-top: 12px;
+    line-height: 1.75;
+  }
+  .faq p b { color: var(--primary); font-weight: 700; }
+
+  /* ============ CLOSING ============ */
+  .closing {
+    background: var(--primary);
+    color: var(--white);
+    text-align: center;
+    padding: 96px 40px;
+  }
+  .closing-copy {
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.35;
+    letter-spacing: -0.8px;
+    margin-bottom: 20px;
+  }
+  .closing-copy .em {
+    color: var(--accent);
+  }
+  .closing-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.8);
+    max-width: 600px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+  .closing-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 26px;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px;
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .closing-brand b { color: var(--accent); font-weight: 800; }
+
+  /* ============ FOOTER ============ */
+  footer {
+    padding: 28px 40px;
+    background: var(--primary-dark);
+    color: rgba(255,255,255,0.6);
+    font-size: 12.5px;
+    text-align: center;
+  }
+  footer b { color: var(--accent); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 720px) {
+    header.top { padding: 14px 20px; }
+    .hero { padding: 48px 22px 40px; }
+    .hero-title-row .k { font-size: 30px; }
+    .hero-title-row .e { font-size: 16px; }
+    .hero-copy { font-size: 28px; }
+    section { padding: 48px 22px; }
+    .sec-title { font-size: 24px; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .ov-card.highlight { transform: none; }
+    .wc-split { grid-template-columns: 1fr; gap: 20px; }
+    .daily-grid { grid-template-columns: 1fr; }
+    .roadmap-timeline::before { left: 18px; }
+    .rm-row { grid-template-columns: 40px 1fr; }
+    .rm-row .rm-blank { display: none; }
+    .rm-row.w2 .rm-node, .rm-row.w4 .rm-node { order: -1; }
+    .rm-node { order: -1; }
+    .rm-card { order: 0; }
+    .closing { padding: 64px 22px; }
+    .closing-copy { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="top">
+    <div class="brand">
+      <span class="brand-icon">정</span>
+      정율사관 <span>·</span> 종합반
+    </div>
+  </header>
+
+  <!-- ==================== HERO ==================== -->
+  <div class="hero">
+    <div class="hero-badge">
+      <span class="dot">●</span>
+      고1 · 2026 여름방학 프로젝트
+    </div>
+
+    <div class="hero-title-row">
+      <span class="k">런투런</span>
+      <span class="e">Run To Learn</span>
+    </div>
+    <p class="hero-sub">통합사회2 루틴 관리 프로그램</p>
+
+    <h1 class="hero-copy">
+      배우려면, 먼저 <span class="em">달려야</span> 합니다.<br>
+      1등급은 <span class="em">'매일'</span> 만들어집니다.
+    </h1>
+
+    <p class="hero-lead">
+      벼락치기로는 잡히지 않는 통합사회2.<br>
+      <b>런투런(Run To Learn)</b>은 방학 한 달 동안 학생의 학습 감각을 유지하고,<br>
+      가장 확실하게 <b>완주</b>하도록 돕는 <b>루틴 매니지먼트</b>입니다.
+    </p>
+
+    <div class="hero-info-badges">
+      <span class="pill accent"><b>썸머핫습 재원생</b> 프리패스</span>
+      <span class="pill"><b>4주</b> · 7/20 ~ 8/16</span>
+      <span class="pill"><b>5단원</b> 완주</span>
+      <span class="pill"><b>매일</b> 루틴 + <b>매주</b> 관리</span>
+    </div>
+  </div>
+
+  <!-- ==================== PROGRAM OVERVIEW ==================== -->
+  <section class="sec-head-center">
+    <div class="sec-label">Program Overview</div>
+    <h2 class="sec-title">방학 첫날부터 마지막 날까지, 끝까지 함께합니다.</h2>
+    <p class="sec-desc">런투런은 단기 특강도, 강의도 아닙니다. 방학 한 달, 매일의 흐름을 만드는 세 개의 축입니다.</p>
+
+    <div class="overview-grid">
+
+      <div class="ov-card">
+        <div class="ov-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        </div>
+        <h3>All-in-One Routine</h3>
+        <p>통합사회2 <b>전 5단원</b>에 대해, 매일 <b>개념 재구성 + 문제 풀이</b>가 함께 도는 학습 루틴을 설계합니다. 한 단원도 놓치지 않고 밸런스를 유지합니다.</p>
+      </div>
+
+      <div class="ov-card highlight">
+        <div class="ov-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3>페이스 메이커 <small style="display:block;font-size:12px;font-weight:700;opacity:0.6;margin-top:2px;">Pace Maker</small></h3>
+        <p>단기 특강이 아닙니다. 방학 <b>첫날부터 마지막 날까지</b>, 주차별 최적화된 로드맵을 제공하여 <b>중단 없이 완주</b>할 수 있도록 페이스를 잡아드립니다.</p>
+      </div>
+
+      <div class="ov-card">
+        <div class="ov-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.133-8-12.739-8-4.585 0-4.585 8 0 8 5.606 0 7.644-8 12.74-8z"/></svg>
+        </div>
+        <h3>무제한 문제 훈련</h3>
+        <p><b>상황별 · 난이도별 문제</b>를 필요한 만큼 제공합니다. 부족해서 못 푸는 일 없이, 학생의 진도와 실력에 맞춰 <b>실전 감각</b>을 매일 유지합니다.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== WEEKLY CHECK ==================== -->
+  <section>
+    <div class="wc-split">
+      <div class="wc-left">
+        <div class="wc-eyebrow">Offline System</div>
+        <h2><span class="k">Weekly Check</span><br>매주, <b>흐름을 놓치지 않습니다.</b></h2>
+        <p>런투런은 단순히 문제만 풀리는 것이 아닙니다. 매주 정해진 시점에 <b>정율사관이 직접 학생의 루틴 이행을 확인</b>하고, 밀린 것이 있으면 다음 주로 넘기지 않습니다.</p>
+        <div class="wc-tag">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          매주 정율사관 점검
+        </div>
+      </div>
+
+      <div class="wc-parts">
+        <div class="wc-part p1">
+          <div class="wc-part-head">
+            <span class="wc-part-tag">Part 1</span>
+            <span class="wc-part-title">주간 이행 체크</span>
+            <span class="wc-part-meta">매주</span>
+          </div>
+          <ul>
+            <li>매일 <b>개념 재구성 · 문제 풀이</b> 완료 여부 확인</li>
+            <li>학생별 <b>진행 속도</b>와 흐트러진 흐름 조기 감지</li>
+            <li>주차별 진도 완주율 <b>기록</b> · 다음 주 계획 조정</li>
+          </ul>
+        </div>
+
+        <div class="wc-part p2">
+          <div class="wc-part-head">
+            <span class="wc-part-tag">Part 2</span>
+            <span class="wc-part-title">미이수 즉시 대응</span>
+            <span class="wc-part-meta">밀리면 그날 안에</span>
+          </div>
+          <ul>
+            <li>루틴이 밀리면 <b>그날 안에</b> 잡아드립니다</li>
+            <li>다음 주로 <b>절대 넘기지 않는</b> 원칙</li>
+            <li>완주 지점까지 <b>흐름 유지</b>가 우선</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== DAILY ROUTINE ==================== -->
+  <section class="sec-head-center">
+    <div class="sec-label">Online / Daily Routine</div>
+    <h2 class="sec-title">"매일의 루틴이 흐름을 만듭니다."</h2>
+    <p class="sec-desc">스스로 꺼내 정리하는 <b>개념 재구성</b>, 실전 감각을 유지하는 <b>문제 풀이</b> — 매일 이 두 축을 돌립니다.</p>
+
+    <div class="daily-grid">
+      <div class="daily-card">
+        <div class="d-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div class="d-sub">Concept Rebuild</div>
+        <h3>개념 재구성</h3>
+        <ul>
+          <li>단원 학습 직후, 노트를 덮고 <b>개념을 스스로 다시 꺼냅니다</b>.</li>
+          <li>기억이 흐린 부분이 <b>즉시 드러나</b> 그 자리에서 보완합니다.</li>
+        </ul>
+        <div class="daily-quote">
+          "혼자 다시 꺼내는 훈련"이 <b>시험장 실력</b>을 만듭니다. 강의로 들은 개념은 하루면 흐려지지만, 스스로 재구성한 개념은 남습니다.
+        </div>
+      </div>
+
+      <div class="daily-card">
+        <div class="d-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="d-sub">Daily Drill</div>
+        <h3>문제 풀이</h3>
+        <ul>
+          <li>매일 새 문제 세트로 <b>실전 감각을 유지</b>합니다.</li>
+          <li>학생의 진도·실력에 맞춰 <b>필요한 유형</b>이 매일 도착합니다.</li>
+        </ul>
+        <div class="daily-quote">
+          "하루 30분이라도 <b>매일 문제를 마주하는 습관</b>이 개학 후에도 흐름을 유지시켜 줍니다."
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-strip">
+      <span class="hs-tag">무한 제공</span>
+      <span><b>상황별 · 난이도별 문제</b>를 필요한 만큼 제공합니다. 부족해서 못 푸는 일은 없습니다.</span>
+    </div>
+  </section>
+
+  <!-- ==================== ROADMAP ==================== -->
+  <section class="sec-head-center">
+    <div class="sec-label">Weekly Roadmap</div>
+    <h2 class="sec-title">4주, 통합사회2 완주 로드맵</h2>
+    <p class="sec-desc">주차별 최적화된 흐름을 통해 방학 한 달 안에 <b>전 5단원</b>을 완주합니다.</p>
+
+    <div class="roadmap-warn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      본 로드맵은 <b>예시</b>이며, 학생의 학습 상황에 따라 <b>개별 조정</b>됩니다.
+    </div>
+
+    <div class="roadmap-timeline">
+
+      <div class="rm-row w1">
+        <div class="rm-card">
+          <span class="rm-tag">7/20 ~ 7/26</span>
+          <h3>Week 1 · Focus Start</h3>
+          <div class="rm-sub">습관 형성 & 개념 시작</div>
+          <ul>
+            <li>진단 및 <b>루틴 세팅</b></li>
+            <li>① 인권 보장과 헌법 <b>개념 1회독</b></li>
+            <li><b>매일 공부하는 몸</b> 만들기</li>
+          </ul>
+        </div>
+        <div class="rm-node"></div>
+        <div class="rm-blank"></div>
+      </div>
+
+      <div class="rm-row w2">
+        <div class="rm-blank"></div>
+        <div class="rm-node"></div>
+        <div class="rm-card">
+          <span class="rm-tag">7/27 ~ 8/2</span>
+          <h3>Week 2 · Deep Focus</h3>
+          <div class="rm-sub">개념 심화 & 유형 진입</div>
+          <ul>
+            <li>② 사회 정의와 불평등 <b>개념 완성</b></li>
+            <li>Week 1 <b>복습 루프</b> 병행</li>
+            <li>유형별 <b>문제 훈련</b> 본격 진입</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="rm-row w3">
+        <div class="rm-card">
+          <span class="rm-tag">8/3 ~ 8/9</span>
+          <h3>Week 3 · Wide Focus</h3>
+          <div class="rm-sub">범위 확장 & 실전 훈련</div>
+          <ul>
+            <li>③ 시장경제와 지속가능발전</li>
+            <li>④ 세계화와 평화</li>
+            <li>고난도·응용 문항 <b>집중 대응</b></li>
+          </ul>
+        </div>
+        <div class="rm-node"></div>
+        <div class="rm-blank"></div>
+      </div>
+
+      <div class="rm-row w4">
+        <div class="rm-blank"></div>
+        <div class="rm-node"></div>
+        <div class="rm-card">
+          <span class="rm-tag">8/10 ~ 8/16</span>
+          <h3>Week 4 · Final Focus</h3>
+          <div class="rm-sub">전 단원 완주 & 총정리</div>
+          <ul>
+            <li>⑤ 미래와 지속가능한 삶</li>
+            <li>전 5단원 <b>총정리 & 실전 세트</b></li>
+            <li>개학 이후에도 <b>이어질 흐름</b> 세팅</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== FAQ ==================== -->
+  <section>
+    <div class="sec-label">FAQ</div>
+    <h2 class="sec-title">자주 묻는 질문</h2>
+    <div class="faq" style="margin-top:24px;">
+      <details>
+        <summary>썸머핫습에 참여하고 있으면 별도 결제 없이 되나요?</summary>
+        <p>네. 고1 썸머핫습 재원생은 별도 결제 없이 <b>프리패스</b>로 참여합니다. 신청서만 접수해주시면 됩니다.</p>
+      </details>
+      <details>
+        <summary>단과 재원생인데 참여 가능한가요?</summary>
+        <p>가능합니다. 단과 재원생은 <b>80,000원</b>으로 방학 1개월 전체 루틴 관리에 참여할 수 있습니다.</p>
+      </details>
+      <details>
+        <summary>강의를 듣는 프로그램인가요?</summary>
+        <p>아닙니다. 런투런은 <b>강의가 아닌 루틴 관리 프로그램</b>입니다. 매일 문제 풀이를 스스로 진행하고, 이를 <b>매주 체크</b>합니다.</p>
+      </details>
+      <details>
+        <summary>문제가 부족하지 않을까요?</summary>
+        <p><b>상황별·난이도별 문제를 무한 제공</b>합니다. 학생의 진도와 실력에 맞춰 필요한 만큼 매일 새 문제로 훈련할 수 있습니다.</p>
+      </details>
+      <details>
+        <summary>결석하면 어떻게 되나요?</summary>
+        <p>다음 등원 시 밀린 루틴을 <b>그날 안에</b> 잡아드립니다.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ==================== CLOSING ==================== -->
+  <section class="closing">
+    <div class="closing-copy">
+      지금 <span class="em">매일</span> 만드는 흐름이<br>
+      개학 첫 날의 <span class="em">자신감</span>이 됩니다.
+    </div>
+    <p class="closing-sub">
+      가장 확실한 통합사회2 완주 솔루션,<br>
+      런투런과 함께 달리십시오.
+    </p>
+    <div class="closing-brand">
+      <b>런투런</b> · Run To Learn Project
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer>
+    문의 · <b>담당 · 김어랑</b><br>
+    © 2026 정율사관 종합반 · Run To Learn Project
+  </footer>
+
+</div>
+</body>
+</html>

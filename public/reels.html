@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정율사관학원 · 마지막 설명회 릴스 (39초)</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+<style>
+:root {
+  --brand: #C8102E;
+  --yellow: #ffe600;
+  --w: 405px;
+  --h: 720px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0a0a0a;
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.title { font-size: 13px; opacity: 0.55; letter-spacing: 0.5px; }
+.stage {
+  width: var(--w);
+  height: var(--h);
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+.scene {
+  position: absolute;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+}
+.scene.active { display: block; }
+.controls { display: flex; gap: 10px; }
+.btn {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn.secondary { background: #333; }
+.hint {
+  font-size: 12px;
+  opacity: 0.5;
+  text-align: center;
+  max-width: var(--w);
+  line-height: 1.6;
+}
+.progress {
+  width: var(--w);
+  height: 3px;
+  background: #222;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--brand);
+  width: 0;
+  transition: width 0.1s linear;
+}
+
+/* Media slot with fallback label */
+.media-slot {
+  position: absolute;
+  inset: 0;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+.media-slot::before {
+  content: attr(data-label);
+  position: absolute;
+  inset: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 11px;
+  border: 2px dashed #333;
+  padding: 20px;
+  text-align: center;
+  line-height: 1.5;
+  z-index: 1;
+  white-space: pre-line;
+}
+.media-slot.has-media::before { display: none; }
+.media-slot img,
+.media-slot video {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+}
+
+/* ============ SCENE 1: 시간 훅 (0-4s) ============ */
+.s1 { background: #000; }
+.s1 .hook-top {
+  position: absolute;
+  top: 22%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #ccc;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  opacity: 0;
+}
+.s1.active .hook-top { animation: fadeIn 0.4s 0.2s both; }
+.s1 .hook-ticker {
+  position: absolute;
+  top: 32%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--brand);
+  font-size: 128px;
+  font-weight: 900;
+  letter-spacing: -2px;
+  opacity: 0;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 60px rgba(200,16,46,0.5);
+  line-height: 1;
+}
+.s1.active .hook-ticker { animation: bigPop 0.5s 0.5s both; }
+.s1 .hook-ticker .colon {
+  color: var(--yellow);
+}
+.s1 .hook-bottom {
+  position: absolute;
+  bottom: 22%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  opacity: 0;
+}
+.s1.active .hook-bottom { animation: bigPop 0.5s 1.4s both, pulse 1.2s 2.2s infinite; }
+.s1 .hook-bottom .red {
+  color: var(--brand);
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.15; }
+}
+
+/* ============ SCENE 2: 이벤트 팩트 (4-8s) ============ */
+.s2 { background: #fff; }
+.s2 .line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #111;
+  font-weight: 800;
+  padding: 0 24px;
+  letter-spacing: -0.5px;
+  opacity: 0;
+}
+.s2 .l1 {
+  top: 26%;
+  font-size: 26px;
+  color: #111;
+}
+.s2.active .l1 { animation: slideDown 0.4s 0.15s both; }
+.s2 .l2 {
+  top: 40%;
+  font-size: 24px;
+  color: #333;
+  font-weight: 700;
+}
+.s2.active .l2 { animation: slideDown 0.4s 0.8s both; }
+.s2 .l3 {
+  top: 56%;
+  font-size: 44px;
+  color: var(--brand);
+  font-weight: 900;
+  line-height: 1.15;
+}
+.s2.active .l3 { animation: bigPop 0.5s 1.5s both; }
+.s2 .underline {
+  position: absolute;
+  top: calc(56% + 55px);
+  left: 25%;
+  right: 25%;
+  height: 6px;
+  background: var(--brand);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.s2.active .underline { animation: growLine 0.4s 2.0s both; }
+
+/* ============ SCENE 2B: 비밀 후킹 (6-10s) ============ */
+.s2b { background: #0a0a0a; }
+.s2b .s2b-hook {
+  position: absolute;
+  top: 17%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--yellow);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  opacity: 0;
+}
+.s2b.active .s2b-hook { animation: fadeIn 0.5s 0.3s both; }
+.s2b .s2b-consequence {
+  position: absolute;
+  top: 28%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1.25;
+  padding: 0 20px;
+  opacity: 0;
+}
+.s2b.active .s2b-consequence { animation: slideDown 0.5s 0.9s both; }
+.s2b .s2b-consequence .waste {
+  color: #ff5252;
+}
+.s2b .s2b-divider {
+  position: absolute;
+  top: 58%;
+  left: 25%;
+  right: 25%;
+  height: 3px;
+  background: var(--brand);
+  transform: scaleX(0);
+  transform-origin: center;
+}
+.s2b.active .s2b-divider { animation: growLine 0.5s 1.8s both; }
+.s2b .s2b-payoff {
+  position: absolute;
+  top: 65%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1.35;
+  padding: 0 20px;
+  opacity: 0;
+}
+.s2b.active .s2b-payoff { animation: bigPop 0.6s 2.3s both; }
+.s2b .s2b-payoff .hilite {
+  color: var(--yellow);
+  font-size: 40px;
+  padding: 0 4px;
+  letter-spacing: -1px;
+}
+
+/* ============ SCENE 3: 좌석 채워짐 + 알림 (10-14s) ============ */
+.s3 { background: #000; }
+.s3 .flash-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--brand);
+  opacity: 0;
+}
+.s3.active .flash-bg { animation: flashPulse 0.4s 0s both; }
+.s3 .main-text {
+  position: absolute;
+  top: 8%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.3;
+  opacity: 0;
+  padding: 0 20px;
+  letter-spacing: -1px;
+}
+.s3.active .main-text { animation: bigPop 0.5s 0.3s both; }
+.s3 .seat-count {
+  color: var(--yellow);
+  font-size: 38px;
+  display: block;
+  line-height: 1.2;
+  margin-top: 12px;
+  letter-spacing: -1.5px;
+}
+.s3 .notif {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  background: rgba(28, 28, 30, 0.94);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 12px;
+  padding: 11px 14px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: translateX(-30px);
+  z-index: 5;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.55);
+  letter-spacing: -0.3px;
+}
+.s3 .notif-1 { top: 36%; }
+.s3 .notif-2 { top: 47%; }
+.s3 .notif-3 { top: 58%; }
+.s3 .notif-4 { top: 69%; }
+.s3 .notif-5 { top: 80%; }
+.s3 .notif .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+  animation: dotPulse 1.4s infinite;
+}
+.s3 .notif .name {
+  color: var(--yellow);
+  font-weight: 900;
+  margin-right: 2px;
+}
+.s3.active .notif-1 { animation: notifIn 0.4s 0.5s both; }
+.s3.active .notif-2 { animation: notifIn 0.4s 1.05s both; }
+.s3.active .notif-3 { animation: notifIn 0.4s 1.6s both; }
+.s3.active .notif-4 { animation: notifIn 0.4s 2.15s both; }
+.s3.active .notif-5 { animation: notifIn 0.4s 2.7s both; }
+@keyframes notifIn {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes dotPulse {
+  0%, 100% { box-shadow: 0 0 4px #4ade80; opacity: 1; }
+  50% { box-shadow: 0 0 14px #4ade80; opacity: 0.55; }
+}
+
+/* ============ SCENE 4: 철학 + BEFORE/AFTER + Flow (17-23s) ============ */
+.s4 { background: #0a0a0a; }
+.s4 .media-slot {
+  top: 4%;
+  bottom: auto;
+  height: 26%;
+  left: 4%;
+  right: 4%;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.65);
+  opacity: 0;
+}
+.s4.active .media-slot { animation: cardIn 0.6s 0.2s both; }
+.s4 .media-slot img {
+  object-fit: contain;
+  animation: kenBurns 6s ease-out both;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.s4 .s4-title-1 {
+  position: absolute;
+  top: 33%;
+  left: 0; right: 0;
+  text-align: center;
+  color: #ccc;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  opacity: 0;
+}
+.s4.active .s4-title-1 { animation: fadeIn 0.5s 1.0s both; }
+.s4 .s4-title-2 {
+  position: absolute;
+  top: 40%;
+  left: 0; right: 0;
+  text-align: center;
+  color: var(--yellow);
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  opacity: 0;
+}
+.s4.active .s4-title-2 { animation: bigPop 0.5s 1.5s both; }
+.s4 .s4-flow {
+  position: absolute;
+  top: 51%;
+  bottom: 5%;
+  left: 6%;
+  right: 6%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.s4 .flow-item {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 20px;
+  font-weight: 800;
+  border: 1px solid rgba(255,255,255,0.14);
+  letter-spacing: -0.5px;
+  opacity: 0;
+}
+.s4 .flow-item.highlight {
+  background: var(--yellow);
+  color: #111;
+  font-size: 22px;
+  border: 1px solid var(--yellow);
+  box-shadow: 0 0 24px rgba(255,230,0,0.4);
+}
+.s4 .flow-arrow {
+  color: #666;
+  font-size: 14px;
+  font-weight: 900;
+  opacity: 0;
+  line-height: 1;
+}
+.s4.active .item-1 { animation: fadeIn 0.4s 2.4s both; }
+.s4.active .arrow-1 { animation: fadeIn 0.3s 2.7s both; }
+.s4.active .item-2 { animation: fadeIn 0.4s 3.0s both; }
+.s4.active .arrow-2 { animation: fadeIn 0.3s 3.3s both; }
+.s4.active .item-3 { animation: fadeIn 0.4s 3.6s both; }
+.s4.active .arrow-3 { animation: fadeIn 0.3s 3.9s both; }
+.s4.active .item-4 { animation: bigPop 0.5s 4.2s both; }
+
+/* ============ SCENE 5: 약점 데이터 (20-24s) ============ */
+.s5 { background: #0a0a0a; }
+.s5 .s5-top {
+  position: absolute;
+  top: 8%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--yellow);
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  opacity: 0;
+  z-index: 5;
+}
+.s5.active .s5-top { animation: bigPop 0.5s 0.2s both; }
+.s5 .s5-images {
+  position: absolute;
+  top: 18%;
+  bottom: 30%;
+  left: 3%;
+  right: 3%;
+}
+.s5 .s5-captions {
+  position: absolute;
+  top: 73%;
+  height: 8%;
+  left: 0;
+  right: 0;
+}
+.s5 .s5-cap {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  color: var(--yellow);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  opacity: 0;
+  padding: 0 20px;
+  will-change: opacity;
+}
+.s5.active .s5-cap-1 { animation: imgSwap1 4s ease-in-out both; }
+.s5.active .s5-cap-2 { animation: imgSwap2 4s ease-in-out both; }
+.s5 .s5-img {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.7);
+  opacity: 0;
+  will-change: opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+.s5 .s5-img .media-slot {
+  background: #fff;
+}
+.s5 .s5-img .media-slot::before { display: none; }
+.s5 .s5-img .media-slot img {
+  object-fit: contain;
+  padding: 3%;
+}
+.s5.active .s5-img-1 { animation: imgSwap1 4s ease-in-out both; }
+.s5.active .s5-img-2 { animation: imgSwap2 4s ease-in-out both; }
+@keyframes imgSwap1 {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  45% { opacity: 1; }
+  60% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes imgSwap2 {
+  0% { opacity: 0; }
+  45% { opacity: 0; }
+  60% { opacity: 1; }
+  100% { opacity: 1; }
+}
+.s5 .s5-bottom {
+  position: absolute;
+  bottom: 8%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #aaa;
+  font-size: 15px;
+  font-weight: 700;
+  opacity: 0;
+  letter-spacing: 0.3px;
+  z-index: 5;
+}
+.s5.active .s5-bottom { animation: fadeIn 0.5s 2.4s both; }
+
+/* ============ SCENE 6: 재시험 (20-24s) ============ */
+.s6 .vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 45%);
+  z-index: 3;
+}
+.s6 .top-fact {
+  position: absolute;
+  top: 12%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  padding: 0 20px;
+  line-height: 1.4;
+  opacity: 0;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+  z-index: 4;
+  letter-spacing: -0.5px;
+}
+.s6.active .top-fact { animation: slideDown 0.5s 0.3s both; }
+.s6 .top-fact .num {
+  color: var(--yellow);
+  font-size: 32px;
+}
+.s6 .top-fact .strong {
+  color: #ff5252;
+  display: block;
+  margin-top: 8px;
+  font-size: 22px;
+}
+
+/* ============ SCENE 7: 자습 데이터 (25-29s) ============ */
+.s7 { background: #0a0a0a; }
+.s7 .media-slot {
+  top: 18%;
+  bottom: auto;
+  height: 34%;
+  left: 4%;
+  right: 4%;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.08);
+}
+.s7.active .media-slot {
+  animation: cardIn 0.7s 0.2s both;
+}
+.s7 .media-slot img {
+  object-fit: cover;
+  animation: kenBurns 5s ease-out both;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.s7 .middle-info {
+  position: absolute;
+  top: 55%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  opacity: 0;
+  z-index: 4;
+  padding: 0 16px;
+}
+.s7 .middle-info .check-desc {
+  color: #ddd;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.s7 .middle-info .check-desc .em {
+  color: var(--yellow);
+}
+.s7 .middle-info .check-freq {
+  color: var(--yellow);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+.s7.active .middle-info { animation: fadeIn 0.5s 1.6s both; }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes kenBurns {
+  from { transform: scale(1) translateX(0); }
+  to { transform: scale(1.12) translateX(-4%); }
+}
+.s7 .caption {
+  position: absolute;
+  bottom: 14%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  padding: 0 20px;
+  line-height: 1.4;
+  opacity: 0;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+  z-index: 4;
+  letter-spacing: -0.5px;
+}
+.s7.active .caption { animation: slideUp 0.5s 0.3s both; }
+.s7 .caption .time {
+  color: var(--yellow);
+  font-size: 30px;
+}
+.s7 .caption .reason {
+  color: var(--yellow);
+  font-size: 22px;
+  font-weight: 800;
+  display: block;
+  margin-top: 6px;
+}
+
+/* ============ SCENE 8: 사회적 증거 (28-32s) ============ */
+.s8 { background: linear-gradient(180deg, #1a1a1a 0%, #000 100%); }
+.s8 .main {
+  position: absolute;
+  top: 22%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  padding: 0 20px;
+  line-height: 1.3;
+  opacity: 0;
+  letter-spacing: -0.5px;
+}
+.s8.active .main { animation: fadeIn 0.5s 0.3s both; }
+.s8 .missed-line {
+  position: absolute;
+  top: 38%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  opacity: 0;
+}
+.s8.active .missed-line { animation: bigPop 0.7s 1s both; }
+.s8 .missed-num {
+  color: #ff5252;
+  font-size: 130px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -4px;
+  display: inline-block;
+  text-shadow: 0 0 40px rgba(255,82,82,0.4);
+}
+.s8 .missed-unit {
+  color: #fff;
+  font-size: 36px;
+  font-weight: 900;
+  margin-left: 4px;
+}
+.s8 .after {
+  position: absolute;
+  top: 66%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  opacity: 0;
+  letter-spacing: -0.5px;
+}
+.s8.active .after { animation: fadeIn 0.5s 2s both; }
+.s8 .sub {
+  position: absolute;
+  bottom: 15%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  letter-spacing: 0.5px;
+}
+.s8.active .sub { animation: fadeIn 0.5s 2.6s both; }
+
+/* ============ SCENE 9: 썸머핫습 개강 + 마지막 설명회 (27-30s) ============ */
+.s9 { background: #000; }
+.s9 .flash-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--brand);
+  opacity: 0;
+}
+.s9.active .flash-bg { animation: flashPulse 0.3s 0s both; }
+.s9 .s9-brand {
+  position: absolute;
+  top: 14%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #999;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  opacity: 0;
+}
+.s9.active .s9-brand { animation: fadeIn 0.4s 0.2s both; }
+.s9 .s9-program {
+  position: absolute;
+  top: 21%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--yellow);
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.8px;
+  opacity: 0;
+}
+.s9.active .s9-program { animation: bigPop 0.5s 0.5s both; }
+.s9 .s9-date {
+  position: absolute;
+  top: 32%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  opacity: 0;
+}
+.s9.active .s9-date { animation: bigPop 0.5s 0.9s both; }
+.s9 .s9-date .open-tag {
+  color: #999;
+  font-size: 24px;
+  font-weight: 700;
+  margin-left: 4px;
+  letter-spacing: -0.3px;
+}
+.s9 .s9-divider {
+  position: absolute;
+  top: 50%;
+  left: 30%;
+  right: 30%;
+  height: 2px;
+  background: rgba(255,255,255,0.15);
+}
+.s9 .big-line {
+  position: absolute;
+  top: 57%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--brand);
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  opacity: 0;
+  padding: 0 20px;
+  text-shadow: 0 0 40px rgba(200,16,46,0.5);
+}
+.s9.active .big-line { animation: bigPop 0.5s 1.3s both, pulse 1.5s 1.9s infinite; }
+.s9 .sub-line {
+  position: absolute;
+  bottom: 12%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  opacity: 0;
+  letter-spacing: 1px;
+}
+.s9.active .sub-line { animation: fadeIn 0.4s 2.0s both; }
+
+/* ============ SCENE 10: CTA (36-42s) ============ */
+.s10 { background: linear-gradient(180deg, #1a1a1a 0%, #000 100%); }
+.s10 .logo-slot {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 78px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 18px;
+  opacity: 0;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+.s10.active .logo-slot { animation: fadeIn 0.5s 0.2s both; }
+.s10 .logo-slot .media-slot {
+  background: transparent;
+}
+.s10 .logo-slot .media-slot img {
+  object-fit: contain;
+}
+.s10 .logo-slot .media-slot::before {
+  font-size: 10px;
+  border: 1px dashed #ffb0b0;
+  color: #ffcaca;
+}
+.s10 .prog-name {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--yellow);
+  font-size: 32px;
+  font-weight: 900;
+  opacity: 0;
+  letter-spacing: -0.5px;
+}
+.s10.active .prog-name { animation: fadeIn 0.5s 0.9s both; }
+.s10 .datetime {
+  position: absolute;
+  top: 52%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  opacity: 0;
+}
+.s10.active .datetime { animation: fadeIn 0.5s 1.4s both; }
+.s10 .cta-arrow {
+  position: absolute;
+  top: 66%;
+  left: 50%;
+  font-size: 32px;
+  color: var(--yellow);
+  opacity: 0;
+  transform: translateX(-50%);
+}
+.s10.active .cta-arrow { animation: fadeIn 0.3s 2.2s both, bounceUp 1s 2.5s infinite; }
+.s10 .cta-text {
+  position: absolute;
+  top: 76%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  opacity: 0;
+}
+.s10.active .cta-text { animation: bigPop 0.5s 2.5s both; }
+.s10 .cta-text .box {
+  display: inline-block;
+  background: #fff;
+  color: #111;
+  padding: 14px 22px;
+  border-radius: 8px;
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+/* ============ Keyframes ============ */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bigPop {
+  0% { opacity: 0; transform: scale(0.6); }
+  60% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes flashPulse {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+@keyframes bounceUp {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(10px); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+@keyframes growLine {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+</style>
+</head>
+<body>
+
+<div class="title">정율사관학원 · 마지막 설명회 릴스 (39초)</div>
+
+<div class="stage" id="stage">
+
+  <!-- ===== Scene 1: 시간 훅 (0-4s) ===== -->
+  <div class="scene s1" id="s1">
+    <div class="hook-top">지금 이 순간에도</div>
+    <div class="hook-ticker">
+      <span id="tickM">10</span><span class="colon">.</span><span id="tickS">00</span>
+    </div>
+    <div class="hook-bottom">시간은 <span class="red">흐르고 있습니다</span></div>
+  </div>
+
+  <!-- ===== Scene 2: 이벤트 팩트 (4-8s) ===== -->
+  <div class="scene s2" id="s2">
+    <div class="line l1">📅 7/15(화) 저녁 7:30</div>
+    <div class="line l2">정율사관학원 썸머핫습</div>
+    <div class="line l3">마지막 설명회</div>
+    <div class="underline"></div>
+  </div>
+
+  <!-- ===== Scene 2B: 비밀 후킹 (6-10s) ===== -->
+  <div class="scene s2b" id="s2b">
+    <div class="s2b-hook">공부량보다 중요한 것이 있습니다</div>
+    <div class="s2b-consequence">이걸 모르는 학생은<br><span class="waste">시간만 낭비합니다</span></div>
+    <div class="s2b-divider"></div>
+    <div class="s2b-payoff">그 비밀은 <span class="hilite">7/15</span>에 공개됩니다</div>
+  </div>
+
+  <!-- ===== Scene 3: 좌석 채워짐 + 알림 (10-14s) ===== -->
+  <div class="scene s3" id="s3">
+    <div class="flash-bg"></div>
+    <div class="main-text">
+      지금도
+      <span class="seat-count">좌석이<br>채워지고 있습니다</span>
+    </div>
+    <div class="notif notif-1">
+      <span class="dot"></span>
+      <div><span class="name">김O우</span> 학부모님이 신청하셨습니다</div>
+    </div>
+    <div class="notif notif-2">
+      <span class="dot"></span>
+      <div><span class="name">박O연</span> 학부모님이 신청하셨습니다</div>
+    </div>
+    <div class="notif notif-3">
+      <span class="dot"></span>
+      <div><span class="name">이O은</span> 학부모님이 신청하셨습니다</div>
+    </div>
+    <div class="notif notif-4">
+      <span class="dot"></span>
+      <div><span class="name">정O훈</span> 학부모님이 신청하셨습니다</div>
+    </div>
+    <div class="notif notif-5">
+      <span class="dot"></span>
+      <div><span class="name">최O민</span> 학부모님이 신청하셨습니다</div>
+    </div>
+  </div>
+
+  <!-- ===== Scene 4: 학원 외관 (12-16s) ===== -->
+  <div class="scene s4" id="s4">
+    <div class="media-slot" data-label="🖼️ 04-before-after.jpg (BEFORE/AFTER 필기)">
+      <img src="reels-assets/04-before-after.jpg" alt="">
+    </div>
+    <div class="s4-title-1">관리하는 게 아니라,</div>
+    <div class="s4-title-2">습관을 만듭니다</div>
+    <div class="s4-flow">
+      <div class="flow-item item-1">스스로 묻는 습관</div>
+      <div class="flow-arrow arrow-1">▼</div>
+      <div class="flow-item item-2">유능감</div>
+      <div class="flow-arrow arrow-2">▼</div>
+      <div class="flow-item item-3">성장과 발전</div>
+      <div class="flow-arrow arrow-3">▼</div>
+      <div class="flow-item item-4 highlight">자연스러운 성적</div>
+    </div>
+  </div>
+
+  <!-- ===== Scene 5: 약점 데이터 시각화 (20-24s) ===== -->
+  <div class="scene s5" id="s5">
+    <div class="s5-top">약점, 매일 잡습니다</div>
+    <div class="s5-images">
+      <div class="s5-img s5-img-1">
+        <div class="media-slot" data-label="🖼️ 05-domain.png (영역별 정답률)">
+          <img src="reels-assets/05-domain.png" alt="">
+        </div>
+      </div>
+      <div class="s5-img s5-img-2">
+        <div class="media-slot" data-label="🖼️ 05-chapter.png (단원별 정답률)">
+          <img src="reels-assets/05-chapter.png" alt="">
+        </div>
+      </div>
+    </div>
+    <div class="s5-captions">
+      <div class="s5-cap s5-cap-1">약한 부분이 어디인지</div>
+      <div class="s5-cap s5-cap-2">어떤 문제 유형이 약한지</div>
+    </div>
+    <div class="s5-bottom">모든 걸 분석합니다</div>
+  </div>
+
+  <!-- ===== Scene 7: 자습 데이터 (25-29s) ===== -->
+  <div class="scene s7" id="s7">
+    <div class="media-slot" data-label="🖼️ 08-data-log.png&#10;(자습 관리 데이터 스크린샷)">
+      <img src="reels-assets/08-data-log.png" alt="">
+    </div>
+    <div class="middle-info">
+      <div class="check-desc">
+        <span class="em">어떤 시간</span>에 · <span class="em">어떤 학생</span>이<br>
+        <span class="em">어떤 과목</span>을 · <span class="em">어떤 도구</span>로<br>
+        <span class="em">어떻게</span> 하고 있는지
+      </div>
+      <div class="check-freq">30분마다 체크합니다</div>
+    </div>
+    <div class="caption">
+      자습도
+      <span class="reason">데이터로 관리합니다</span>
+    </div>
+  </div>
+
+  <!-- ===== Scene 9: 썸머핫습 개강 + 마지막 (27-30s) ===== -->
+  <div class="scene s9" id="s9">
+    <div class="flash-bg"></div>
+    <div class="s9-brand">정율사관학원</div>
+    <div class="s9-program">썸머핫습</div>
+    <div class="s9-date">7/20<span class="open-tag">개강</span></div>
+    <div class="s9-divider"></div>
+    <div class="big-line">개강 전, 마지막 설명회</div>
+    <div class="sub-line">다음 회차는 없습니다</div>
+  </div>
+
+  <!-- ===== Scene 10: CTA (33-39s) ===== -->
+  <div class="scene s10" id="s10">
+    <div class="logo-slot">
+      <div class="media-slot" data-label="10-logo.png">
+        <img src="reels-assets/10-logo.png" alt="">
+      </div>
+    </div>
+    <div class="prog-name">썸머핫습</div>
+    <div class="datetime">📅 7/15(화) 저녁 7:30</div>
+    <div class="cta-arrow">↓</div>
+    <div class="cta-text"><span class="box">자세히보기 클릭</span></div>
+  </div>
+
+</div>
+
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+<div class="controls">
+  <button class="btn" id="playBtn">▶ 재생 (39초)</button>
+  <button class="btn secondary" id="resetBtn">↻ 리셋</button>
+</div>
+
+<div class="hint">
+  화면 녹화 (Mac): <b>Cmd + Shift + 5</b> → "선택한 영역 기록" → 릴스 화면만 드래그<br>
+  재생 버튼 누르고 34초 뒤 녹화 정지 → 캡컷에 올려서 BGM 얹으면 완성
+</div>
+
+<script>
+// ============================================
+// CONFIG — 원장님이 수정할 값
+// ============================================
+// 하드코딩된 값 사용. 수정은 HTML 자막에서 직접.
+
+// 미디어 로드 감지 → 성공 시 placeholder 라벨 숨김
+document.querySelectorAll('.media-slot img').forEach(img => {
+  const finalize = () => {
+    if (img.naturalWidth > 0) img.parentElement.classList.add('has-media');
+  };
+  if (img.complete) finalize();
+  else {
+    img.addEventListener('load', finalize);
+    img.addEventListener('error', () => { img.style.display = 'none'; });
+  }
+});
+document.querySelectorAll('.media-slot video').forEach(video => {
+  video.addEventListener('loadeddata', () => {
+    if (video.videoWidth > 0) video.parentElement.classList.add('has-media');
+  });
+  video.addEventListener('error', () => { video.style.display = 'none'; });
+});
+
+// Scene 순서 & 시작 타이밍 (초)
+const scenes = [
+  { id: 's1',  start: 0  },
+  { id: 's2',  start: 3  },
+  { id: 's2b', start: 6  },
+  { id: 's3',  start: 10 },
+  { id: 's4',  start: 14 },
+  { id: 's5',  start: 20 },
+  { id: 's7',  start: 24 },
+  { id: 's9',  start: 28 },
+  { id: 's10', start: 31 }
+];
+const TOTAL_DUR = 36;
+
+let timers = [];
+let progressTimer = null;
+let tickerInterval = null;
+let startTime = 0;
+
+function startTicker() {
+  if (tickerInterval) clearInterval(tickerInterval);
+  let value = 1000; // 10.00 as centiseconds (integer for precision)
+  const tm = document.getElementById('tickM');
+  const ts = document.getElementById('tickS');
+  const update = () => {
+    const whole = Math.floor(value / 100);
+    const frac = value % 100;
+    tm.textContent = String(whole).padStart(2,'0');
+    ts.textContent = String(frac).padStart(2,'0');
+  };
+  update();
+  tickerInterval = setInterval(() => {
+    value -= 10; // decrement 0.10 seconds per tick
+    if (value <= 0) {
+      value = 0;
+      update();
+      clearInterval(tickerInterval);
+      return;
+    }
+    update();
+  }, 20);
+}
+
+function play() {
+  reset();
+  startTime = Date.now();
+
+  scenes.forEach(s => {
+    timers.push(setTimeout(() => {
+      document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+      const el = document.getElementById(s.id);
+      el.classList.add('active');
+      if (s.id === 's1') setTimeout(startTicker, 500);
+      el.querySelectorAll('video').forEach(v => {
+        try { v.currentTime = 0; v.play(); } catch(e) {}
+      });
+    }, s.start * 1000));
+  });
+
+  progressTimer = setInterval(() => {
+    const elapsed = (Date.now() - startTime) / 1000;
+    const pct = Math.min(100, (elapsed / TOTAL_DUR) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    if (pct >= 100) clearInterval(progressTimer);
+  }, 50);
+}
+
+function reset() {
+  timers.forEach(t => clearTimeout(t));
+  timers = [];
+  if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+  if (tickerInterval) { clearInterval(tickerInterval); tickerInterval = null; }
+  document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+  document.getElementById('progressBar').style.width = '0';
+}
+
+document.getElementById('playBtn').addEventListener('click', play);
+document.getElementById('resetBtn').addEventListener('click', reset);
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') { e.preventDefault(); play(); }
+});
+</script>
+
+</body>
+</html>

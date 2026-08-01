@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>관리자 로그인 · 무엇이든 말해보살</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
 <style>
@@ -73,19 +76,33 @@
 <script>
   const ID = 'admin';
   const PW = 'admin1234';
+
+  function redirectAfterLogin() {
+    // 로그인 전에 저장된 원래 URL이 있으면 그리로, 없으면 admin.html
+    const saved = sessionStorage.getItem('jasupFeedback_returnTo');
+    if (saved) {
+      sessionStorage.removeItem('jasupFeedback_returnTo');
+      location.href = saved;
+    } else {
+      location.href = 'admin.html';
+    }
+  }
+
   document.getElementById('loginForm').addEventListener('submit', e => {
     e.preventDefault();
     const id = document.getElementById('userId').value.trim();
     const pw = document.getElementById('userPw').value;
     if (id === ID && pw === PW) {
-      sessionStorage.setItem('jasupFeedback_auth', '1');
-      sessionStorage.setItem('jasupFeedback_loginAt', Date.now().toString());
-      location.href = 'admin.html';
+      // localStorage 사용 → 텔레그램 내부 브라우저 등에서도 유지
+      localStorage.setItem('jasupFeedback_auth', '1');
+      localStorage.setItem('jasupFeedback_loginAt', Date.now().toString());
+      redirectAfterLogin();
     } else {
       document.getElementById('errMsg').textContent = '아이디나 비밀번호가 맞지 않아요';
     }
   });
-  if (sessionStorage.getItem('jasupFeedback_auth') === '1') location.href = 'admin.html';
+  // 이미 로그인 되어 있으면 바로 목적지로
+  if (localStorage.getItem('jasupFeedback_auth') === '1') redirectAfterLogin();
 </script>
 </body>
 </html>
