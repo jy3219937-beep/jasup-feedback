@@ -43,6 +43,18 @@
     padding-bottom: calc(28px + env(safe-area-inset-bottom));
   }
 
+  /* ══════════ 학원 브랜드 바 ══════════ */
+  .brandbar {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 13px 18px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .brandbar img {
+    height: 26px; width: auto; display: block;
+  }
+  @media (max-width: 400px) { .brandbar { padding: 11px 14px; } .brandbar img { height: 22px; } }
+
   /* ══════════ 상단 바 : 세그먼트 진행 표시 ══════════ */
   .topbar {
     position: sticky; top: 0; z-index: 60;
@@ -404,6 +416,10 @@
 </style>
 </head>
 <body>
+
+<header class="brandbar">
+  <img src="jungyoul-logo.png" alt="정율사관학원" width="1131" height="174">
+</header>
 
 <!-- ═══════════ 상단 진행 표시 ═══════════ -->
 <div class="topbar" id="topbar" style="display:none">
