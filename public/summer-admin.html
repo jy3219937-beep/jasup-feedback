@@ -304,9 +304,13 @@ if (localStorage.getItem('jasupFeedback_auth') !== '1') {
 const COLLECTION = 'summer_survey_2026';
 
 /* ══════════ 라벨 사전 ══════════ */
-const L_AHA_USED = { many:'여러 번 해봤다', few:'한두 번 해봤다', none:'아직 안 해봤다', idk:'뭔지 잘 모른다' };
-const L_AHA_AGAIN = { sure:'또 쓸 것', maybe:'아마도', unsure:'모르겠다', no:'안 쓸 것' };
-const L_AHA_WHEN = { thisweek:'이번 주에', remain:'남은 기간에', chance:'기회 되면', noplan:'쓸 생각 없다', dunno:'모르겠다' };
+const L_AHA_MADE  = { many:'여러 개 만들었다', few:'한두 개 만들었다', none:'아직 안 만들었다', idk:'뭔지 잘 모른다' };
+const L_AHA_COUNT = { c1:'1~2개', c3:'3~5개', c6:'6~10개', c10:'10개 넘게' };
+const L_AHA_DIFF  = { easy:'쉬웠다', ok:'할 만했다', hard:'좀 어려웠다', vhard:'많이 어려웠다' };
+const L_AHA_HELP  = { sure:'확실히 도움', some:'좀 도움', unsure:'모르겠다', no:'별로 도움 안 됨' };
+const L_QR_ASK    = { many:'여러 번 올림', few:'한두 번 올림', none:'올린 적 없음' };
+const L_QR_ANSWER = { many:'여러 번 답변', few:'한두 번 답변', none:'답변 안 함' };
+const L_AHA_WHEN = { thisweek:'이번 주에', remain:'남은 기간에', chance:'기회 되면', noplan:'만들 생각 없다', dunno:'모르겠다' };
 const L_AHA_INTRO = { try:'해보고 싶다', more:'더 알아보고 싶다', nonow:'지금은 필요 없다', unsure:'모르겠다', later:'모르겠다(구)' };
 const L_QR_USED = { many:'여러 번 써봤다', few:'한두 번 써봤다', none:'아직 안 써봤다', idk:'뭔지 잘 모른다',
   /* 구버전 응답 호환 */ often:'여러 번 써봤다(구)' };
@@ -421,6 +425,10 @@ function relabel(pairs, dict) {
 // 주의: Object.keys 는 정수형 키를 오름차순으로 재정렬하므로 순서를 배열로 명시해야 한다.
 const ORD_SCORE = [5, 4, 3, 2, 1];
 const ORD_COND  = ['great', 'ok', 'tired', 'hard'];
+const ORD_COUNT = ['c1', 'c3', 'c6', 'c10'];
+const ORD_DIFF  = ['easy', 'ok', 'hard', 'vhard'];
+const ORD_HELP  = ['sure', 'some', 'unsure', 'no'];
+const ORD_FREQ  = ['many', 'few', 'none'];
 function ordered(rows, getter, dict, keys) {
   return keys.map(k =>
     [dict[k] || k, rows.filter(r => String(getter(r)) === String(k)).length]);
@@ -565,10 +573,10 @@ function renderSummary() {
   const n = VIEW.length;
   if (!n) { el.innerHTML = emptyBox('아직 응답이 없어요'); return; }
 
-  const ahaTried = VIEW.filter(r => ['many','few'].includes(r.aha?.used)).length;
-  const ahaMany  = VIEW.filter(r => r.aha?.used === 'many').length;
+  const ahaTried = VIEW.filter(r => ['many','few'].includes(r.aha?.made)).length;
+  const ahaMany  = VIEW.filter(r => r.aha?.made === 'many').length;
   const qrWent   = VIEW.filter(r => ['many','often','few'].includes(r.qroom?.used)).length;
-  const neither  = VIEW.filter(r => !['many','few'].includes(r.aha?.used)
+  const neither  = VIEW.filter(r => !['many','few'].includes(r.aha?.made)
                                  && !['many','often','few'].includes(r.qroom?.used)).length;
   const ovAvg    = avg(VIEW, r => r.academy?.overall);
   const fcAvg    = avg(VIEW, r => r.jasup?.satisfaction);
@@ -583,9 +591,9 @@ function renderSummary() {
     <div class="grid g4" style="margin-bottom:14px">
       ${kpi('응답률', pct(n, TOTAL_CAPACITY) + '<small>%</small>', `${n}명 / 전체 ${TOTAL_CAPACITY}명`, pct(n, TOTAL_CAPACITY) < 40 ? 'k-rose' : '')}
       ${kpi('응답 수', n, `${named}명 실명 · ${n-named}명 익명`, '')}
-      ${kpi('아하포인트 경험률', pct(ahaTried, n) + '<small>%</small>', `${ahaTried}명 중 여러 번 ${ahaMany}명`, 'k-sun')}
+      ${kpi('아하포인트 제작률', pct(ahaTried, n) + '<small>%</small>', `${ahaTried}명 중 여러 개 ${ahaMany}명`, 'k-sun')}
       ${kpi('질문방 이용률', pct(qrWent, n) + '<small>%</small>', `${qrWent}명`, 'k-sun')}
-      ${kpi('둘 다 안 씀', neither, '막혀도 혼자 버티는 학생', neither ? 'k-rose' : 'k-mint')}
+      ${kpi('둘 다 안 함', neither, '아하도 질문방도 안 하는 학생', neither ? 'k-rose' : 'k-mint')}
       ${kpi('썸머핫습 만족도', ovAvg ? ovAvg.toFixed(1) + '<small>/5</small>' : '–', ovAvg ? scoreWord(ovAvg) : '', 'k-mint')}
       ${kpi('자습관 만족도', fcAvg ? fcAvg.toFixed(1) + '<small>/5</small>' : '–', fcAvg ? scoreWord(fcAvg) : '', '')}
       ${kpi('지친 학생', tired, `그중 "많이 힘들다" ${hard}명`, hard ? 'k-rose' : '')}
@@ -594,10 +602,10 @@ function renderSummary() {
 
     <div class="grid g2">
       <div class="card">
-        <div class="card-h"><i class="fas fa-lightbulb" aria-hidden="true"></i> 아하포인트 · 질문방 경험</div>
-        <div class="card-sub">막혔을 때 실제로 어디로 가는지</div>
+        <div class="card-h"><i class="fas fa-lightbulb" aria-hidden="true"></i> 아하포인트 · 질문방</div>
+        <div class="card-sub">두 활동에 학생들이 실제로 얼마나 참여하는지</div>
         <div style="font-size:12px;font-weight:800;color:var(--ink2);margin-bottom:7px">아하포인트</div>
-        ${bars(relabel(tally(VIEW, r => r.aha?.used), L_AHA_USED), n, 'warm')}
+        ${bars(relabel(tally(VIEW, r => r.aha?.made), L_AHA_MADE), n, 'warm')}
         <div style="font-size:12px;font-weight:800;color:var(--ink2);margin:14px 0 7px">질문방</div>
         ${bars(relabel(tally(VIEW, r => r.qroom?.used), L_QR_USED), n)}
       </div>
@@ -620,7 +628,7 @@ function renderSummary() {
 
     <div class="card">
       <div class="card-h"><i class="fas fa-scale-balanced" aria-hidden="true"></i> 학년별 요약</div>
-      <div class="card-sub">썸머핫습 만족도 · 자습관 만족도 · 아하 경험률을 학년 단위로 비교</div>
+      <div class="card-sub">썸머핫습 만족도 · 자습관 만족도 · 아하 제작률을 학년 단위로 비교</div>
       ${groupTable(r => r.grade || '(미기재)', '학년')}
     </div>
 
@@ -638,7 +646,7 @@ function actionBrief() {
   if (!n) return '';
   const care = careRows();
   const careTalk = care.filter(r => r.closing?.want_talk);
-  const notYet = VIEW.filter(r => r.aha?.used === 'none');   // 아하 탭과 같은 모집단
+  const notYet = VIEW.filter(r => r.aha?.made === 'none');   // 아하 탭과 같은 모집단
   const blk = tally(notYet, r => r.aha?.blockers)[0];
 
   const rooms = new Map();
@@ -670,8 +678,8 @@ function actionBrief() {
     + `<button class="abtn" data-go="care">케어 필요 탭 열기</button>`);
   else items.push('<b>① 즉시 케어가 필요한 미처리 응답은 없습니다.</b>');
 
-  if (blk) items.push(`<b>② 아하포인트 미경험 ${notYet.length}명(${pct(notYet.length, n)}%)</b>의 걸림돌 1위는 `
-    + `"${esc(blk[0])}" ${blk[1]}명 — 이걸 없애는 안내부터 붙이면 경험률이 올라갑니다. `
+  if (blk) items.push(`<b>② 아하포인트 미제작 ${notYet.length}명(${pct(notYet.length, n)}%)</b>의 걸림돌 1위는 `
+    + `"${esc(blk[0])}" ${blk[1]}명 — 이걸 없애는 안내부터 붙이면 제작률이 올라갑니다. `
     + `<button class="abtn" data-go="aha">아하·질문방 탭</button>`);
 
   if (worst && worst.fc != null) items.push(`<b>③ 자습관 만족도 최하위는 ${esc(worst.k)}</b> (${worst.fc.toFixed(1)}점, 응답 ${worst.n}명${worst.kObs < 5 ? ' — 표본이 적어 참고만' : ''})`
@@ -721,7 +729,7 @@ function groupTable(keyFn, keyLabel, sortBy) {
   const rows = [...groups.entries()].map(([k, rs]) => {
     const ov = avg(rs, r => r.academy?.overall);
     const fc = avg(rs, r => r.jasup?.satisfaction);
-    const tried = rs.filter(r => ['many','few'].includes(r.aha?.used)).length;
+    const tried = rs.filter(r => ['many','few'].includes(r.aha?.made)).length;
     const hard = rs.filter(r => r.academy?.condition === 'hard').length;
     const tired = rs.filter(r => ['tired','hard'].includes(r.academy?.condition)).length;
     return { k, n: rs.length, kObs: obs(rs, r => r.academy?.overall),
@@ -744,7 +752,7 @@ function groupTable(keyFn, keyLabel, sortBy) {
   return `<div class="tbl-wrap" tabindex="0" role="region" aria-label="${esc(keyLabel)}별 요약"><table>
     <thead><tr>
       <th scope="col">${keyLabel}</th><th class="num" scope="col">응답</th>${byRoom?'<th class="num" scope="col">응답률</th>':''}<th class="num" scope="col">썸머핫습 만족</th>
-      <th class="num" scope="col">자습관 만족</th><th class="num" scope="col">아하 경험률</th><th class="num" scope="col">지침</th>
+      <th class="num" scope="col">자습관 만족</th><th class="num" scope="col">아하 제작률</th><th class="num" scope="col">지침</th>
     </tr></thead>
     <tbody>${rows.map(r => `<tr>
       <td style="font-weight:700">${esc(r.k)}</td>
@@ -767,9 +775,9 @@ function renderAha() {
   const n = VIEW.length;
   if (!n) { el.innerHTML = emptyBox('아직 응답이 없어요'); return; }
 
-  const tried = VIEW.filter(r => ['many','few'].includes(r.aha?.used));
-  const notYet = VIEW.filter(r => r.aha?.used === 'none');
-  const idk = VIEW.filter(r => r.aha?.used === 'idk');
+  const tried = VIEW.filter(r => ['many','few'].includes(r.aha?.made));
+  const notYet = VIEW.filter(r => r.aha?.made === 'none');
+  const idk = VIEW.filter(r => r.aha?.made === 'idk');
   const willAgain = tried.filter(r => ['sure','maybe'].includes(r.aha?.will_use_again)).length;
 
   const notes = VIEW.filter(r => (r.aha?.note||'').trim());
@@ -777,39 +785,49 @@ function renderAha() {
 
   el.innerHTML = `
     <div class="hint"><i class="fas fa-circle-info" aria-hidden="true"></i>
-      아하포인트는 학원 핵심 자산이에요. <b>안 쓰는 이유</b>가 이 탭의 핵심 — 걸림돌을 없애면 경험률이 올라갑니다.
+      아하포인트는 학원 핵심 자산이에요. <b>안 만드는 이유</b>가 이 탭의 핵심 — 걸림돌을 없애면 제작률이 올라갑니다.
     </div>
 
     <div class="grid g4" style="margin-bottom:14px">
-      ${kpi('경험률', pct(tried.length, n) + '<small>%</small>', `${tried.length}명 / ${n}명`, 'k-sun')}
-      ${kpi('아직 안 해봄', notYet.length, `전체의 ${pct(notYet.length, n)}%`, notYet.length ? 'k-rose' : '')}
+      ${kpi('제작률', pct(tried.length, n) + '<small>%</small>', `${tried.length}명 / ${n}명`, 'k-sun')}
+      ${kpi('아직 안 만듦', notYet.length, `전체의 ${pct(notYet.length, n)}%`, notYet.length ? 'k-rose' : '')}
       ${kpi('뭔지 모름', idk.length, idk.length ? '안내 자체가 안 닿았음' : '전원 인지', idk.length ? 'k-rose' : 'k-mint')}
       ${kpi('재사용 의향', tried.length ? pct(willAgain, tried.length) + '<small>%</small>' : '–', `해본 학생 중 ${willAgain}명`, 'k-mint')}
     </div>
 
     <div class="grid g2">
       <div class="card">
-        <div class="card-h"><i class="fas fa-chart-simple" aria-hidden="true"></i> 사용 경험 분포</div>
-        ${bars(relabel(tally(VIEW, r => r.aha?.used), L_AHA_USED), n, 'warm')}
+        <div class="card-h"><i class="fas fa-chart-simple" aria-hidden="true"></i> 제작 경험 분포</div>
+        ${bars(relabel(tally(VIEW, r => r.aha?.made), L_AHA_MADE), n, 'warm')}
       </div>
       <div class="card">
-        <div class="card-h"><i class="fas fa-rotate-right" aria-hidden="true"></i> 또 쓸 것 같은지</div>
-        <div class="card-sub">해본 학생 ${tried.length}명 기준</div>
-        ${bars(relabel(tally(tried, r => r.aha?.will_use_again), L_AHA_AGAIN), tried.length, 'good')}
+        <div class="card-h"><i class="fas fa-hashtag" aria-hidden="true"></i> 몇 개나 만들었는지</div>
+        <div class="card-sub">만든 학생 ${tried.length}명 기준</div>
+        ${bars(ordered(tried, r => r.aha?.count, L_AHA_COUNT, ORD_COUNT), tried.length, 'good', true)}
       </div>
       <div class="card">
-        <div class="card-h"><i class="fas fa-thumbs-up" aria-hidden="true"></i> 해보니 어땠는지</div>
-        <div class="card-sub">해본 학생 ${tried.length}명 · 복수 응답</div>
+        <div class="card-h"><i class="fas fa-dumbbell" aria-hidden="true"></i> 만들기가 어려웠는지</div>
+        <div class="card-sub">여기가 어려우면 제작률이 안 올라갑니다</div>
+        ${bars(ordered(tried, r => r.aha?.difficulty, L_AHA_DIFF, ORD_DIFF), tried.length, 'warm', true)}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-seedling" aria-hidden="true"></i> 도움이 되는 것 같은지</div>
+        <div class="card-sub">만든 학생이 체감한 효과 — 확산을 설득할 근거</div>
+        ${bars(ordered(tried, r => r.aha?.helpful, L_AHA_HELP, ORD_HELP), tried.length, 'good', true)}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-thumbs-up" aria-hidden="true"></i> 만들면서 어땠는지</div>
+        <div class="card-sub">만든 학생 ${tried.length}명 · 복수 응답</div>
         ${bars(tally(tried, r => r.aha?.experience), tried.length, 'good')}
       </div>
       <div class="card">
         <div class="card-h" style="color:#be123c"><i class="fas fa-triangle-exclamation" aria-hidden="true" style="color:#be123c"></i> 안 쓰는 이유 (걸림돌)</div>
-        <div class="card-sub">아직 안 해본 학생 ${notYet.length}명 · 복수 응답 — <b>여기가 개선 포인트</b></div>
+        <div class="card-sub">아직 안 만든 학생 ${notYet.length}명 · 복수 응답 — <b>여기가 개선 포인트</b></div>
         ${bars(tally(notYet, r => r.aha?.blockers), notYet.length, 'bad')}
       </div>
       <div class="card">
-        <div class="card-h"><i class="fas fa-clock" aria-hidden="true"></i> 언제 해볼 것 같은지</div>
-        <div class="card-sub">아직 안 해본 학생 ${notYet.length}명</div>
+        <div class="card-h"><i class="fas fa-clock" aria-hidden="true"></i> 언제 만들어볼 것 같은지</div>
+        <div class="card-sub">아직 안 만든 학생 ${notYet.length}명</div>
         ${bars(relabel(tally(notYet, r => r.aha?.when_try), L_AHA_WHEN), notYet.length, 'warm')}
       </div>
       <div class="card">
@@ -835,8 +853,8 @@ function renderAha() {
 
 /* ── 아하포인트 사용 여부별 대조 ── */
 function crossSection() {
-  const used = VIEW.filter(r => ['many','few'].includes(r.aha?.used));
-  const not  = VIEW.filter(r => !['many','few'].includes(r.aha?.used));
+  const used = VIEW.filter(r => ['many','few'].includes(r.aha?.made));
+  const not  = VIEW.filter(r => !['many','few'].includes(r.aha?.made));
   if (!used.length || !not.length) {
     return `<div class="card"><div class="card-h"><i class="fas fa-code-compare" aria-hidden="true"></i> 쓰는 학생 vs 안 쓰는 학생</div>
       <div class="card-sub">두 집단이 모두 모이면 비교가 나타납니다 (현재 사용 ${used.length}명 / 미사용 ${not.length}명).</div></div>`;
@@ -853,11 +871,11 @@ function crossSection() {
   };
   const small = used.length < 5 || not.length < 5;
   return `<div class="card">
-    <div class="card-h"><i class="fas fa-code-compare" aria-hidden="true"></i> 아하포인트를 쓰는 학생은 실제로 다를까</div>
-    <div class="card-sub">경험자 ${used.length}명 vs 미경험자 ${not.length}명. 인과가 아니라 상관이지만, 확산을 설득할 때 쓸 수 있는 근거입니다.
+    <div class="card-h"><i class="fas fa-code-compare" aria-hidden="true"></i> 아하포인트를 만드는 학생은 실제로 다를까</div>
+    <div class="card-sub">만든 학생 ${used.length}명 vs 안 만든 학생 ${not.length}명. 인과가 아니라 상관이지만, 확산을 설득할 때 쓸 수 있는 근거입니다.
       ${small ? '<b style="color:#be123c"> 아직 한쪽 표본이 5명 미만이라 참고만 하세요.</b>' : ''}</div>
-    <div class="tbl-wrap" tabindex="0" role="region" aria-label="아하포인트 경험 여부별 비교">
-      <table><thead><tr><th scope="col">지표</th><th class="num" scope="col">경험자</th><th class="num" scope="col">미경험자</th><th class="num" scope="col">차이 (경험자−미경험자)</th></tr></thead>
+    <div class="tbl-wrap" tabindex="0" role="region" aria-label="아하포인트 제작 여부별 비교">
+      <table><thead><tr><th scope="col">지표</th><th class="num" scope="col">만든 학생</th><th class="num" scope="col">안 만든 학생</th><th class="num" scope="col">차이 (경험자−미경험자)</th></tr></thead>
       <tbody>
         ${row('썸머핫습 만족도', rs => avg(rs, r => r.academy?.overall))}
         ${row('자습관 만족도', rs => avg(rs, r => r.jasup?.satisfaction))}
@@ -874,10 +892,11 @@ function qroomSection() {
   const notYet = VIEW.filter(r => r.qroom?.used === 'none');
   const idk = VIEW.filter(r => r.qroom?.used === 'idk');
   const often = VIEW.filter(r => ['many','often'].includes(r.qroom?.used)).length;
+  const answered = VIEW.filter(r => ['many','few'].includes(r.qroom?.answer_freq)).length;
 
   // 두 경로 중 아무것도 안 쓰는 학생 = 막혀도 혼자 버티는 학생
   const neither = VIEW.filter(r =>
-    !['many','few'].includes(r.aha?.used) && !['many','often','few'].includes(r.qroom?.used)).length;
+    !['many','few'].includes(r.aha?.made) && !['many','often','few'].includes(r.qroom?.used)).length;
 
   return `
     <div class="card" style="border-color:#bae6fd;background:linear-gradient(180deg,#f0f9ff,#fff 30%)">
@@ -885,9 +904,10 @@ function qroomSection() {
       <div class="card-sub" style="color:var(--ink4)">질문방 앱 이용 현황 — 아하포인트와 함께 봐야 전체 그림이 나옵니다</div>
       <div class="grid g4" style="margin-bottom:14px">
         ${kpi('질문방 이용률', pct(went.length, n) + '<small>%</small>', `${went.length}명 중 여러 번 쓴 학생 ${often}명`, 'k-mint')}
+        ${kpi('답변까지 한 학생', answered, went.length ? `써본 학생의 ${pct(answered, went.length)}%` : '–', answered ? 'k-mint' : '')}
         ${kpi('아직 안 써봄', notYet.length, `전체의 ${pct(notYet.length, n)}%`, notYet.length ? 'k-rose' : '')}
         ${kpi('뭔지 모름', idk.length, idk.length ? '안내가 안 닿았음' : '전원 인지', idk.length ? 'k-rose' : 'k-mint')}
-        ${kpi('둘 다 안 씀', neither, '막혀도 혼자 버티는 학생', neither ? 'k-rose' : 'k-mint')}
+        ${kpi('둘 다 안 함', neither, '아하도 질문방도 안 하는 학생', neither ? 'k-rose' : 'k-mint')}
       </div>
       <div class="grid g2">
         <div>
@@ -900,9 +920,14 @@ function qroomSection() {
           ${bars(tally(went, r => r.qroom?.experience), went.length, 'good')}
         </div>
         <div>
-          <div class="card-h" style="font-size:13px"><i class="fas fa-rotate-right" aria-hidden="true"></i> 또 쓸 것 같은지</div>
+          <div class="card-h" style="font-size:13px"><i class="fas fa-circle-question" aria-hidden="true"></i> 질문을 올린 정도</div>
           <div class="card-sub" style="color:var(--ink4)">써본 학생 ${went.length}명 기준</div>
-          ${bars(relabel(tally(went, r => r.qroom?.will_use_again), L_AHA_AGAIN), went.length, 'good')}
+          ${bars(ordered(went, r => r.qroom?.ask_freq, L_QR_ASK, ORD_FREQ), went.length, '', true)}
+        </div>
+        <div>
+          <div class="card-h" style="font-size:13px"><i class="fas fa-reply" aria-hidden="true"></i> 답변을 단 정도</div>
+          <div class="card-sub" style="color:var(--ink4)">답변까지 하는 학생이 이 앱의 핵심 사용자입니다</div>
+          ${bars(ordered(went, r => r.qroom?.answer_freq, L_QR_ANSWER, ORD_FREQ), went.length, 'good', true)}
         </div>
         <div>
           <div class="card-h" style="font-size:13px"><i class="fas fa-circle-question" aria-hidden="true"></i> 설명 듣고 난 반응</div>
@@ -1138,7 +1163,7 @@ function renderAllTab() {
           <td style="white-space:nowrap;color:var(--ink4);font-size:11.5px">${esc(fmtWhen(whenOf(r)))}</td>
           <td style="font-weight:700;white-space:nowrap">${esc(r.grade||'')}</td>
           <td>${r.is_named ? `<b>${esc(r.name)}</b>` : '<span style="color:var(--ink3)">익명</span>'}</td>
-          <td style="white-space:nowrap"><span class="pill ${['many','few'].includes(r.aha?.used)?'p-mint':'p-sun'}">${esc(L_AHA_USED[r.aha?.used]||'–')}</span></td>
+          <td style="white-space:nowrap"><span class="pill ${['many','few'].includes(r.aha?.made)?'p-mint':'p-sun'}">${esc(L_AHA_MADE[r.aha?.made]||'–')}</span></td>
           <td class="num" style="font-weight:800">${num(r.academy?.overall)}</td>
           <td class="num" style="font-weight:700">${num(r.jasup?.satisfaction)}</td>
           <td style="white-space:nowrap">${r.academy?.condition === 'hard'
@@ -1197,7 +1222,7 @@ function respCard(r, o) {
       ${talk ? `<span class="pill ${r.is_named ? 'p-mint' : 'p-sun'}"><i class="fas fa-comments" aria-hidden="true"></i> 면담 희망${r.is_named ? '' : ' · 익명'}</span>` : ''}
       ${hard ? `<span class="pill p-rose"><i class="fas fa-heart-crack" aria-hidden="true"></i> 많이 힘들다</span>` : ''}
       ${ov !== null && ov <= 2 ? `<span class="pill p-rose">만족도 ${ov}점</span>` : ''}
-      <span class="pill ${['many','few'].includes(r.aha?.used)?'p-mint':'p-sun'}">아하 ${esc(L_AHA_USED[r.aha?.used]||'–')}</span>
+      <span class="pill ${['many','few'].includes(r.aha?.made)?'p-mint':'p-sun'}">아하 ${esc(L_AHA_MADE[r.aha?.made]||'–')}</span>
       <span class="pill ${['many','often','few'].includes(r.qroom?.used)?'p-mint':'p-sun'}">질문방 ${esc(L_QR_USED[r.qroom?.used]||'–')}</span>
       <span class="resp-when">${esc(fmtWhen(whenOf(r)))}${Number.isFinite(r.duration_sec) ? ` · ${r.duration_sec}초 응답` : ''}</span>
     </div>
@@ -1206,8 +1231,11 @@ function respCard(r, o) {
       <span>만족도 <b>${num(r.academy?.overall)}/5</b> (${esc(L_OVERALL[r.academy?.overall]||'–')})</span>
       <span>자습관 <b>${esc(r.jasup?.room||'–')}</b> 만족 <b>${num(r.jasup?.satisfaction)}/5</b> (${esc(L_ROOM_SAT[r.jasup?.satisfaction]||'–')})</span>
       <span>컨디션 <b>${esc(L_COND[r.academy?.condition]||'–')}</b></span>
-      ${r.aha?.will_use_again ? `<span>아하 재사용 <b>${esc(L_AHA_AGAIN[r.aha.will_use_again])}</b></span>` : ''}
-      ${r.qroom?.will_use_again ? `<span>질문방 재사용 <b>${esc(L_AHA_AGAIN[r.qroom.will_use_again])}</b></span>` : ''}
+      ${r.aha?.count ? `<span>아하 <b>${esc(L_AHA_COUNT[r.aha.count])}</b></span>` : ''}
+      ${r.aha?.difficulty ? `<span>난이도 <b>${esc(L_AHA_DIFF[r.aha.difficulty])}</b></span>` : ''}
+      ${r.aha?.helpful ? `<span>도움 <b>${esc(L_AHA_HELP[r.aha.helpful])}</b></span>` : ''}
+      ${r.qroom?.ask_freq ? `<span>질문 <b>${esc(L_QR_ASK[r.qroom.ask_freq])}</b></span>` : ''}
+      ${r.qroom?.answer_freq ? `<span>답변 <b>${esc(L_QR_ANSWER[r.qroom.answer_freq])}</b></span>` : ''}
       ${r.aha?.when_try ? `<span>해볼 시점 <b>${esc(L_AHA_WHEN[r.aha.when_try])}</b></span>` : ''}
     </div>
 
@@ -1287,17 +1315,18 @@ async function removeResp(id) {
 /* ══════════ CSV ══════════ */
 function exportCSV() {
   if (!VIEW.length) { alert('내보낼 응답이 없어요.'); return; }
-  const head = ['시각','문서ID','학년','자습관','자습관정원','이름','아하_사용','아하_경험','아하_재사용','아하_기억','아하_해볼시점',
-    '아하_걸림돌','아하_바람','질문방_사용','질문방_경험','질문방_걸림돌','질문방_한마디','질문방_재사용','질문방_설명후반응','아하_설명후반응','학원_만족도','학원_좋은점','학원_개선1순위','학원_개선메모','컨디션',
+  const head = ['시각','문서ID','학년','자습관','자습관정원','이름','아하_제작','아하_개수','아하_난이도','아하_도움','아하_경험','아하_기억','아하_만들시점',
+    '아하_걸림돌','아하_바람','질문방_사용','질문방_질문빈도','질문방_답변빈도','질문방_경험','질문방_걸림돌','질문방_한마디','질문방_설명후반응','아하_설명후반응','학원_만족도','학원_좋은점','학원_개선1순위','학원_개선메모','컨디션',
     '자습관_만족도','자습관_만족도_라벨','자습관_도움','자습관_개선1순위','자습관_개선메모',
     '하고싶은말','고마운사람','면담희망','상태','관리자메모','응답시간(초)'];
   const rows = VIEW.map(r => [
     whenOf(r), r.id, r.grade||'', r.jasup?.room||'', capOf(r.jasup?.room) ?? '', r.name||'',
-    L_AHA_USED[r.aha?.used]||'', (r.aha?.experience||[]).join(' / '), L_AHA_AGAIN[r.aha?.will_use_again]||'',
-    r.aha?.note||'', L_AHA_WHEN[r.aha?.when_try]||'', (r.aha?.blockers||[]).join(' / '), r.aha?.wish||'',
-    L_QR_USED[r.qroom?.used]||'', (r.qroom?.experience||[]).join(' / '),
+    L_AHA_MADE[r.aha?.made]||'', L_AHA_COUNT[r.aha?.count]||'', L_AHA_DIFF[r.aha?.difficulty]||'',
+    L_AHA_HELP[r.aha?.helpful]||'', (r.aha?.experience||[]).join(' / '), r.aha?.note||'', L_AHA_WHEN[r.aha?.when_try]||'', (r.aha?.blockers||[]).join(' / '), r.aha?.wish||'',
+    L_QR_USED[r.qroom?.used]||'', L_QR_ASK[r.qroom?.ask_freq]||'', L_QR_ANSWER[r.qroom?.answer_freq]||'',
+    (r.qroom?.experience||[]).join(' / '),
     (r.qroom?.blockers||[]).join(' / '), r.qroom?.note||'',
-    L_AHA_AGAIN[r.qroom?.will_use_again]||'', L_AHA_INTRO[r.qroom?.after_intro]||'', L_AHA_INTRO[r.aha?.after_intro]||'',
+    L_AHA_INTRO[r.qroom?.after_intro]||'', L_AHA_INTRO[r.aha?.after_intro]||'',
     r.academy?.overall ?? '', (r.academy?.goods||[]).join(' / '),
     L_LIFE_IMPROVE[r.academy?.improve_one]||'', r.academy?.improve_note||'', L_COND[r.academy?.condition]||'',
     r.jasup?.satisfaction ?? '', L_ROOM_SAT[r.jasup?.satisfaction]||'', (r.jasup?.helps||[]).join(' / '),

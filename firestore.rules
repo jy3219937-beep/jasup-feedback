@@ -41,8 +41,13 @@ service cloud.firestore {
         return scoreOk(request.resource.data.academy.overall)
             && scoreOk(request.resource.data.jasup.satisfaction)
             && textOk(request.resource.data.academy.condition, 20)
-            && textOk(request.resource.data.aha.used, 20)
+            && textOk(request.resource.data.aha.made, 20)
+            && textOk(request.resource.data.aha.count, 20)
+            && textOk(request.resource.data.aha.difficulty, 20)
+            && textOk(request.resource.data.aha.helpful, 20)
             && textOk(request.resource.data.qroom.used, 20)
+            && textOk(request.resource.data.qroom.ask_freq, 20)
+            && textOk(request.resource.data.qroom.answer_freq, 20)
             && textOk(request.resource.data.academy.improve_one, 20)
             && textOk(request.resource.data.jasup.improve_one, 20);
       }
