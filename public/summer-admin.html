@@ -127,7 +127,24 @@
 
   /* ── 테이블 ── */
   .tbl-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--line); }
+  /* 선택 삭제 바 */
+  .bulkbar {
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    padding:12px 14px; margin-bottom:12px; border-radius:12px;
+    background:#fff1f2; border:1.5px solid #fecdd3;
+  }
+  .bulkbar.idle { background:#f8fafc; border-color:var(--line); }
+  .bulkbar-tx { font-size:13px; font-weight:700; color:var(--ink2); }
+  .bulkbar-tx b { color:#be123c; }
+  .btn-del {
+    font-family:inherit; font-size:12.5px; font-weight:800; cursor:pointer;
+    padding:11px 16px; min-height:44px; border-radius:9px;
+    background:#be123c; border:1.5px solid #be123c; color:#fff;
+  }
+  .btn-del:disabled { background:#cbd5e1; border-color:#cbd5e1; color:#64748b; cursor:not-allowed; }
+  .rowchk { width:19px; height:19px; accent-color:#be123c; cursor:pointer; }
   table { width:100%; border-collapse:collapse; font-size:12.5px; background:var(--card); }
+  .th-unit { font-size:10px; font-weight:600; color:var(--ink4); letter-spacing:-.02em; }
   th {
     background:#f8fafc; font-size:11.5px; font-weight:800; color:var(--ink2);
     text-align:left; padding:10px 12px; border-bottom:1.5px solid var(--line); white-space:nowrap;
@@ -477,6 +494,8 @@ function applyFilter() {
     (!st || (r.status || 'new') === st) &&
     (!q  || textOf(r).includes(q))
   );
+  // 필터에서 빠진 응답이 선택된 채 남아 있으면 "선택 3건 삭제"가 안 보이는 것을 지운다
+  [...SEL].forEach(id => { if (!VIEW.some(r => r.id === id)) SEL.delete(id); });
   document.getElementById('fCount').textContent = VIEW.length;
   document.getElementById('fTotal').textContent = ALL.length;
   document.getElementById('hdCount').textContent = ALL.length;
@@ -611,7 +630,7 @@ function renderSummary() {
       </div>
       <div class="card">
         <div class="card-h"><i class="fas fa-face-smile" aria-hidden="true"></i> 썸머핫습 전체 느낌</div>
-        <div class="card-sub">평균 ${ovAvg ? ovAvg.toFixed(1) : '–'} / 5점</div>
+        <div class="card-sub">5점 만점 · 평균 ${ovAvg ? ovAvg.toFixed(1) : '–'}점</div>
         ${bars(ordered(VIEW, r => r.academy?.overall, L_OVERALL, ORD_SCORE), n, '', true)}
       </div>
       <div class="card">
@@ -751,8 +770,8 @@ function groupTable(keyFn, keyLabel, sortBy) {
 
   return `<div class="tbl-wrap" tabindex="0" role="region" aria-label="${esc(keyLabel)}별 요약"><table>
     <thead><tr>
-      <th scope="col">${keyLabel}</th><th class="num" scope="col">응답</th>${byRoom?'<th class="num" scope="col">응답률</th>':''}<th class="num" scope="col">썸머핫습 만족</th>
-      <th class="num" scope="col">자습관 만족</th><th class="num" scope="col">아하 제작률</th><th class="num" scope="col">지침</th>
+      <th scope="col">${keyLabel}</th><th class="num" scope="col">응답</th>${byRoom?'<th class="num" scope="col">응답률</th>':''}<th class="num" scope="col">썸머핫습 만족<br><span class="th-unit">5점 만점</span></th>
+      <th class="num" scope="col">자습관 만족<br><span class="th-unit">5점 만점</span></th><th class="num" scope="col">아하 제작률</th><th class="num" scope="col">지침</th>
     </tr></thead>
     <tbody>${rows.map(r => `<tr>
       <td style="font-weight:700">${esc(r.k)}</td>
@@ -1060,6 +1079,7 @@ function renderRoom() {
     <div class="grid g2">
       <div class="card">
         <div class="card-h"><i class="fas fa-bullseye" aria-hidden="true"></i> 자습관 만족도 분포</div>
+        <div class="card-sub">5점 만점 · 평균 ${fcAvg ? fcAvg.toFixed(1) : '–'}점</div>
         ${bars(ordered(VIEW, r => r.jasup?.satisfaction, L_ROOM_SAT, ORD_SCORE), n, '', true)}
       </div>
       <div class="card">
@@ -1082,7 +1102,7 @@ function renderRoom() {
       <div class="card-h"><i class="fas fa-table-list" aria-hidden="true"></i> 자습관별 비교</div>
       <div class="card-sub">만족도 낮은 순 정렬 — 위쪽 관부터 살펴보세요</div>
       <div class="tbl-wrap" tabindex="0" role="region" aria-label="자습관별 비교"><table>
-        <thead><tr><th scope="col">자습관</th><th class="num" scope="col">응답</th><th class="num" scope="col">응답률</th><th class="num" scope="col">자습관 만족</th><th class="num" scope="col">썸머핫습 만족</th><th class="num" scope="col">아쉬움</th><th class="num" scope="col">지침률</th><th scope="col">개선 1순위</th></tr></thead>
+        <thead><tr><th scope="col">자습관</th><th class="num" scope="col">응답</th><th class="num" scope="col">응답률</th><th class="num" scope="col">자습관 만족<br><span class="th-unit">5점 만점</span></th><th class="num" scope="col">썸머핫습 만족<br><span class="th-unit">5점 만점</span></th><th class="num" scope="col">아쉬움</th><th class="num" scope="col">지침률</th><th scope="col">개선 1순위</th></tr></thead>
         <tbody>${roomRows.map(r => `<tr>
           <td style="font-weight:800">${esc(r.k)}</td>
           <td class="num">${r.n}${r.kObs<5?' <span class="pill">표본 적음</span>':''}</td>
@@ -1152,14 +1172,27 @@ function renderAllTab() {
     <div class="card">
       <div class="card-h"><i class="fas fa-table-list" aria-hidden="true"></i> 전체 응답 ${VIEW.length}건</div>
       <div class="card-sub">최신순. 카드를 눌러 상세를 펼치고, 상태·메모를 바로 저장할 수 있어요.</div>
+      <div class="bulkbar ${SEL.size ? '' : 'idle'}">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" class="rowchk" data-act="selall" ${SEL.size && SEL.size === VIEW.length ? 'checked' : ''}>
+          <span class="bulkbar-tx">전체 선택</span>
+        </label>
+        <span class="bulkbar-tx">${SEL.size ? `<b>${SEL.size}건</b> 선택됨` : '지울 응답을 체크하세요'}</span>
+        <button class="btn-del" data-act="delsel" ${SEL.size ? '' : 'disabled'} style="margin-left:auto">
+          <i class="fas fa-trash" aria-hidden="true"></i> 선택한 ${SEL.size}건 삭제
+        </button>
+      </div>
       <div class="tbl-wrap" tabindex="0" role="region" aria-label="전체 응답 목록"><table>
         <thead><tr>
+          <th scope="col"><span class="sr-only">선택</span></th>
           <th scope="col">시각</th><th scope="col">학년</th><th scope="col">이름</th><th scope="col">아하</th>
-          <th class="num" scope="col">핫습 만족</th><th class="num" scope="col">자습관 만족</th>
+          <th class="num" scope="col">핫습 만족<br><span class="th-unit">5점</span></th><th class="num" scope="col">자습관 만족<br><span class="th-unit">5점</span></th>
           <th scope="col">컨디션</th><th scope="col">자습관</th><th scope="col">상태</th>
-          <th scope="col"><span class="sr-only">상세 보기</span></th>
+          <th scope="col"><span class="sr-only">상세 보기·삭제</span></th>
         </tr></thead>
         <tbody>${VIEW.map((r, i) => `<tr>
+          <td><input type="checkbox" class="rowchk" data-act="sel" data-id="${esc(r.id)}"
+                     aria-label="이 응답 선택" ${SEL.has(r.id) ? 'checked' : ''}></td>
           <td style="white-space:nowrap;color:var(--ink4);font-size:11.5px">${esc(fmtWhen(whenOf(r)))}</td>
           <td style="font-weight:700;white-space:nowrap">${esc(r.grade||'')}</td>
           <td>${r.is_named ? `<b>${esc(r.name)}</b>` : '<span style="color:var(--ink3)">익명</span>'}</td>
@@ -1171,7 +1204,9 @@ function renderAllTab() {
             : esc(L_COND[r.academy?.condition] || '–')}</td>
           <td style="white-space:nowrap">${esc(r.jasup?.room||'–')}</td>
           <td><span class="pill ${r.status==='done'?'p-mint':r.status==='new'?'p-sky':''}">${esc(L_STATUS[r.status||'new'])}</span>${(r.admin_memo||'').trim()?' <i class="fas fa-note-sticky" aria-hidden="true" title="관리자 메모 있음" style="color:var(--ink4)"></i><span class="sr-only">관리자 메모 있음</span>':''}</td>
-          <td><button class="abtn" data-act="detail" data-id="${esc(r.id)}">보기</button></td>
+          <td style="white-space:nowrap"><button class="abtn" data-act="detail" data-id="${esc(r.id)}">보기</button>
+            <button class="abtn" data-act="remove" data-id="${esc(r.id)}"
+                    style="color:#be123c;border-color:#be123c" aria-label="이 응답 삭제"><i class="fas fa-trash" aria-hidden="true"></i></button></td>
         </tr>`).join('')}</tbody>
       </table></div>
     </div>
@@ -1180,6 +1215,7 @@ function renderAllTab() {
   if (openId) { if (VIEW.some(r => r.id === openId)) openDetail(openId); else openId = null; }
 }
 
+const SEL = new Set();   // 응답 전체 탭에서 체크한 문서 ID
 let openId = null;
 function openDetail(id, opt) {
   const r = VIEW.find(x => x.id === id);          // 필터에서 빠진 응답을 남겨두지 않는다
@@ -1304,12 +1340,34 @@ async function saveMemo(ta, id) {
 }
 
 async function removeResp(id) {
-  if (!confirm('이 응답을 삭제할까요? 되돌릴 수 없어요.')) return;
+  const r = ALL.find(x => x.id === id);
+  const who = r ? `${r.grade || ''} ${r.jasup?.room || ''} ${r.is_named ? r.name : '익명'}` : '';
+  if (!confirm(`이 응답을 삭제할까요?\n${who}\n\n되돌릴 수 없어요.`)) return;
   try {
     await window.__fb.deleteDoc(window.__fb.doc(window.__fb.db, COLLECTION, id));
     ALL = ALL.filter(x => x.id !== id);
+    SEL.delete(id);
+    if (openId === id) openId = null;
     applyFilter();
   } catch (e) { alert('삭제 실패: ' + e.message); }
+}
+
+// 체크한 응답을 한 번에 삭제 — 테스트 응답 정리나 중복 제출 처리를 위해
+async function removeSelected() {
+  const ids = [...SEL].filter(id => ALL.some(r => r.id === id));
+  if (!ids.length) return;
+  if (!confirm(`선택한 ${ids.length}건을 삭제할까요?\n\n되돌릴 수 없어요.`)) return;
+  const failed = [];
+  for (const id of ids) {
+    try {
+      await window.__fb.deleteDoc(window.__fb.doc(window.__fb.db, COLLECTION, id));
+      ALL = ALL.filter(x => x.id !== id);
+      SEL.delete(id);
+      if (openId === id) openId = null;
+    } catch (e) { failed.push(id); }
+  }
+  applyFilter();
+  if (failed.length) alert(`${failed.length}건은 삭제하지 못했어요. 새로고침 후 다시 시도해주세요.`);
 }
 
 /* ══════════ CSV ══════════ */
@@ -1367,10 +1425,20 @@ document.addEventListener('click', e => {
   if (b.dataset.act === 'detail') openDetail(id, { move: true });
   else if (b.dataset.act === 'status') setStatus(id, b.dataset.v);
   else if (b.dataset.act === 'remove') removeResp(id);
+  else if (b.dataset.act === 'delsel') removeSelected();
 });
 document.addEventListener('change', e => {
   const t = e.target;
-  if (t.matches('textarea[data-act="memo"]')) saveMemo(t, t.dataset.id);
+  if (t.matches('textarea[data-act="memo"]')) { saveMemo(t, t.dataset.id); return; }
+  if (t.matches('input[data-act="sel"]')) {
+    t.checked ? SEL.add(t.dataset.id) : SEL.delete(t.dataset.id);
+    renderAllTab();   // 선택 수·버튼 상태 갱신
+  }
+  if (t.matches('input[data-act="selall"]')) {
+    SEL.clear();
+    if (t.checked) VIEW.forEach(r => SEL.add(r.id));
+    renderAllTab();
+  }
 });
 
 /* ══════════ 시작 ══════════ */
