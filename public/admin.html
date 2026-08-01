@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>관리자 대시보드 · 무엇이든 말해보살</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
@@ -517,16 +520,300 @@
     font-size: 11px; font-weight: 800;
   }
 
+  /* ===== 응답 상세 모달 (풀스크린, 모바일 우선) ===== */
+  .detail-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15, 10, 20, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    z-index: 2000;
+    animation: overlayFadeIn 0.25s ease;
+  }
+  .detail-modal-overlay.show { display: block; }
+  @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .detail-modal {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    background: #f8f6f1;
+    border-radius: 20px;
+    max-width: 560px;
+    width: calc(100% - 24px);
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    display: flex; flex-direction: column;
+    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes modalSlideUp {
+    from { transform: translate(-50%, -40%); opacity: 0; }
+    to { transform: translate(-50%, -50%); opacity: 1; }
+  }
+  .detail-modal-header {
+    position: sticky; top: 0;
+    background: #fff;
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #ece8de;
+    z-index: 2;
+  }
+  .detail-modal-header-title { font-size: 15px; font-weight: 800; color: #1a1310; }
+  .detail-modal-close {
+    background: #f3f4f6; border: none;
+    width: 36px; height: 36px; border-radius: 50%;
+    font-size: 20px; cursor: pointer; color: #6b7280;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .detail-modal-close:active { background: #e5e7eb; }
+  .detail-modal-body {
+    padding: 18px 16px 28px;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .detail-hero {
+    padding: 18px;
+    background: linear-gradient(135deg, #fff 0%, #fef2f2 100%);
+    border-radius: 16px;
+    border: 1.5px solid #ece8de;
+    margin-bottom: 14px;
+  }
+  .detail-hero-priority {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-color: #ef4444;
+    box-shadow: 0 4px 16px rgba(239,68,68,0.12);
+  }
+  .detail-hero-name {
+    font-size: 20px; font-weight: 900;
+    color: #1a1310; margin-bottom: 8px;
+  }
+  .detail-hero-meta {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .detail-actions {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #ece8de;
+  }
+  .detail-actions .status-select { flex: 1; min-width: 140px; }
+
+  .detail-section {
+    margin-bottom: 14px;
+    padding: 14px 16px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #ece8de;
+  }
+  .detail-section-title {
+    font-size: 13px; font-weight: 700;
+    color: #4b3a2c; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .detail-text {
+    font-size: 14.5px; line-height: 1.7;
+    color: #1f2937;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .detail-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .detail-tag {
+    font-size: 13px; padding: 6px 12px;
+    border-radius: 14px; font-weight: 600;
+    background: #f3f4f6; color: #4b3a2c;
+  }
+  .detail-tag-good { background: #dcfce7; color: #15803d; }
+  .detail-tag-bad { background: #fff7ed; color: #9a3412; }
+  .detail-tag-cond { background: #f3e8ff; color: #7c3aed; }
+
+  /* focus-pulse: ?id= 로 열렸을 때 카드 강조 */
+  .reply-card.focus-pulse {
+    animation: focusPulse 1.6s ease-in-out 3;
+  }
+  @keyframes focusPulse {
+    0%, 100% { box-shadow: 0 4px 16px rgba(239,68,68,0.12); }
+    50% { box-shadow: 0 4px 20px rgba(239,68,68,0.55); }
+  }
+
+  .talk-action-btn.primary {
+    background: linear-gradient(135deg, #f43f5e, #e11d48);
+    color: white;
+    border: none;
+  }
+  .talk-action-btn.danger {
+    background: #fff;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
+  }
+  .talk-action-btn.danger:hover { background: #fef2f2; }
+  .talk-action-btn.danger:active { background: #fee2e2; }
+
+  .status-chips {
+    display: flex; gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #ece8de;
+  }
+
+  /* ===== KPI 클릭 가능 ===== */
+  .kpi-clickable { cursor: pointer; user-select: none; transition: transform 0.15s, box-shadow 0.15s; }
+  .kpi-clickable:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+  .kpi-clickable:active { transform: translateY(0); }
+
+  /* ===== 응답 전용 뷰 (알림 링크로 진입) ===== */
+  .focused-view {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 4px;
+  }
+  .focused-back-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .focused-back {
+    display: inline-flex; align-items: center;
+    padding: 8px 14px;
+    background: #fff;
+    border: 1.5px solid #ece8de;
+    border-radius: 12px;
+    color: #4b3a2c;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .focused-back:active { background: #f3f4f6; }
+  .focused-status-label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 600;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border-radius: 20px;
+  }
+  .focused-hero {
+    padding: 22px 20px;
+    background: linear-gradient(135deg, #fff 0%, #fef2f2 100%);
+    border-radius: 18px;
+    border: 1.5px solid #ece8de;
+    margin-bottom: 14px;
+  }
+  .focused-hero-priority {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-color: #ef4444;
+    box-shadow: 0 4px 16px rgba(239,68,68,0.15);
+  }
+  .focused-hero-name {
+    font-size: 24px; font-weight: 900;
+    color: #1a1310; margin-bottom: 10px;
+  }
+  .focused-hero-meta {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .focused-actions {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .focused-resolve-btn {
+    flex: 1;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 800;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+    transition: transform 0.15s;
+  }
+  .focused-resolve-btn:active { transform: translateY(1px); }
+  .focused-section {
+    margin-top: 12px;
+    padding: 16px 18px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #ece8de;
+  }
+  .focused-section-title {
+    font-size: 13px; font-weight: 700;
+    color: #4b3a2c; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
   /* ===== 모바일 ===== */
-  @media (max-width: 640px) {
+  @media (max-width: 700px) {
     .topbar { padding: 10px 14px; }
     .topbar-title { font-size: 14px; }
-    .dashboard { padding: 16px 12px 60px; }
+    .top-btn { padding: 6px 10px; font-size: 11px; }
+    .top-btn .fa, .top-btn i { font-size: 11px; }
+    .dashboard { padding: 12px 10px 60px; }
+
+    /* KPI: 2열 */
     .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .kpi-card { padding: 14px; }
+    .kpi-card { padding: 12px; }
     .kpi-value { font-size: 22px; }
-    .panel { padding: 16px 14px; }
+    .kpi-label { font-size: 10px; }
+    .kpi-icon { width: 28px; height: 28px; font-size: 12px; }
+    .kpi-detail { font-size: 10px; }
+
+    /* 패널 */
+    .panel { padding: 14px 12px; }
+    .panel-title { font-size: 14px; flex-wrap: wrap; }
     .room-stat-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* 탭바: 가로 스크롤 */
+    .tab-nav {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 4px;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn { flex-shrink: 0; font-size: 12px; padding: 8px 12px; }
+
+    /* 필터바 */
+    .filter-bar {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: none;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-label { flex-shrink: 0; }
+    .filter-pill { flex-shrink: 0; }
+    .search-wrap { min-width: 160px; }
+
+    /* 응답 카드 크게 */
+    .reply-card { padding: 14px 12px; }
+    .reply-name { font-size: 16px; }
+    .reply-section { font-size: 13.5px; }
+    .reply-tag, .talk-tag { font-size: 12.5px; padding: 5px 10px; }
+
+    /* 상세 모달 풀스크린 */
+    .detail-modal {
+      width: 100%; max-width: none;
+      height: 100vh; max-height: 100vh;
+      border-radius: 0;
+      top: 0; left: 0;
+      transform: none;
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .detail-modal-body { padding: 16px 14px 40px; }
+    .detail-hero { padding: 14px; }
+    .detail-hero-name { font-size: 18px; }
   }
 </style>
 </head>
@@ -543,6 +830,7 @@
   </div>
   <div class="topbar-right">
     <span class="last-updated" id="lastUpdated"></span>
+    <button class="top-btn" onclick="location.href='summer-admin.html'"><i class="fas fa-sun"></i> 썸머핫습 리뷰</button>
     <button class="top-btn" onclick="exportCSV()"><i class="fas fa-download"></i> CSV</button>
     <button class="top-btn loading" id="refreshBtn" onclick="loadData()"><i class="fas fa-sync-alt"></i> 새로고침</button>
     <button class="top-btn top-btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> 로그아웃</button>
@@ -589,12 +877,23 @@
   </div>
 </div>
 
+<!-- 응답 상세 모달 (풀스크린, 모바일 우선) -->
+<div class="detail-modal-overlay" id="detailModalOverlay">
+  <div class="detail-modal">
+    <div class="detail-modal-header">
+      <div class="detail-modal-header-title">📋 응답 상세보기</div>
+      <button class="detail-modal-close" onclick="closeDetailModal()">×</button>
+    </div>
+    <div class="detail-modal-body" id="detailModalBody"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, setDoc, getDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCUpVlY5al5uvH4wRv7WQxWrbV_OnvfPQg",
@@ -606,13 +905,17 @@
   };
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  window.__fb = { db, collection, getDocs, doc, updateDoc, query, orderBy };
+  window.__fb = { db, collection, getDocs, doc, updateDoc, setDoc, getDoc, deleteDoc, query, orderBy };
   window.dispatchEvent(new Event('fbready'));
 </script>
 
 <script>
 // ===== 인증 가드 =====
-if (sessionStorage.getItem('jasupFeedback_auth') !== '1') {
+if (localStorage.getItem('jasupFeedback_auth') !== '1') {
+  // 로그인 안 된 상태에서 ?id= 등 파라미터로 들어오면, 로그인 후 되돌아올 URL 저장
+  if (location.search) {
+    sessionStorage.setItem('jasupFeedback_returnTo', location.pathname + location.search);
+  }
   location.href = 'login.html';
 }
 
@@ -622,6 +925,36 @@ const LEGACY_ROOMS = ['5관','420관'];
 const ALL_ROOMS = [...NEW_ROOMS, ...LEGACY_ROOMS];
 
 const LABELS = {
+  // 신규 스키마
+  env_good: {
+    temp_good:'🌡️ 온도 딱 좋음', air_good:'🍃 공기 쾌적', light_good:'💡 조명 편안함',
+    seat_good:'💺 책상·의자 편함', quiet_good:'🤫 조용해서 집중', focus_atmosphere:'🎯 분위기 좋음',
+    clean_good:'✨ 청소·정리 잘 됨'
+  },
+  env_bad: {
+    too_hot:'🥵 너무 덥다', too_cold:'🥶 너무 춥다', stuffy_air:'😮‍💨 공기 탁함',
+    lighting:'💡 조명 불편', desk_chair:'🪑 책상·의자 불편', outlet:'🔌 콘센트 부족',
+    corridor_noise:'🚪 방음 안 됨', restroom_water:'🚻 화장실·정수기 멂',
+    whispering:'🗣️ 속삭임 소리', chatting_time:'📢 특정 시간대 소란', sleeping:'😴 잠자는 학생',
+    snack_noise:'🍫 간식 소리', repetitive_sound:'🖊️ 반복적 소리', movement:'🚶 잦은 출입',
+    phone_vibrate:'📱 휴대폰 진동'
+  },
+  op_good: {
+    rules_clear:'📏 규칙 명확', time_balance:'⏰ 시간 배분 좋음', supervisor_good:'👨‍🏫 감독 선생님 든든',
+    atmosphere_good:'🎯 자습 분위기 좋음', class_understand:'📚 수업 이해 잘 됨',
+    teacher_care:'💬 선생님 도움', seat_system_good:'💺 좌석 시스템 만족'
+  },
+  op_bad: {
+    study_too_long:'⏰ 자습시간 길다', seating:'💺 좌석 배치 아쉬움', too_strict:'🔒 규칙 엄격',
+    too_loose:'🔓 규칙 느슨', teacher_diff:'👨‍🏫 감독 선생님 차이', time_adjust:'🌙 야간자습 시간',
+    class_pace:'📚 수업 속도·난이도', class_visibility:'🖍️ 칠판·화면 안 보임'
+  },
+  condition: {
+    focus_drop:'🎯 집중 어려움', dont_know_what:'❓ 뭘 공부할지 헷갈림', sleepy:'😪 잠 부족',
+    burnout:'🔥 지쳐 있음', worry:'💭 생각 많음', peer_pressure:'📊 비교 불안',
+    condition_none:'🌱 잘 지내고 있음'
+  },
+  // 구버전 호환용 (기존 응답 표시)
   facility: {
     too_hot:'🥵 너무 덥다', too_cold:'🥶 너무 춥다', stuffy_air:'😮‍💨 공기 탁함',
     lighting:'💡 조명 불편', desk_chair:'🪑 책상·의자 불편', outlet:'🔌 콘센트 부족',
@@ -637,19 +970,21 @@ const LABELS = {
     study_too_long:'⏰ 자습시간 길다', seating:'💺 좌석 배치 불만', too_strict:'🔒 규칙 엄격',
     too_loose:'🔓 규칙 느슨', teacher_diff:'👨‍🏫 감독 선생님 차이', time_adjust:'🌙 야간자습 시간',
     rules_none:'✅ 불편 없다'
-  },
-  condition: {
-    focus_drop:'🎯 집중력 저하', dont_know_what:'❓ 뭘 공부할지 모름', sleepy:'😪 졸음',
-    burnout:'🔥 번아웃', worry:'💭 고민 많음', peer_pressure:'📊 비교 불안',
-    condition_none:'✅ 어려움 없다'
   }
 };
-const SECTION_COLORS = { facility:'rgba(59,130,246,0.7)', noise:'rgba(245,158,11,0.7)', rules:'rgba(34,197,94,0.7)', condition:'rgba(168,85,247,0.7)' };
-const SECTION_HEAT_COLOR = { facility:[59,130,246], noise:[245,158,11], rules:[34,197,94], condition:[168,85,247] };
-const SECTION_TITLES = { facility:'🏫 시설·환경', noise:'🔊 소음·분위기', rules:'📐 운영·규칙', condition:'🧠 자습 컨디션' };
-const ETC_FIELDS = { facility:'facility_etc', noise:'noise_etc', rules:'rules_etc', condition:'condition_etc' };
-const CATS = ['facility','noise','rules','condition'];
-const TAB_IDS = ['overview','talk','final','rooms','categories','named','all'];
+const SECTION_COLORS = { env_good:'rgba(34,197,94,0.7)', env_bad:'rgba(249,115,22,0.7)', op_good:'rgba(34,197,94,0.55)', op_bad:'rgba(249,115,22,0.55)', condition:'rgba(168,85,247,0.7)', facility:'rgba(59,130,246,0.7)', noise:'rgba(245,158,11,0.7)', rules:'rgba(34,197,94,0.7)' };
+const SECTION_HEAT_COLOR = { env_bad:[249,115,22], op_bad:[220,38,38], condition:[168,85,247], facility:[59,130,246], noise:[245,158,11], rules:[34,197,94] };
+const SECTION_TITLES = { env_good:'💚 환경 좋은 점', env_bad:'🙏 환경 아쉬운 점', op_good:'💚 운영·수업 좋은 점', op_bad:'🙏 운영·수업 아쉬운 점', condition:'🌿 나의 컨디션', facility:'🏫 시설(구)', noise:'🔊 소음(구)', rules:'📐 운영(구)' };
+const ETC_FIELDS = { env_bad:'env_etc', op_bad:'op_etc', condition:'condition_etc', facility:'facility_etc', noise:'noise_etc', rules:'rules_etc' };
+// 신규 스키마 카테고리 (기본 표시용)
+const CATS_NEW = ['env_good','env_bad','op_good','op_bad','condition'];
+const CATS_BAD_NEW = ['env_bad','op_bad'];
+const CATS_LEGACY = ['facility','noise','rules'];
+const CATS_ALL = [...CATS_NEW, ...CATS_LEGACY];
+// 기존 코드가 CATS를 참조하므로 유지 (통계·표시용)
+const CATS = CATS_NEW;
+const TAB_IDS = ['overview','priority','talk','gratitude','announce','final','rooms','categories','named','all'];
+const RISK_KEYWORDS = ['힘들','그만','못 하겠','못하겠','자퇴','우울','죽고','포기','괴로','싫어'];
 
 const STATUS_LABELS = {
   new: '🆕 신규', reviewing: '👀 검토중', resolved: '✅ 처리완료', onhold: '⏸️ 보류'
@@ -661,15 +996,50 @@ let chartInstances = {};
 let currentRoom = 'all';
 let currentPeriod = 'all';
 let currentSearch = '';
-let activeTab = 'overview';
-let activeCat = 'facility';
+let currentStatus = 'all';   // 상태 필터
+// 모바일이면 기본 탭을 우선 확인으로
+const IS_MOBILE = window.matchMedia('(max-width: 700px)').matches;
+let activeTab = IS_MOBILE ? 'priority' : 'overview';
+let activeCat = 'env_bad';
 let memoTargetId = null;
 let fbReady = false;
+let focusDocId = null;    // ?id= 로 지정된 응답 ID
+let detailTargetId = null; // 상세 모달에 표시할 응답 ID
+
+// URL 파라미터에서 응답 ID 감지
+(function detectFocusId() {
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  if (id) {
+    focusDocId = id;
+    activeTab = 'all'; // 전체 목록에서 찾기
+  }
+})();
 
 window.addEventListener('fbready', () => { fbReady = true; if (!allData.length) loadData(); });
 
 function parseArr(v) { if (!v) return []; if (Array.isArray(v)) return v; try { return JSON.parse(v); } catch { return []; } }
 function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+
+// 위험도 계산 (제출시 서버가 매기지만 admin 정렬용으로 로컬 재계산도 지원)
+function riskScoreOf(r) {
+  if (typeof r.risk_score === 'number') return r.risk_score;
+  const envBad = parseArr(r.env_bad).length + parseArr(r.facility).filter(k => !k.endsWith('_none')).length + parseArr(r.noise).filter(k => !k.endsWith('_none')).length;
+  const opBad = parseArr(r.op_bad).length + parseArr(r.rules).filter(k => !k.endsWith('_none')).length;
+  const cond = parseArr(r.condition);
+  const condBad = cond.filter(v => v !== 'condition_none').length;
+  const condRisk = cond.filter(v => ['burnout','worry','peer_pressure'].includes(v)).length;
+  const text = [r.free_text, r.condition_etc, r.env_etc, r.op_etc, r.facility_etc, r.noise_etc, r.rules_etc].filter(Boolean).join(' ').toLowerCase();
+  const keywordHit = RISK_KEYWORDS.some(k => text.includes(k)) ? 2 : 0;
+  return envBad + opBad + condBad + condRisk + keywordHit;
+}
+function hasRiskKeyword(r) {
+  const text = [r.free_text, r.condition_etc, r.env_etc, r.op_etc, r.facility_etc, r.noise_etc, r.rules_etc].filter(Boolean).join(' ').toLowerCase();
+  return RISK_KEYWORDS.find(k => text.includes(k)) || null;
+}
+function isPriority(r) {
+  return r.priority_flag === true || riskScoreOf(r) >= 4 || hasRiskKeyword(r) || r.want_talk === 'yes';
+}
 function getTimestamp(r) {
   if (!r.created_at) return null;
   if (typeof r.created_at === 'string') return new Date(r.created_at);
@@ -724,12 +1094,17 @@ function applyFilter() {
       const days = (Date.now() - dt.getTime()) / (1000 * 60 * 60 * 24);
       if (days > parseInt(currentPeriod)) return false;
     }
+    if (currentStatus !== 'all') {
+      const status = r.status || 'new';
+      if (status !== currentStatus) return false;
+    }
     if (currentSearch) {
       const q = currentSearch.toLowerCase();
       const haystack = [
         r.student_name, r.study_room,
-        r.facility_etc, r.noise_etc, r.rules_etc, r.condition_etc,
-        r.free_text, r.class_feedback, r.one_wish, r.admin_memo
+        r.env_etc, r.op_etc, r.condition_etc,
+        r.facility_etc, r.noise_etc, r.rules_etc,
+        r.free_text, r.class_feedback, r.one_wish, r.gratitude_text, r.admin_memo
       ].filter(Boolean).join(' ').toLowerCase();
       if (!haystack.includes(q)) return false;
     }
@@ -740,11 +1115,12 @@ function applyFilter() {
 
 // ===== 통계 계산 =====
 function computeStats(data) {
-  const counts = { facility:{}, noise:{}, rules:{}, condition:{} };
+  const counts = {};
+  CATS_ALL.forEach(cat => counts[cat] = {});
   let totalChecks = 0;
   const noneSet = new Set();
   data.forEach((row, idx) => {
-    CATS.forEach(cat => {
+    CATS_ALL.forEach(cat => {
       parseArr(row[cat]).forEach(item => {
         counts[cat][item] = (counts[cat][item] || 0) + 1;
         totalChecks++;
@@ -752,20 +1128,36 @@ function computeStats(data) {
       });
     });
   });
-  // Top 5 (None 제외)
-  const allItems = [];
-  CATS.forEach(cat => Object.entries(counts[cat]).forEach(([k, v]) => {
-    if (!k.endsWith('_none')) allItems.push({ cat, key: k, label: LABELS[cat][k] || k, count: v });
-  }));
-  allItems.sort((a, b) => b.count - a.count);
-  const top5 = allItems.slice(0, 5);
+  // "아쉬운 점" TOP 5 만 뽑기 (env_bad, op_bad, condition[none 제외], + legacy)
+  const badItems = [];
+  ['env_bad','op_bad','condition','facility','noise','rules'].forEach(cat => {
+    Object.entries(counts[cat] || {}).forEach(([k, v]) => {
+      if (k.endsWith('_none')) return;
+      badItems.push({ cat, key: k, label: LABELS[cat]?.[k] || k, count: v });
+    });
+  });
+  badItems.sort((a, b) => b.count - a.count);
+  const top5 = badItems.slice(0, 5);
 
-  // 심각도
+  // "좋아요" TOP 5
+  const goodItems = [];
+  ['env_good','op_good'].forEach(cat => {
+    Object.entries(counts[cat] || {}).forEach(([k, v]) => {
+      goodItems.push({ cat, key: k, label: LABELS[cat]?.[k] || k, count: v });
+    });
+  });
+  goodItems.sort((a, b) => b.count - a.count);
+  const top5Good = goodItems.slice(0, 5);
+
+  // 심각도 (구버전 응답 대응)
   const sev = [0,0,0,0,0];
   data.forEach(r => { const s = parseInt(r.noise_severity); if (s >= 1 && s <= 5) sev[s-1]++; });
 
   // 통계
   const wantTalk = data.filter(r => r.want_talk === 'yes').length;
+  const priorityCount = data.filter(isPriority).length;
+  const gratitudeCount = data.filter(r => r.gratitude_text && r.gratitude_text.trim()).length;
+  const gratitudeShareOk = data.filter(r => r.gratitude_text && r.gratitude_text.trim() && r.gratitude_share_ok !== false).length;
   const newCount = data.filter(r => !r.status || r.status === 'new').length;
   const reviewing = data.filter(r => r.status === 'reviewing').length;
   const resolved = data.filter(r => r.status === 'resolved').length;
@@ -776,8 +1168,9 @@ function computeStats(data) {
   const namedCount = data.filter(r => r.student_name && r.student_name.trim() && r.student_name !== '익명').length;
   const freeTextCount = data.filter(r => r.free_text && r.free_text.trim()).length;
 
-  return { total: data.length, totalChecks, top5, noneCount: noneSet.size, counts, sev,
-           wantTalk, newCount, reviewing, resolved, recent7, namedCount, freeTextCount };
+  return { total: data.length, totalChecks, top5, top5Good, noneCount: noneSet.size, counts, sev,
+           wantTalk, priorityCount, gratitudeCount, gratitudeShareOk,
+           newCount, reviewing, resolved, recent7, namedCount, freeTextCount };
 }
 
 // ===== 자습관 필터 빌드 =====
@@ -802,47 +1195,228 @@ function buildRoomFilters() {
   });
 }
 
+// ===== 응답 전용 뷰 (알림 링크로 들어왔을 때) =====
+function renderFocusedView(r) {
+  document.querySelector('.filter-bar').style.display = 'none';
+  const dt = getTimestamp(r);
+  const status = r.status || 'new';
+  const score = riskScoreOf(r);
+  const riskKw = hasRiskKeyword(r);
+  const isTalk = r.want_talk === 'yes';
+
+  // 체크 항목 수집
+  const goodItems = [], badItems = [], condItems = [];
+  ['env_good','op_good'].forEach(cat => parseArr(r[cat]).forEach(k => {
+    if (LABELS[cat]?.[k]) goodItems.push(LABELS[cat][k]);
+  }));
+  ['env_bad','op_bad','facility','noise','rules'].forEach(cat => parseArr(r[cat]).forEach(k => {
+    if (!k.endsWith('_none') && LABELS[cat]?.[k]) badItems.push(LABELS[cat][k]);
+  }));
+  parseArr(r.condition).forEach(k => {
+    if (LABELS.condition?.[k]) condItems.push({ label: LABELS.condition[k], isNone: k === 'condition_none' });
+  });
+
+  let h = `<div class="focused-view">
+    <div class="focused-back-row">
+      <a class="focused-back" href="admin.html">← 전체 대시보드로</a>
+      <span class="focused-status-label">${STATUS_LABELS[status] || status}</span>
+    </div>
+
+    <div class="focused-hero ${isTalk || score >= 4 ? 'focused-hero-priority' : ''}">
+      <div class="focused-hero-name">${esc(r.student_name || '익명')}</div>
+      <div class="focused-hero-meta">
+        <span class="badge badge-room">📍 ${esc(r.study_room || '')}</span>
+        <span class="badge badge-date">${fmtDate(dt)}</span>
+        ${isTalk ? '<span class="badge badge-talk">🙋 면담 희망</span>' : ''}
+        ${score >= 4 ? `<span class="badge" style="background:#fee2e2;color:#991b1b;">⚠️ 위험도 ${score}</span>` : ''}
+        ${riskKw ? `<span class="badge" style="background:#fef3c7;color:#92400e;">🔍 "${riskKw}"</span>` : ''}
+      </div>
+    </div>
+
+    <div class="focused-actions">
+      <select class="status-select" onchange="changeStatus('${r.id}', this.value)" style="flex:1;">
+        <option value="new" ${status==='new'?'selected':''}>🆕 신규</option>
+        <option value="reviewing" ${status==='reviewing'?'selected':''}>👀 검토중</option>
+        <option value="resolved" ${status==='resolved'?'selected':''}>✅ 처리완료</option>
+        <option value="onhold" ${status==='onhold'?'selected':''}>⏸️ 보류</option>
+      </select>
+      <button class="talk-action-btn" onclick="openMemoModal('${r.id}')"><i class="fas fa-pen"></i> 메모</button>
+    </div>
+
+    <div class="focused-actions" style="margin-top:8px;">
+      <button class="focused-resolve-btn" onclick="resolveWithAnnounce('${r.id}')">
+        ✅ 해결 완료 · 인트로에 알리기
+      </button>
+      ${isTalk && r.meeting_status !== 'done' ? `<button class="talk-action-btn success" onclick="markMeetingDone('${r.id}')"><i class="fas fa-check"></i> 면담 완료</button>` : ''}
+    </div>
+
+    <div class="focused-actions" style="margin-top:8px;justify-content:flex-end;">
+      <button class="talk-action-btn danger" onclick="deleteResponse('${r.id}')"><i class="fas fa-trash"></i> 이 응답 삭제</button>
+    </div>`;
+
+  if (goodItems.length) {
+    h += `<div class="focused-section"><div class="focused-section-title" style="color:#15803d;">💚 좋아요</div><div class="detail-tags">`;
+    goodItems.forEach(l => h += `<span class="detail-tag detail-tag-good">${l}</span>`);
+    h += `</div></div>`;
+  }
+  if (badItems.length) {
+    h += `<div class="focused-section"><div class="focused-section-title" style="color:#9a3412;">🙏 아쉬워요</div><div class="detail-tags">`;
+    badItems.forEach(l => h += `<span class="detail-tag detail-tag-bad">${l}</span>`);
+    h += `</div></div>`;
+  }
+  if (condItems.length) {
+    h += `<div class="focused-section"><div class="focused-section-title" style="color:#7c3aed;">🌿 컨디션</div><div class="detail-tags">`;
+    condItems.forEach(i => h += `<span class="detail-tag ${i.isNone ? 'detail-tag-good' : 'detail-tag-cond'}">${i.label}</span>`);
+    h += `</div></div>`;
+  }
+
+  const textFields = [
+    { key:'free_text', title:'💬 자유 서술' },
+    { key:'one_wish', title:'⭐ 가장 바라는 것' },
+    { key:'env_etc', title:'🏫 환경 의견' },
+    { key:'op_etc', title:'📐 운영·수업 의견' },
+    { key:'condition_etc', title:'🌿 컨디션 의견' },
+    { key:'facility_etc', title:'🏫 시설(구)' },
+    { key:'noise_etc', title:'🔊 소음(구)' },
+    { key:'rules_etc', title:'📐 운영(구)' },
+    { key:'class_feedback', title:'🏫 수업(구)' }
+  ];
+  textFields.forEach(({ key, title }) => {
+    if (r[key] && r[key].trim()) {
+      h += `<div class="focused-section"><div class="focused-section-title">${title}</div><div class="detail-text">${esc(r[key])}</div></div>`;
+    }
+  });
+
+  if (r.gratitude_text && r.gratitude_text.trim()) {
+    const shareLabel = r.gratitude_share_ok === false ? '🔒 비공개' : '🌱 공유 OK';
+    h += `<div class="focused-section" style="background:#fdf2f8;border-color:#fbcfe8;">
+      <div class="focused-section-title" style="color:#be185d;">💝 감사·응원 <span class="badge" style="background:#fce7f3;color:#9d174d;font-size:10px;">${shareLabel}</span></div>
+      <div class="detail-text" style="color:#831843;">${esc(r.gratitude_text)}</div>
+    </div>`;
+  }
+
+  if (r.admin_memo && r.admin_memo.trim()) {
+    h += `<div class="focused-section" style="background:#fffbeb;border-left:4px solid #fbbf24;">
+      <div class="focused-section-title">📌 관리자 메모</div>
+      <div class="detail-text">${esc(r.admin_memo)}</div>
+      ${r.meeting_date ? `<div style="margin-top:8px;font-size:12px;color:#92400e;">📅 면담 예정: ${esc(r.meeting_date)}</div>` : ''}
+    </div>`;
+  }
+
+  h += `</div>`;
+  document.getElementById('dashboardArea').innerHTML = h;
+}
+
+// ===== 해결 완료 + 인트로 알림 자동 추가 =====
+async function resolveWithAnnounce(docId) {
+  const r = allData.find(x => x.id === docId);
+  if (!r) return;
+  // 기본 문구 자동 생성
+  const room = r.study_room || '';
+  const badItems = [];
+  ['env_bad','op_bad'].forEach(cat => parseArr(r[cat]).slice(0, 2).forEach(k => {
+    if (LABELS[cat]?.[k]) badItems.push(LABELS[cat][k].replace(/^[^ ]+ /, '')); // 이모지 제거
+  }));
+  const defaultText = badItems.length
+    ? `${room} ${badItems[0]} 개선했어요`
+    : `${room} 응답에 담긴 의견 반영했어요`;
+
+  const text = prompt(
+    '학생 인트로 화면에 표시할 "지난 주 변화" 문구를 입력하세요.\n\n예: "3관 냉방 세기를 조정했어요"',
+    defaultText
+  );
+  if (text === null) return; // 취소
+  const clean = text.trim();
+
+  try {
+    const { db, doc, updateDoc, setDoc, getDoc } = window.__fb;
+    // 상태 처리완료
+    await updateDoc(doc(db, 'study_room_reports', docId), { status: 'resolved' });
+    r.status = 'resolved';
+
+    // 인트로 알림 추가
+    if (clean) {
+      const snap = await getDoc(doc(db, 'settings', 'announcements'));
+      const existing = snap.exists() ? (snap.data().items || []) : [];
+      // 중복 방지
+      const items = existing.includes(clean) ? existing : [clean, ...existing].slice(0, 10);
+      await setDoc(doc(db, 'settings', 'announcements'), { items, updated_at: new Date().toISOString() });
+      announceItems = items;
+      announceLoaded = true;
+      toast('✅ 처리완료 · 인트로에 반영됨', 'success');
+    } else {
+      toast('✅ 처리완료로 변경됨', 'success');
+    }
+
+    // 응답 전용 뷰라면 상단 상태 라벨 갱신
+    const statusLabel = document.querySelector('.focused-status-label');
+    if (statusLabel) statusLabel.textContent = STATUS_LABELS.resolved;
+    const statusSelect = document.querySelector('.focused-view .status-select');
+    if (statusSelect) statusSelect.value = 'resolved';
+  } catch (e) {
+    console.error(e);
+    toast('처리 실패: ' + e.message, 'error');
+  }
+}
+
 // ===== 메인 렌더 =====
 function render() {
   Object.values(chartInstances).forEach(c => { try { c.destroy(); } catch {} });
   chartInstances = {};
+
+  // 알림 링크로 들어온 경우: 대시보드 대신 응답 전용 뷰
+  if (focusDocId) {
+    const r = allData.find(x => x.id === focusDocId);
+    if (r) {
+      renderFocusedView(r);
+      return;
+    }
+    // 못 찾으면 폴백: 전체 대시보드
+    toast('해당 응답을 찾을 수 없어요', 'error');
+    focusDocId = null;
+  }
+  document.querySelector('.filter-bar').style.display = '';
+
   const S = computeStats(filteredData);
   const filterLabel = currentRoom === 'all' ? '전체' : currentRoom;
   let h = '';
 
-  // KPI 그리드
+  // KPI 그리드 (전부 클릭 가능 · 클릭 시 관련 탭으로 이동)
   h += `<div class="kpi-grid">
-    <div class="kpi-card kpi-blue">
-      <div class="kpi-header"><span class="kpi-label">총 응답 수</span><div class="kpi-icon"><i class="fas fa-paper-plane"></i></div></div>
-      <div class="kpi-value">${S.total}</div>
-      <div class="kpi-detail">${filterLabel} 기준</div>
+    <div class="kpi-card kpi-blue kpi-clickable" data-kpi-action="all">
+      <div class="kpi-header"><span class="kpi-label">총 응답 · 신규</span><div class="kpi-icon"><i class="fas fa-paper-plane"></i></div></div>
+      <div class="kpi-value">${S.total}<span style="font-size:14px;color:#9ca3af;font-weight:600;"> / 신규 ${S.newCount}</span></div>
+      <div class="kpi-detail">👆 눌러서 최신순 보기</div>
     </div>
-    <div class="kpi-card kpi-red">
+    <div class="kpi-card kpi-red kpi-clickable" data-kpi-action="priority" style="${S.priorityCount > 0 ? 'box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);' : ''}">
+      <div class="kpi-header"><span class="kpi-label">🚨 우선 확인</span><div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div></div>
+      <div class="kpi-value">${S.priorityCount}</div>
+      <div class="kpi-detail ${S.priorityCount > 0 ? 'kpi-up' : ''}">${S.priorityCount > 0 ? '즉시 확인 필요' : '이상 없음'}</div>
+    </div>
+    <div class="kpi-card kpi-amber kpi-clickable" data-kpi-action="talk">
       <div class="kpi-header"><span class="kpi-label">면담 희망</span><div class="kpi-icon"><i class="fas fa-hand-paper"></i></div></div>
       <div class="kpi-value">${S.wantTalk}</div>
-      <div class="kpi-detail ${S.wantTalk > 0 ? 'kpi-up' : ''}">${S.wantTalk > 0 ? '즉시 케어 필요' : '대기 없음'}</div>
+      <div class="kpi-detail ${S.wantTalk > 0 ? 'kpi-up' : ''}">${S.wantTalk > 0 ? '👆 눌러서 열기' : '대기 없음'}</div>
     </div>
-    <div class="kpi-card kpi-amber">
-      <div class="kpi-header"><span class="kpi-label">미처리</span><div class="kpi-icon"><i class="fas fa-clock"></i></div></div>
-      <div class="kpi-value">${S.newCount}</div>
-      <div class="kpi-detail">신규 + 검토중 ${S.reviewing}</div>
+    <div class="kpi-card kpi-purple kpi-clickable" data-kpi-action="gratitude">
+      <div class="kpi-header"><span class="kpi-label">💝 감사·응원</span><div class="kpi-icon"><i class="fas fa-heart"></i></div></div>
+      <div class="kpi-value">${S.gratitudeCount}</div>
+      <div class="kpi-detail">${S.gratitudeShareOk}건 게시 가능</div>
     </div>
-    <div class="kpi-card kpi-purple">
-      <div class="kpi-header"><span class="kpi-label">자유 서술</span><div class="kpi-icon"><i class="fas fa-comment-dots"></i></div></div>
-      <div class="kpi-value">${S.freeTextCount}</div>
-      <div class="kpi-detail">건의 사항 작성됨</div>
-    </div>
-    <div class="kpi-card kpi-green">
+    <div class="kpi-card kpi-green kpi-clickable" data-kpi-action="recent7">
       <div class="kpi-header"><span class="kpi-label">최근 7일</span><div class="kpi-icon"><i class="fas fa-bolt"></i></div></div>
       <div class="kpi-value">${S.recent7}</div>
-      <div class="kpi-detail">새로운 응답</div>
+      <div class="kpi-detail">👆 눌러서 열기</div>
     </div>
   </div>`;
 
-  // 탭 네비 (7개로 정리)
+  // 탭 네비
   h += `<div class="tab-nav">
     <button class="tab-btn ${activeTab === 'overview' ? 'active' : ''}" data-tab="overview">📊 한눈에 보기</button>
+    <button class="tab-btn ${activeTab === 'priority' ? 'active' : ''}" data-tab="priority">🚨 우선 확인${S.priorityCount > 0 ? `<span class="badge-num" style="background:#dc2626;">${S.priorityCount}</span>` : ''}</button>
     <button class="tab-btn ${activeTab === 'talk' ? 'active' : ''}" data-tab="talk">🙋 면담 희망${S.wantTalk > 0 ? `<span class="badge-num">${S.wantTalk}</span>` : ''}</button>
+    <button class="tab-btn ${activeTab === 'gratitude' ? 'active' : ''}" data-tab="gratitude">💝 감사·응원${S.gratitudeCount > 0 ? `<span class="badge-num" style="background:#ec4899;">${S.gratitudeCount}</span>` : ''}</button>
+    <button class="tab-btn ${activeTab === 'announce' ? 'active' : ''}" data-tab="announce">🌱 지난 주 변화</button>
     <button class="tab-btn ${activeTab === 'final' ? 'active' : ''}" data-tab="final">💬 자유 서술${S.freeTextCount > 0 ? `<span class="badge-num">${S.freeTextCount}</span>` : ''}</button>
     <button class="tab-btn ${activeTab === 'rooms' ? 'active' : ''}" data-tab="rooms">🏠 자습관 분석</button>
     <button class="tab-btn ${activeTab === 'categories' ? 'active' : ''}" data-tab="categories">📂 카테고리 분석</button>
@@ -852,8 +1426,18 @@ function render() {
 
   // === 한눈에 보기 ===
   h += `<div class="tab-content ${activeTab === 'overview' ? 'active' : ''}" id="tab-overview">`;
-  // 인사이트 (TOP 5 고민)
-  h += `<div class="insight-card"><h3>🔥 지금 가장 많이 호소하는 고민 TOP 5</h3><ol class="insight-list">`;
+  // 인사이트 (좋았던 점 TOP + 아쉬운 점 TOP 나란히)
+  h += `<div class="two-col">`;
+  h += `<div class="insight-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:rgba(34,197,94,0.25);"><h3 style="color:#15803d;">💚 학생들이 좋아하는 점 TOP 5</h3><ol class="insight-list">`;
+  if (!S.top5Good.length) {
+    h += `<li style="color:#6b7280;">아직 좋아요 응답이 없어요 (신규 스키마 응답부터 집계됩니다)</li>`;
+  } else {
+    S.top5Good.forEach((item, i) => {
+      h += `<li><span class="num" style="background:#16a34a;">${i+1}</span><span><strong>${item.label}</strong> · ${item.count}명</span></li>`;
+    });
+  }
+  h += `</ol></div>`;
+  h += `<div class="insight-card"><h3>🔥 아쉬워 하는 점 TOP 5</h3><ol class="insight-list">`;
   if (!S.top5.length) {
     h += `<li>아직 분석할 응답이 없어요</li>`;
   } else {
@@ -862,6 +1446,7 @@ function render() {
     });
   }
   h += `</ol></div>`;
+  h += `</div>`;
 
   h += `<div class="two-col">
     <div class="panel"><div class="panel-title">📊 카테고리별 응답 현황<span class="count-tag">${S.totalChecks}건 체크</span></div><div class="chart-container"><canvas id="chartOverview"></canvas></div></div>
@@ -903,6 +1488,33 @@ function render() {
 
   h += `</div>`;
 
+  // 공용 상태 필터 칩 HTML
+  const statusCounts = {
+    all: filteredData.length,
+    new: filteredData.filter(r => !r.status || r.status === 'new').length,
+    reviewing: filteredData.filter(r => r.status === 'reviewing').length,
+    resolved: filteredData.filter(r => r.status === 'resolved').length,
+    onhold: filteredData.filter(r => r.status === 'onhold').length
+  };
+  const statusChipsHtml = `<div class="status-chips">
+    <button class="filter-pill ${currentStatus === 'all' ? 'active' : ''}" data-status-chip="all">전체 (${statusCounts.all})</button>
+    <button class="filter-pill ${currentStatus === 'new' ? 'active' : ''}" data-status-chip="new">🆕 신규 (${statusCounts.new})</button>
+    <button class="filter-pill ${currentStatus === 'reviewing' ? 'active' : ''}" data-status-chip="reviewing">👀 검토중 (${statusCounts.reviewing})</button>
+    <button class="filter-pill ${currentStatus === 'resolved' ? 'active' : ''}" data-status-chip="resolved">✅ 처리완료 (${statusCounts.resolved})</button>
+    <button class="filter-pill ${currentStatus === 'onhold' ? 'active' : ''}" data-status-chip="onhold">⏸️ 보류 (${statusCounts.onhold})</button>
+  </div>`;
+
+  // === 🚨 우선 확인 탭 ===
+  h += `<div class="tab-content ${activeTab === 'priority' ? 'active' : ''}" id="tab-priority">`;
+  h += statusChipsHtml;
+  const priorityList = filteredData.filter(isPriority).slice().sort((a, b) => riskScoreOf(b) - riskScoreOf(a));
+  h += `<div class="panel" style="border-color:rgba(220,38,38,0.25);background:linear-gradient(135deg,#fff,#fef2f2);">
+    <div class="panel-title" style="color:#b91c1c;">🚨 위험도 높은 응답<span class="count-tag" style="background:#fee2e2;color:#991b1b;">${priorityList.length}건</span></div>
+    <div style="font-size:12px;color:#6b7280;margin:-8px 0 14px;">부정 항목이 많거나, 위험 키워드가 감지되었거나, 면담을 요청한 응답을 위험도 순으로 표시합니다.</div>`;
+  if (!priorityList.length) h += `<div class="no-data">🌿 지금 우선 확인이 필요한 응답이 없어요</div>`;
+  else priorityList.forEach(r => h += buildReplyCard(r, { priority: true }));
+  h += `</div></div>`;
+
   // === 면담 희망 탭 ===
   h += `<div class="tab-content ${activeTab === 'talk' ? 'active' : ''}" id="tab-talk">`;
   const talkers = filteredData.filter(r => r.want_talk === 'yes');
@@ -919,10 +1531,53 @@ function render() {
   }
   h += `</div>`;
 
+  // === 💝 감사·응원 탭 (게시 후보) ===
+  h += `<div class="tab-content ${activeTab === 'gratitude' ? 'active' : ''}" id="tab-gratitude">`;
+  const grats = filteredData.filter(r => r.gratitude_text && r.gratitude_text.trim());
+  const gratsShare = grats.filter(r => r.gratitude_share_ok !== false);
+  const gratsPrivate = grats.filter(r => r.gratitude_share_ok === false);
+  // 전자칠판 게시판 링크
+  h += `<a href="gratitude-board.html" target="_blank" style="display:block;padding:22px 24px;margin-bottom:16px;background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-radius:16px;border:1.5px solid #fbcfe8;text-decoration:none;color:#be185d;transition:transform 0.15s;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="font-size:34px;">💝</div>
+      <div style="flex:1;">
+        <div style="font-size:16px;font-weight:800;margin-bottom:2px;">전자칠판 게시판 열기</div>
+        <div style="font-size:12px;color:#9d174d;">감사·응원 카드 크게 보기 · PNG 저장 · 슬라이드쇼 · PDF 인쇄</div>
+      </div>
+      <div style="font-size:20px;color:#ec4899;">→</div>
+    </div>
+  </a>`;
+  h += `<div class="panel" style="background:linear-gradient(135deg,#fff5f7,#fdf2f8);border-color:#fbcfe8;">
+    <div class="panel-title" style="color:#be185d;">💝 학원 전자칠판 게시 후보<span class="count-tag" style="background:#fce7f3;color:#9d174d;">${gratsShare.length}건</span></div>
+    <div style="font-size:12px;color:#6b7280;margin:-8px 0 14px;">"공유 OK"에 체크한 감사·응원 메시지입니다. 위 게시판을 열어 카드로 보시거나, 아래에서 텍스트만 복사하실 수 있어요.</div>`;
+  if (!gratsShare.length) h += `<div class="no-data">아직 게시 가능한 메시지가 없어요</div>`;
+  else gratsShare.forEach(r => h += buildGratitudeCard(r));
+  h += `</div>`;
+  if (gratsPrivate.length) {
+    h += `<div class="panel"><div class="panel-title">🔒 비공개 감사·응원 (사감장만 열람)<span class="count-tag">${gratsPrivate.length}건</span></div>
+      <div style="font-size:12px;color:#9ca3af;margin:-8px 0 14px;">공유 동의를 하지 않은 메시지 — 사감장님만 참고하세요.</div>`;
+    gratsPrivate.forEach(r => h += buildGratitudeCard(r, { private: true }));
+    h += `</div>`;
+  }
+  h += `</div>`;
+
+  // === 🌱 지난 주 변화 편집 탭 ===
+  h += `<div class="tab-content ${activeTab === 'announce' ? 'active' : ''}" id="tab-announce">`;
+  h += `<div class="panel" style="background:linear-gradient(135deg,#fff,#f0fdf4);border-color:#bbf7d0;">
+    <div class="panel-title" style="color:#15803d;">🌱 "지난 주, 여러분 덕분에 이렇게 바뀌었어요"</div>
+    <div style="font-size:13px;color:#4b5563;margin:-4px 0 16px;line-height:1.7;">
+      학생 인트로 페이지 하단에 표시되는 <strong>실제 개선 사항</strong> 목록입니다.<br>
+      "학생 의견 → 실제 변화"를 보여주는 것이 신뢰의 핵심이에요. 3~5줄 정도가 딱 좋습니다.
+    </div>
+    <div id="announceEditorBox">
+      <div class="loading-screen" style="padding:24px;"><i class="fas fa-circle-notch"></i><p>불러오는 중...</p></div>
+    </div>
+  </div></div>`;
+
   // === 자유 서술 탭 ===
   h += `<div class="tab-content ${activeTab === 'final' ? 'active' : ''}" id="tab-final">`;
   h += buildFreeTextCard('💬 자유 서술', 'free_text');
-  h += buildFreeTextCard('🏫 수업시간 피드백', 'class_feedback');
+  h += buildFreeTextCard('🏫 수업시간 피드백 (구버전)', 'class_feedback');
   h += buildFreeTextCard('⭐ 가장 바라는 한 가지', 'one_wish');
   h += `</div>`;
 
@@ -941,13 +1596,14 @@ function render() {
     </div>`;
   });
   h += `</div></div>`;
-  // 자습관별 1위 고민
+  // 자습관별 1위 고민 (아쉬운 항목만)
   h += `<div class="panel"><div class="panel-title">🔥 자습관별 1위 고민</div><div style="display:flex;flex-direction:column;gap:8px;">`;
+  const badCatsForRoom = ['env_bad','op_bad','condition','facility','noise','rules'];
   ALL_ROOMS.forEach(room => {
     const roomData = allData.filter(r => r.study_room === room);
     if (!roomData.length) return;
     const tmp = {};
-    roomData.forEach(row => CATS.forEach(cat => parseArr(row[cat]).forEach(item => {
+    roomData.forEach(row => badCatsForRoom.forEach(cat => parseArr(row[cat]).forEach(item => {
       if (!item.endsWith('_none')) tmp[cat+'|'+item] = (tmp[cat+'|'+item]||0)+1;
     })));
     let top = { label:'특별한 고민 없음', count:0 };
@@ -981,6 +1637,7 @@ function render() {
 
   // === 응답 전체 탭 ===
   h += `<div class="tab-content ${activeTab === 'all' ? 'active' : ''}" id="tab-all">`;
+  h += statusChipsHtml;
   h += `<div class="panel"><div class="panel-title">📋 전체 응답<span class="count-tag">${filteredData.length}건</span></div>`;
   if (!filteredData.length) h += `<div class="no-data">조건에 맞는 응답이 없어요</div>`;
   else filteredData.forEach(r => h += buildReplyCard(r));
@@ -991,6 +1648,29 @@ function render() {
   // 탭 클릭
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.addEventListener('click', () => { activeTab = b.dataset.tab; render(); });
+  });
+  // 상태 필터 칩 클릭
+  document.querySelectorAll('[data-status-chip]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      currentStatus = chip.dataset.statusChip;
+      applyFilter();
+    });
+  });
+  // KPI 카드 클릭 → 관련 탭으로 이동
+  document.querySelectorAll('[data-kpi-action]').forEach(k => {
+    k.addEventListener('click', () => {
+      const action = k.dataset.kpiAction;
+      if (action === 'recent7') {
+        currentPeriod = '7';
+        activeTab = 'all';
+        document.querySelectorAll('[data-period]').forEach(x => x.classList.toggle('active', x.dataset.period === '7'));
+        applyFilter();
+      } else {
+        activeTab = action;
+        render();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   });
   // 자습관 카드 클릭
   document.querySelectorAll('[data-room-tile]').forEach(t => {
@@ -1014,7 +1694,7 @@ function render() {
       }
     });
   });
-  // 차트
+  // 차트 + 부가 렌더
   setTimeout(() => {
     if (activeTab === 'overview') {
       renderOverviewChart(S);
@@ -1022,46 +1702,53 @@ function render() {
       renderTrendChart();
     }
     if (activeTab === 'categories') renderCatChart(activeCat, S);
+    if (activeTab === 'announce') renderAnnounceEditor();
+    // ?id=xxx 링크로 들어온 경우: 해당 카드로 스크롤 + 하이라이트 + 상세 모달 자동 열기
+    if (focusDocId) {
+      const card = document.querySelector(`[data-doc-id="${focusDocId}"]`);
+      if (card) {
+        card.classList.add('focus-pulse');
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        openDetailModal(focusDocId);
+      } else {
+        toast('해당 응답을 찾을 수 없어요. 최근 목록에서 확인하세요.', 'error');
+      }
+      focusDocId = null; // 한 번만 실행
+    }
   }, 30);
 }
 
 // ===== 카테고리 패널 빌더 (chip 토글 시 부분 재렌더) =====
 function buildCatPanels(cat, S) {
   let h = '';
-  const noneCount = S.counts[cat][cat+'_none'] || 0;
-  h += `<div class="panel" style="background:#f0fdf4;border-color:rgba(34,197,94,0.2);"><div class="panel-title" style="margin-bottom:6px;">✅ "${cat === 'condition' ? '어려움 없다' : '불편 없다'}"라고 답한 학생<span class="count-tag" style="background:#d1fae5;color:#047857;">${noneCount}명</span></div></div>`;
-  h += `<div class="panel"><div class="panel-title">${SECTION_TITLES[cat]} 항목별 현황</div><div class="chart-container tall"><canvas id="chart-cat"></canvas></div></div>`;
-  if (cat === 'noise') {
-    const colors = ['#86efac','#fde047','#fdba74','#fca5a5','#f87171'];
-    const lbl = ['1 (괜찮음)','2','3 (보통)','4','5 (심각)'];
-    const sevTotal = S.sev.reduce((a,b)=>a+b, 0);
-    const mx = Math.max(...S.sev, 1);
-    h += `<div class="panel"><div class="panel-title">📈 소음 심각도 분포<span class="count-tag">${sevTotal}명 응답</span></div><div class="severity-dist">`;
-    S.sev.forEach((c, i) => {
-      const ht = Math.max((c/mx)*70, 4);
-      h += `<div class="sev-bar-wrap"><div class="sev-count">${c}</div><div class="sev-bar" style="height:${ht}px;background:${colors[i]};"></div><div class="sev-label">${lbl[i]}</div></div>`;
-    });
-    h += `</div></div>`;
+  if (cat === 'condition') {
+    const noneCount = S.counts[cat]?.condition_none || 0;
+    h += `<div class="panel" style="background:#f0fdf4;border-color:rgba(34,197,94,0.2);"><div class="panel-title" style="margin-bottom:6px;">🌱 "잘 지내고 있음"이라고 답한 학생<span class="count-tag" style="background:#d1fae5;color:#047857;">${noneCount}명</span></div></div>`;
   }
+  h += `<div class="panel"><div class="panel-title">${SECTION_TITLES[cat] || cat} 항목별 현황</div><div class="chart-container tall"><canvas id="chart-cat"></canvas></div></div>`;
+
+  // 주관식 응답 (신규 필드가 있는 경우만 매핑)
   const etc = ETC_FIELDS[cat];
-  const items = filteredData.filter(r => r[etc] && r[etc].trim());
-  h += `<div class="panel"><div class="panel-title">📝 주관식 응답<span class="count-tag">${items.length}건</span></div>`;
-  if (!items.length) h += `<div class="no-data">아직 주관식 응답이 없어요</div>`;
-  else {
-    h += `<ul class="response-list">`;
-    items.forEach(r => {
-      const hl = r.want_talk === 'yes';
-      const dt = getTimestamp(r);
-      h += `<li class="response-item${hl?' highlight':''}"><div class="body-text">${esc(r[etc])}</div><div class="meta">
-        <span class="badge badge-room">${esc(r.study_room || '')}</span>
-        <span class="badge ${r.student_name && r.student_name !== '익명' ? 'badge-name' : 'badge-anon'}">${esc(r.student_name || '익명')}</span>
-        ${hl?'<span class="badge badge-talk">🙋 면담 희망</span>':''}
-        <span class="badge badge-date">${fmtDate(dt)}</span>
-      </div></li>`;
-    });
-    h += `</ul>`;
+  if (etc) {
+    const items = filteredData.filter(r => r[etc] && r[etc].trim());
+    h += `<div class="panel"><div class="panel-title">📝 관련 주관식 응답<span class="count-tag">${items.length}건</span></div>`;
+    if (!items.length) h += `<div class="no-data">아직 주관식 응답이 없어요</div>`;
+    else {
+      h += `<ul class="response-list">`;
+      items.forEach(r => {
+        const hl = r.want_talk === 'yes' || riskScoreOf(r) >= 4;
+        const dt = getTimestamp(r);
+        h += `<li class="response-item${hl?' highlight':''}"><div class="body-text">${esc(r[etc])}</div><div class="meta">
+          <span class="badge badge-room">${esc(r.study_room || '')}</span>
+          <span class="badge ${r.student_name && r.student_name !== '익명' ? 'badge-name' : 'badge-anon'}">${esc(r.student_name || '익명')}</span>
+          ${hl?'<span class="badge badge-talk">🙋 우선</span>':''}
+          <span class="badge badge-date">${fmtDate(dt)}</span>
+        </div></li>`;
+      });
+      h += `</ul>`;
+    }
+    h += `</div>`;
   }
-  h += `</div>`;
   return h;
 }
 
@@ -1078,22 +1765,31 @@ function buildTalkCard(r) {
       ${r.meeting_date ? `<span class="badge" style="background:#dbeafe;color:#1e40af;">📅 ${esc(r.meeting_date)}</span>` : ''}
     </div>
   </div>`;
-  // 체크된 항목
-  CATS.forEach(cat => {
+  // 체크된 항목 (신규+구버전 모두)
+  CATS_ALL.forEach(cat => {
     const items = parseArr(r[cat]).filter(i => !i.endsWith('_none'));
     if (items.length) {
-      h += `<div class="talk-section"><div class="talk-section-title">${SECTION_TITLES[cat]}</div><div class="talk-tags">`;
+      h += `<div class="talk-section"><div class="talk-section-title">${SECTION_TITLES[cat] || cat}</div><div class="talk-tags">`;
       items.forEach(i => h += `<span class="talk-tag">${LABELS[cat]?.[i] || i}</span>`);
       h += `</div></div>`;
     }
   });
   // 자유 서술 등
-  ['free_text','one_wish','facility_etc','noise_etc','rules_etc','condition_etc','class_feedback'].forEach(field => {
+  const talkTextFields = {
+    free_text:'💬 자유 서술', one_wish:'⭐ 가장 바라는 것',
+    env_etc:'🏫 환경 의견', op_etc:'📐 운영·수업 의견', condition_etc:'🌿 컨디션 의견',
+    facility_etc:'🏫 시설 의견(구)', noise_etc:'🔊 소음 의견(구)', rules_etc:'📐 운영 의견(구)',
+    class_feedback:'🏫 수업 피드백(구)'
+  };
+  Object.entries(talkTextFields).forEach(([field, title]) => {
     if (r[field] && r[field].trim()) {
-      const titles = {free_text:'💬 자유 서술',one_wish:'⭐ 가장 바라는 것',facility_etc:'🏫 시설 의견',noise_etc:'🔊 소음 의견',rules_etc:'📐 운영 의견',condition_etc:'🧠 컨디션 의견',class_feedback:'🏫 수업 피드백'};
-      h += `<div class="talk-section"><div class="talk-section-title">${titles[field]}</div><div class="talk-text">${esc(r[field])}</div></div>`;
+      h += `<div class="talk-section"><div class="talk-section-title">${title}</div><div class="talk-text">${esc(r[field])}</div></div>`;
     }
   });
+  // 감사·응원 있으면
+  if (r.gratitude_text && r.gratitude_text.trim()) {
+    h += `<div class="talk-section" style="background:#fdf2f8;padding:10px 12px;border-radius:10px;"><div class="talk-section-title" style="color:#be185d;">💝 감사·응원</div><div class="talk-text" style="color:#831843;">${esc(r.gratitude_text)}</div></div>`;
+  }
   // 관리자 메모
   if (r.admin_memo && r.admin_memo.trim()) {
     h += `<div class="talk-memo">📌 ${esc(r.admin_memo)}</div>`;
@@ -1111,16 +1807,24 @@ function buildTalkCard(r) {
 }
 
 // ===== 응답 카드 (이름작성자 + 전체) =====
-function buildReplyCard(r) {
+function buildReplyCard(r, opts) {
+  opts = opts || {};
   const dt = getTimestamp(r);
   const status = r.status || 'new';
-  let h = `<div class="reply-card">`;
+  const score = riskScoreOf(r);
+  const riskKw = hasRiskKeyword(r);
+  const priorityStyle = opts.priority || score >= 4 || r.want_talk === 'yes'
+    ? 'border:2px solid #ef4444;box-shadow:0 4px 16px rgba(239,68,68,0.12);'
+    : '';
+  let h = `<div class="reply-card" data-doc-id="${r.id}" style="${priorityStyle}">`;
   h += `<div class="reply-header">
     <div>
       <span class="reply-name">${esc(r.student_name || '익명')}</span>
       <span class="badge badge-room" style="margin-left:6px;">${esc(r.study_room || '')}</span>
       <span class="badge badge-date">${fmtDate(dt)}</span>
       ${r.want_talk === 'yes' ? '<span class="badge badge-talk">🙋 면담</span>' : ''}
+      ${score >= 4 ? `<span class="badge" style="background:#fee2e2;color:#991b1b;">⚠️ 위험도 ${score}</span>` : ''}
+      ${riskKw ? `<span class="badge" style="background:#fef3c7;color:#92400e;">🔍 "${riskKw}" 감지</span>` : ''}
     </div>
     <div class="reply-badges">
       <select class="status-select" onchange="changeStatus('${r.id}', this.value)">
@@ -1131,26 +1835,77 @@ function buildReplyCard(r) {
       </select>
     </div>
   </div>`;
-  CATS.forEach(cat => {
+  // 신규 스키마 + 구버전 필드 모두 표시
+  CATS_ALL.forEach(cat => {
     const items = parseArr(r[cat]).filter(i => !i.endsWith('_none'));
     if (items.length) {
-      h += `<div class="reply-section"><div class="reply-section-title">${SECTION_TITLES[cat]}</div><div class="reply-tags">`;
+      const color = cat.endsWith('_good') ? 'background:#f0fdf4;color:#15803d;' : (cat.endsWith('_bad') || CATS_LEGACY.includes(cat) ? 'background:#fff7ed;color:#9a3412;' : '');
+      h += `<div class="reply-section"><div class="reply-section-title" style="${color}padding:3px 10px;border-radius:8px;display:inline-block;">${SECTION_TITLES[cat] || cat}</div><div class="reply-tags">`;
       items.forEach(i => h += `<span class="reply-tag">${LABELS[cat]?.[i] || i}</span>`);
       h += `</div></div>`;
     }
   });
-  ['free_text','one_wish','facility_etc','noise_etc','rules_etc','condition_etc','class_feedback'].forEach(field => {
-    if (r[field] && r[field].trim()) {
-      const titles = {free_text:'💬 자유 서술',one_wish:'⭐ 가장 바라는 것',facility_etc:'🏫 시설 의견',noise_etc:'🔊 소음 의견',rules_etc:'📐 운영 의견',condition_etc:'🧠 컨디션 의견',class_feedback:'🏫 수업 피드백'};
-      h += `<div class="reply-section"><div class="reply-section-title">${titles[field]}</div><div class="reply-text">${esc(r[field])}</div></div>`;
+  const textFields = [
+    { key:'free_text', title:'💬 자유 서술' },
+    { key:'one_wish', title:'⭐ 가장 바라는 것' },
+    { key:'env_etc', title:'🏫 환경·분위기 의견' },
+    { key:'op_etc', title:'📐 운영·수업 의견' },
+    { key:'condition_etc', title:'🌿 컨디션 의견' },
+    { key:'facility_etc', title:'🏫 시설 의견(구)' },
+    { key:'noise_etc', title:'🔊 소음 의견(구)' },
+    { key:'rules_etc', title:'📐 운영 의견(구)' },
+    { key:'class_feedback', title:'🏫 수업 피드백(구)' }
+  ];
+  textFields.forEach(({ key, title }) => {
+    if (r[key] && r[key].trim()) {
+      h += `<div class="reply-section"><div class="reply-section-title">${title}</div><div class="reply-text">${esc(r[key])}</div></div>`;
     }
   });
+  // 감사·응원 (있으면)
+  if (r.gratitude_text && r.gratitude_text.trim()) {
+    const shareLabel = r.gratitude_share_ok === false ? '🔒 비공개' : '🌱 공유 OK';
+    h += `<div class="reply-section" style="background:#fdf2f8;padding:10px 12px;border-radius:10px;margin-top:8px;">
+      <div class="reply-section-title" style="color:#be185d;">💝 감사·응원 <span class="badge" style="background:#fce7f3;color:#9d174d;font-size:10px;">${shareLabel}</span></div>
+      <div class="reply-text" style="color:#831843;">${esc(r.gratitude_text)}</div>
+    </div>`;
+  }
   if (r.admin_memo && r.admin_memo.trim()) {
     h += `<div class="talk-memo" style="margin-top:8px;">📌 ${esc(r.admin_memo)}</div>`;
   }
   h += `<div class="reply-actions">
+    <button class="talk-action-btn primary" onclick="openDetailModal('${r.id}')"><i class="fas fa-expand"></i> 전체 상세보기</button>
     <button class="talk-action-btn" onclick="openMemoModal('${r.id}')"><i class="fas fa-pen"></i> 메모</button>
+    <button class="talk-action-btn danger" onclick="deleteResponse('${r.id}')"><i class="fas fa-trash"></i> 삭제</button>
   </div></div>`;
+  return h;
+}
+
+// ===== 감사·응원 카드 (게시 후보) =====
+function buildGratitudeCard(r, opts) {
+  opts = opts || {};
+  const dt = getTimestamp(r);
+  const nameMode = r.gratitude_display_name || 'anon';
+  const displayName = nameMode === 'name' && r.student_name && r.student_name !== '익명' ? r.student_name
+                    : nameMode === 'nickname' ? '학년만 표시(닉네임)'
+                    : '익명';
+  const bg = opts.private ? 'background:#fafafa;border-color:#e5e7eb;' : 'background:linear-gradient(135deg,#fff,#fdf4ff);border-color:#fbcfe8;';
+  const grpId = `grat-${r.id}`;
+  let h = `<div class="reply-card" style="${bg}">
+    <div class="reply-header">
+      <div>
+        <span class="badge" style="background:#fce7f3;color:#9d174d;font-weight:700;">💝 ${displayName}</span>
+        <span class="badge badge-room" style="margin-left:6px;">${esc(r.study_room || '')}</span>
+        <span class="badge badge-date">${fmtDate(dt)}</span>
+        <span class="badge" style="background:#fef3c7;color:#92400e;">표시: ${nameMode === 'name' ? '이름 OK' : nameMode === 'nickname' ? '학년만' : '익명'}</span>
+      </div>
+    </div>
+    <div class="reply-section" style="background:#fdf2f8;padding:14px 16px;border-radius:12px;margin-top:6px;">
+      <div class="reply-text" id="${grpId}" style="color:#831843;font-size:14.5px;line-height:1.7;">"${esc(r.gratitude_text)}"</div>
+    </div>
+    <div class="reply-actions">
+      <button class="talk-action-btn" onclick="copyGratitude('${grpId}', '${esc(displayName)}')"><i class="fas fa-copy"></i> 텍스트 복사</button>
+    </div>
+  </div>`;
   return h;
 }
 
@@ -1173,22 +1928,22 @@ function buildFreeTextCard(title, field) {
   return h + `</ul></div>`;
 }
 
-// ===== 히트맵 =====
+// ===== 히트맵 (아쉬운 항목 중심) =====
 function buildHeatmap() {
-  // 행: 자습관, 열: 카테고리 항목 TOP들 (각 카테고리 1위~3위)
   const usedRooms = ALL_ROOMS.filter(r => allData.some(d => d.study_room === r));
-  // 카테고리별 항목 통합 점수로 정렬해서 표시
+  // 아쉬운 항목만 (신규 + 구버전)
+  const badCats = ['env_bad','op_bad','condition','facility','noise','rules'];
   const allItems = [];
-  CATS.forEach(cat => {
-    Object.keys(LABELS[cat]).forEach(key => {
+  badCats.forEach(cat => {
+    Object.keys(LABELS[cat] || {}).forEach(key => {
       if (key.endsWith('_none')) return;
       let total = 0;
       filteredData.forEach(r => { if (parseArr(r[cat]).includes(key)) total++; });
-      allItems.push({ cat, key, label: LABELS[cat][key], total });
+      if (total > 0) allItems.push({ cat, key, label: LABELS[cat][key], total });
     });
   });
   allItems.sort((a, b) => b.total - a.total);
-  const cols = allItems.filter(i => i.total > 0).slice(0, 10);
+  const cols = allItems.slice(0, 10);
   if (!usedRooms.length || !cols.length) {
     return '<div class="no-data">아직 데이터가 부족해요</div>';
   }
@@ -1212,7 +1967,7 @@ function buildHeatmap() {
       const v = matrix[room][col.key] || 0;
       if (v === 0) h += `<td class="heatmap-cell zero">0</td>`;
       else {
-        const [r,g,b] = SECTION_HEAT_COLOR[col.cat];
+        const [r,g,b] = SECTION_HEAT_COLOR[col.cat] || [249,115,22];
         const alpha = 0.25 + (v / maxVal) * 0.75;
         h += `<td class="heatmap-cell" style="background:rgba(${r},${g},${b},${alpha});" title="${esc(room)} - ${esc(col.label)}: ${v}명">${v}</td>`;
       }
@@ -1226,12 +1981,16 @@ function buildHeatmap() {
 // ===== 차트 =====
 function renderOverviewChart(S) {
   const ctx = document.getElementById('chartOverview'); if (!ctx) return;
-  const data = CATS.map(cat => Object.entries(S.counts[cat]).filter(([k]) => !k.endsWith('_none')).reduce((s, [,v]) => s+v, 0));
+  const sumCat = cat => Object.entries(S.counts[cat] || {}).filter(([k]) => !k.endsWith('_none')).reduce((s, [,v]) => s+v, 0);
+  // 좋아요 vs 아쉬워요 vs 컨디션 (신규 스키마)
+  const good = sumCat('env_good') + sumCat('op_good');
+  const bad = sumCat('env_bad') + sumCat('op_bad') + sumCat('facility') + sumCat('noise') + sumCat('rules');
+  const cond = sumCat('condition');
   chartInstances['overview'] = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['🏫 시설·환경', '🔊 소음·분위기', '📐 운영·규칙', '🧠 자습 컨디션'],
-      datasets: [{ data, backgroundColor: ['rgba(59,130,246,0.8)','rgba(245,158,11,0.8)','rgba(34,197,94,0.8)','rgba(168,85,247,0.8)'], borderWidth: 0 }]
+      labels: ['💚 좋아요', '🙏 아쉬워요', '🌿 컨디션'],
+      datasets: [{ data: [good, bad, cond], backgroundColor: ['rgba(34,197,94,0.85)','rgba(249,115,22,0.85)','rgba(168,85,247,0.85)'], borderWidth: 0 }]
     },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { family: 'Noto Sans KR', size: 11 } } } } }
   });
@@ -1422,7 +2181,14 @@ async function saveMemo() {
 
 // ===== CSV 내보내기 =====
 function exportCSV() {
-  const headers = ['날짜','자습관','이름','면담희망','상태','시설','시설_의견','소음','소음_의견','심각도','운영','운영_의견','컨디션','컨디션_의견','자유서술','수업피드백','가장바라는것','관리자메모','면담일'];
+  const headers = ['날짜','자습관','이름','면담희망','위험도','상태',
+    '환경_좋아요','환경_아쉬워요','환경_의견',
+    '운영_좋아요','운영_아쉬워요','운영_의견',
+    '컨디션','컨디션_의견',
+    '자유서술','가장바라는것','감사응원','공유동의','표시방식',
+    '시설(구)','시설의견(구)','소음(구)','소음의견(구)','심각도(구)','운영(구)','운영의견(구)','수업피드백(구)',
+    '관리자메모','면담일'];
+  const mapArr = (arr, cat) => parseArr(arr).map(k => LABELS[cat]?.[k] || k).join('; ');
   const rows = filteredData.map(r => {
     const dt = getTimestamp(r);
     return [
@@ -1430,19 +2196,29 @@ function exportCSV() {
       r.study_room || '',
       r.student_name || '익명',
       r.want_talk === 'yes' ? '예' : (r.want_talk === 'no' ? '아니오' : ''),
+      riskScoreOf(r),
       STATUS_LABELS[r.status || 'new'] || '',
-      parseArr(r.facility).map(k => LABELS.facility[k] || k).join('; '),
-      r.facility_etc || '',
-      parseArr(r.noise).map(k => LABELS.noise[k] || k).join('; '),
-      r.noise_etc || '',
-      r.noise_severity || '',
-      parseArr(r.rules).map(k => LABELS.rules[k] || k).join('; '),
-      r.rules_etc || '',
-      parseArr(r.condition).map(k => LABELS.condition[k] || k).join('; '),
+      mapArr(r.env_good, 'env_good'),
+      mapArr(r.env_bad, 'env_bad'),
+      r.env_etc || '',
+      mapArr(r.op_good, 'op_good'),
+      mapArr(r.op_bad, 'op_bad'),
+      r.op_etc || '',
+      mapArr(r.condition, 'condition'),
       r.condition_etc || '',
       r.free_text || '',
-      r.class_feedback || '',
       r.one_wish || '',
+      r.gratitude_text || '',
+      r.gratitude_share_ok === false ? '아니오' : (r.gratitude_text ? '예' : ''),
+      r.gratitude_display_name || '',
+      mapArr(r.facility, 'facility'),
+      r.facility_etc || '',
+      mapArr(r.noise, 'noise'),
+      r.noise_etc || '',
+      r.noise_severity || '',
+      mapArr(r.rules, 'rules'),
+      r.rules_etc || '',
+      r.class_feedback || '',
       r.admin_memo || '',
       r.meeting_date || ''
     ];
@@ -1464,9 +2240,237 @@ function exportCSV() {
   toast('CSV 다운로드 완료', 'success');
 }
 
+// ===== 응답 삭제 =====
+async function deleteResponse(docId) {
+  const r = allData.find(x => x.id === docId);
+  const name = r?.student_name || '익명';
+  const room = r?.study_room || '';
+  if (!confirm(`정말 삭제할까요?\n\n${room} · ${name}\n\n⚠️ 되돌릴 수 없습니다.`)) return;
+  try {
+    const { db, doc, deleteDoc } = window.__fb;
+    await deleteDoc(doc(db, 'study_room_reports', docId));
+    // 로컬 데이터에서도 제거
+    const idx = allData.findIndex(x => x.id === docId);
+    if (idx >= 0) allData.splice(idx, 1);
+    toast('삭제 완료', 'success');
+    // focused view 였다면 대시보드로 돌아가기
+    if (focusDocId === docId) {
+      focusDocId = null;
+      location.href = 'admin.html';
+      return;
+    }
+    // 상세 모달 열려있으면 닫기
+    if (detailTargetId === docId) closeDetailModal();
+    applyFilter();
+  } catch (e) {
+    console.error(e);
+    toast('삭제 실패: ' + e.message, 'error');
+  }
+}
+
+// ===== 응답 상세 모달 =====
+function openDetailModal(docId) {
+  const r = allData.find(x => x.id === docId);
+  if (!r) { toast('응답을 찾을 수 없어요', 'error'); return; }
+  detailTargetId = docId;
+  const dt = getTimestamp(r);
+  const status = r.status || 'new';
+  const score = riskScoreOf(r);
+  const riskKw = hasRiskKeyword(r);
+  const isTalk = r.want_talk === 'yes';
+
+  let h = '';
+  // 헤더 정보
+  h += `<div class="detail-hero ${isTalk || score >= 4 ? 'detail-hero-priority' : ''}">
+    <div class="detail-hero-name">${esc(r.student_name || '익명')}</div>
+    <div class="detail-hero-meta">
+      <span class="badge badge-room">${esc(r.study_room || '')}</span>
+      <span class="badge badge-date">${fmtDate(dt)}</span>
+      ${isTalk ? '<span class="badge badge-talk">🙋 면담 희망</span>' : ''}
+      ${score >= 4 ? `<span class="badge" style="background:#fee2e2;color:#991b1b;">⚠️ 위험도 ${score}</span>` : ''}
+      ${riskKw ? `<span class="badge" style="background:#fef3c7;color:#92400e;">🔍 "${riskKw}"</span>` : ''}
+    </div>
+  </div>`;
+
+  // 상태 + 액션
+  h += `<div class="detail-actions">
+    <select class="status-select" onchange="changeStatus('${r.id}', this.value); this.closest('.detail-modal').querySelector('.status-label').textContent = this.options[this.selectedIndex].text;">
+      <option value="new" ${status==='new'?'selected':''}>🆕 신규</option>
+      <option value="reviewing" ${status==='reviewing'?'selected':''}>👀 검토중</option>
+      <option value="resolved" ${status==='resolved'?'selected':''}>✅ 처리완료</option>
+      <option value="onhold" ${status==='onhold'?'selected':''}>⏸️ 보류</option>
+    </select>
+    <button class="talk-action-btn" onclick="openMemoModal('${r.id}')"><i class="fas fa-pen"></i> 메모</button>
+    ${isTalk && r.meeting_status !== 'done' ? `<button class="talk-action-btn success" onclick="markMeetingDone('${r.id}'); closeDetailModal();"><i class="fas fa-check"></i> 면담 완료</button>` : ''}
+    <button class="talk-action-btn danger" onclick="deleteResponse('${r.id}')"><i class="fas fa-trash"></i> 삭제</button>
+  </div>`;
+
+  // 체크된 항목
+  const goodItems = [];
+  const badItems = [];
+  const condItems = [];
+  ['env_good','op_good'].forEach(cat => parseArr(r[cat]).forEach(k => {
+    if (LABELS[cat]?.[k]) goodItems.push({ cat, label: LABELS[cat][k] });
+  }));
+  ['env_bad','op_bad','facility','noise','rules'].forEach(cat => parseArr(r[cat]).forEach(k => {
+    if (!k.endsWith('_none') && LABELS[cat]?.[k]) badItems.push({ cat, label: LABELS[cat][k] });
+  }));
+  parseArr(r.condition).forEach(k => {
+    if (LABELS.condition?.[k]) condItems.push({ label: LABELS.condition[k], isNone: k === 'condition_none' });
+  });
+
+  if (goodItems.length) {
+    h += `<div class="detail-section"><div class="detail-section-title" style="color:#15803d;">💚 좋아요</div><div class="detail-tags">`;
+    goodItems.forEach(i => h += `<span class="detail-tag detail-tag-good">${i.label}</span>`);
+    h += `</div></div>`;
+  }
+  if (badItems.length) {
+    h += `<div class="detail-section"><div class="detail-section-title" style="color:#9a3412;">🙏 아쉬워요</div><div class="detail-tags">`;
+    badItems.forEach(i => h += `<span class="detail-tag detail-tag-bad">${i.label}</span>`);
+    h += `</div></div>`;
+  }
+  if (condItems.length) {
+    h += `<div class="detail-section"><div class="detail-section-title" style="color:#7c3aed;">🌿 컨디션</div><div class="detail-tags">`;
+    condItems.forEach(i => h += `<span class="detail-tag ${i.isNone ? 'detail-tag-good' : 'detail-tag-cond'}">${i.label}</span>`);
+    h += `</div></div>`;
+  }
+
+  // 자유서술 필드들
+  const textFields = [
+    { key:'free_text', title:'💬 자유 서술' },
+    { key:'one_wish', title:'⭐ 가장 바라는 것' },
+    { key:'env_etc', title:'🏫 환경 의견' },
+    { key:'op_etc', title:'📐 운영·수업 의견' },
+    { key:'condition_etc', title:'🌿 컨디션 의견' },
+    { key:'facility_etc', title:'🏫 시설(구)' },
+    { key:'noise_etc', title:'🔊 소음(구)' },
+    { key:'rules_etc', title:'📐 운영(구)' },
+    { key:'class_feedback', title:'🏫 수업(구)' }
+  ];
+  textFields.forEach(({ key, title }) => {
+    if (r[key] && r[key].trim()) {
+      h += `<div class="detail-section"><div class="detail-section-title">${title}</div><div class="detail-text">${esc(r[key])}</div></div>`;
+    }
+  });
+
+  // 감사·응원
+  if (r.gratitude_text && r.gratitude_text.trim()) {
+    const shareLabel = r.gratitude_share_ok === false ? '🔒 비공개' : '🌱 공유 OK';
+    h += `<div class="detail-section" style="background:#fdf2f8;padding:14px;border-radius:12px;">
+      <div class="detail-section-title" style="color:#be185d;">💝 감사·응원 <span class="badge" style="background:#fce7f3;color:#9d174d;font-size:10px;">${shareLabel}</span></div>
+      <div class="detail-text" style="color:#831843;">${esc(r.gratitude_text)}</div>
+    </div>`;
+  }
+
+  // 관리자 메모
+  if (r.admin_memo && r.admin_memo.trim()) {
+    h += `<div class="detail-section" style="background:#fffbeb;padding:14px;border-radius:12px;border-left:4px solid #fbbf24;">
+      <div class="detail-section-title">📌 관리자 메모</div>
+      <div class="detail-text">${esc(r.admin_memo)}</div>
+      ${r.meeting_date ? `<div style="margin-top:8px;font-size:12px;color:#92400e;">📅 면담 예정: ${esc(r.meeting_date)}</div>` : ''}
+    </div>`;
+  }
+
+  document.getElementById('detailModalBody').innerHTML = h;
+  document.getElementById('detailModalOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetailModal() {
+  document.getElementById('detailModalOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+  detailTargetId = null;
+}
+
+// ===== 감사 카드 복사 =====
+function copyGratitude(elId, name) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const text = el.textContent.trim() + '\n\n— ' + name;
+  navigator.clipboard.writeText(text).then(() => {
+    toast('복사됨! 전자칠판에 붙여넣으세요', 'success');
+  }).catch(() => {
+    toast('복사 실패 — 직접 선택해서 복사해주세요', 'error');
+  });
+}
+
+// ===== 지난 주 변화 편집기 =====
+let announceItems = [];
+let announceLoaded = false;
+
+async function loadAnnouncements() {
+  try {
+    const { db, doc, getDoc } = window.__fb;
+    const snap = await getDoc(doc(db, 'settings', 'announcements'));
+    announceItems = snap.exists() ? (snap.data().items || []) : [];
+    announceLoaded = true;
+  } catch (e) {
+    console.warn('announcements load 실패', e);
+    announceItems = [];
+    announceLoaded = true;
+  }
+}
+
+function renderAnnounceEditor() {
+  const box = document.getElementById('announceEditorBox');
+  if (!box) return;
+  if (!announceLoaded) {
+    loadAnnouncements().then(renderAnnounceEditor);
+    return;
+  }
+  // 항상 5칸 표시 (빈칸은 비워두면 저장 시 제외)
+  const rows = [...announceItems];
+  while (rows.length < 5) rows.push('');
+  let h = '<div style="display:flex;flex-direction:column;gap:10px;">';
+  rows.slice(0, 5).forEach((txt, i) => {
+    h += `<div style="display:flex;align-items:center;gap:10px;">
+      <span style="flex-shrink:0;width:28px;height:28px;background:#dcfce7;color:#15803d;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">${i+1}</span>
+      <input type="text" class="announce-input" data-idx="${i}" value="${esc(txt)}" placeholder="예: 3관 냉방 세기를 조정했어요" maxlength="120"
+        style="flex:1;padding:12px 14px;background:#fff;border:1.5px solid #d1fae5;border-radius:10px;font-size:14px;font-family:'Noto Sans KR';outline:none;">
+    </div>`;
+  });
+  h += '</div>';
+  h += `<div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <button class="talk-action-btn success" onclick="saveAnnouncements()"><i class="fas fa-save"></i> 저장 (학생 화면 즉시 반영)</button>
+    <button class="talk-action-btn" onclick="clearAnnouncements()"><i class="fas fa-trash"></i> 전체 비우기</button>
+    <span style="font-size:12px;color:#6b7280;">${announceItems.filter(x => x && x.trim()).length}줄 저장되어 있음</span>
+  </div>`;
+  box.innerHTML = h;
+}
+
+async function saveAnnouncements() {
+  const inputs = document.querySelectorAll('.announce-input');
+  const items = Array.from(inputs).map(inp => inp.value.trim()).filter(Boolean);
+  try {
+    const { db, doc, setDoc } = window.__fb;
+    await setDoc(doc(db, 'settings', 'announcements'), { items, updated_at: new Date().toISOString() });
+    announceItems = items;
+    toast(`${items.length}줄 저장됨 — 학생 인트로에 즉시 반영`, 'success');
+    renderAnnounceEditor();
+  } catch (e) {
+    console.error(e);
+    toast('저장 실패: ' + e.message, 'error');
+  }
+}
+
+async function clearAnnouncements() {
+  if (!confirm('지난 주 변화 내용을 모두 지울까요?')) return;
+  try {
+    const { db, doc, setDoc } = window.__fb;
+    await setDoc(doc(db, 'settings', 'announcements'), { items: [], updated_at: new Date().toISOString() });
+    announceItems = [];
+    toast('모두 비웠습니다', 'success');
+    renderAnnounceEditor();
+  } catch (e) {
+    toast('실패: ' + e.message, 'error');
+  }
+}
+
 // ===== 로그아웃 =====
 function logout() {
   if (!confirm('로그아웃 하시겠어요?')) return;
+  localStorage.removeItem('jasupFeedback_auth');
+  localStorage.removeItem('jasupFeedback_loginAt');
   sessionStorage.removeItem('jasupFeedback_auth');
   location.href = 'login.html';
 }
@@ -1493,9 +2497,16 @@ document.addEventListener('DOMContentLoaded', () => {
   buildRoomFilters();
 });
 
-// 모달 외부 클릭으로 닫기
+// 모달 외부 클릭 · ESC로 닫기
 document.addEventListener('click', e => {
   if (e.target.id === 'memoModal') closeModal();
+  if (e.target.id === 'detailModalOverlay') closeDetailModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('detailModalOverlay').classList.contains('show')) closeDetailModal();
+    else if (document.getElementById('memoModal').classList.contains('show')) closeModal();
+  }
 });
 
 // 전역 노출
@@ -1508,6 +2519,13 @@ window.saveMemo = saveMemo;
 window.exportCSV = exportCSV;
 window.logout = logout;
 window.loadData = loadData;
+window.copyGratitude = copyGratitude;
+window.saveAnnouncements = saveAnnouncements;
+window.clearAnnouncements = clearAnnouncements;
+window.openDetailModal = openDetailModal;
+window.closeDetailModal = closeDetailModal;
+window.resolveWithAnnounce = resolveWithAnnounce;
+window.deleteResponse = deleteResponse;
 </script>
 </body>
 </html>

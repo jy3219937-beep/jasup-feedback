@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="robots" content="noindex, nofollow">
+<title>썸머핫습 리뷰 · 관리자</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --ink:#0f172a; --ink2:#475569; --ink3:#64748b;   /* 흰 배경 4.76:1 */
+    --ink4:#5b6b7f;                                  /* 12px 이하용 5.0:1 */
+    --line:#e2e8f0; --line-ctl:#748f9f; --card:#ffffff; --bg:#f1f5f9;
+    --sky:#0284c7; --sky2:#0369a1; --cyan:#06b6d4;
+    --sun:#f59e0b; --mint:#10b981; --rose:#e11d48; --violet:#7c3aed;
+  }
+  body {
+    font-family:'Noto Sans KR',-apple-system,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.65; font-size:14px;
+    padding-bottom:60px;
+  }
+
+  /* ── 헤더 ── */
+  .hd {
+    background:linear-gradient(115deg,#0f2a3d,#0e3a52 60%,#075985);
+    color:#e6f4fb; padding:18px 22px;
+    position:sticky; top:0; z-index:70;
+    box-shadow:0 4px 20px rgba(15,42,61,.24);
+  }
+  .hd-row { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; max-width:1360px; margin:0 auto; }
+  .hd-title { font-size:18px; font-weight:900; letter-spacing:-.03em; display:flex; align-items:center; gap:9px; }
+  .hd-sun { width:22px; height:22px; border-radius:50%; background:radial-gradient(circle at 34% 32%,#fde68a,var(--sun) 62%,#d97706); box-shadow:0 0 0 3px rgba(245,158,11,.2); }
+  .hd-sub { font-size:11.5px; color:#bfe0f5; font-weight:500; margin-top:1px; }
+  .hd-btns { display:flex; gap:8px; flex-wrap:wrap; }
+  .hbtn {
+    font-family:inherit; font-size:12px; font-weight:700; cursor:pointer;
+    padding:12px 16px; min-height:44px; border-radius:10px; border:1px solid rgba(255,255,255,.22);
+    background:rgba(255,255,255,.1); color:#e6f4fb; transition:.15s;
+  }
+  .hbtn:hover { background:rgba(255,255,255,.2); }
+  .hbtn.danger { background:rgba(225,29,72,.24); border-color:rgba(225,29,72,.44); }
+
+  /* ── 탭 ── */
+  .tabs {
+    background:var(--card); border-bottom:1px solid var(--line);
+    position:sticky; top:var(--hd-h,86px); z-index:60; overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .tabs-in { display:flex; gap:2px; max-width:1360px; margin:0 auto; padding:0 14px; min-width:max-content; }
+  .tab {
+    font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+    padding:14px 15px; border:none; background:none; color:var(--ink2);
+    border-bottom:3px solid transparent; transition:.15s; white-space:nowrap;
+  }
+  .tab:hover { color:var(--ink2); }
+  .tab.on { color:#0369a1; border-bottom-color:#0369a1; }
+  .tab .cnt { font-size:11px; background:var(--bg); color:var(--ink2); padding:1px 6px; border-radius:6px; margin-left:5px; font-weight:800; }
+  .tab.on .cnt { background:#e0f2fe; color:var(--sky2); }
+
+  /* ── 필터 바 ── */
+  .filters {
+    max-width:1360px; margin:0 auto; padding:14px 18px 0;
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  }
+  .fsel {
+    font-family:inherit; font-size:12.5px; font-weight:600; color:var(--ink2);
+    padding:11px 13px; min-height:44px; border-radius:9px; border:1.5px solid var(--line-ctl);
+    background:var(--card); outline:none; cursor:pointer;
+  }
+  .fsel:focus { border-color:#0369a1; }
+  .fclear {
+    font-family:inherit; font-size:12px; font-weight:700; cursor:pointer;
+    padding:11px 13px; min-height:44px; border-radius:9px; border:1.5px solid var(--line-ctl);
+    background:var(--card); color:var(--ink2);
+  }
+  .fnote { font-size:12px; color:var(--ink4); font-weight:600; margin-left:auto; }
+  .fnote b { color:#0369a1; font-weight:900; }
+
+  /* ── 컨테이너 ── */
+  .wrap { max-width:1360px; margin:0 auto; padding:16px 18px 40px; }
+  .pane { display:none; }
+  .pane.on { display:block; animation:fade .3s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+  /* ── 카드 ── */
+  .card {
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:18px 18px 16px; margin-bottom:14px;
+    box-shadow:0 2px 10px rgba(15,23,42,.04);
+  }
+  .card-h { font-size:14.5px; font-weight:900; letter-spacing:-.02em; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+  .card-h i { color:var(--sky); font-size:13px; }
+  .card-sub { font-size:12px; color:var(--ink3); margin-bottom:14px; line-height:1.6; }
+
+  .grid { display:grid; gap:14px; }
+  .g2 { grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); }
+  .g4 { grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); }
+
+  /* ── KPI ── */
+  .kpi {
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:15px 16px; position:relative; overflow:hidden;
+  }
+  .kpi::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--sky); }
+  .kpi.k-sun::before { background:var(--sun); }
+  .kpi.k-mint::before { background:var(--mint); }
+  .kpi.k-rose::before { background:var(--rose); }
+  .kpi.k-violet::before { background:var(--violet); }
+  .kpi-lb { font-size:11.5px; font-weight:700; color:var(--ink3); letter-spacing:-.01em; }
+  .kpi-v { font-size:27px; font-weight:900; letter-spacing:-.04em; margin-top:2px; line-height:1.2; }
+  .kpi-v small { font-size:14px; font-weight:700; color:var(--ink3); margin-left:2px; }
+  .kpi-note { font-size:11.5px; color:var(--ink3); font-weight:600; margin-top:3px; }
+
+  /* ── 막대(수평) ── */
+  .bars { display:flex; flex-direction:column; gap:9px; }
+  .bar-row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; }
+  .bar-lb { font-size:12.5px; font-weight:600; color:var(--ink2); line-height:1.4; }
+  .bar-num { font-size:12px; font-weight:800; color:var(--ink4); white-space:nowrap; }
+  .bar-track { grid-column:1/-1; height:8px; background:#dbe3ec; border-radius:99px; overflow:hidden; margin-top:-4px; }
+  .bar-fill { height:100%; border-radius:99px; background:#0369a1; transition:width .6s cubic-bezier(.16,1,.3,1); }
+  .bar-fill.warm { background:#b45309; }
+  .bar-fill.good { background:#047857; }
+  .bar-fill.bad  { background:#be123c; }
+
+  /* ── 테이블 ── */
+  .tbl-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--line); }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; background:var(--card); }
+  th {
+    background:#f8fafc; font-size:11.5px; font-weight:800; color:var(--ink2);
+    text-align:left; padding:10px 12px; border-bottom:1.5px solid var(--line); white-space:nowrap;
+  }
+  td { padding:10px 12px; border-bottom:1px solid #f1f5f9; vertical-align:top; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#f8fbfd; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+
+  /* ── 응답 카드 ── */
+  .resp {
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:15px 16px; margin-bottom:11px;
+  }
+  .resp.talk { border-color:#a7f3d0; background:linear-gradient(180deg,#f4fdf7,#fff 40%); }
+  .resp.care { border-color:#fecdd3; background:linear-gradient(180deg,#fff6f7,#fff 40%); }
+  .resp.care .resp-meta, .resp.talk .resp-meta { color:var(--ink2); }
+  .resp-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:9px; }
+  .pill {
+    font-size:11px; font-weight:800; padding:3px 9px; border-radius:7px;
+    background:var(--bg); color:var(--ink2);
+  }
+  .pill.p-sky { background:#e0f2fe; color:var(--sky2); }
+  .pill.p-sun { background:#fef3c7; color:#b45309; }
+  .pill.p-mint{ background:#d1fae5; color:#047857; }
+  .pill.p-rose{ background:#ffe4e6; color:#be123c; }
+  .pill.p-violet{ background:#ede9fe; color:#6d28d9; }
+  .resp-when { font-size:11px; color:var(--ink4); margin-left:auto; font-weight:600; }
+  .resp-body { font-size:13.5px; color:var(--ink); white-space:pre-wrap; line-height:1.75; word-break:break-word; }
+  .resp-meta { font-size:12px; color:var(--ink3); margin-top:9px; display:flex; gap:12px; flex-wrap:wrap; }
+  .resp-meta b { color:var(--ink2); font-weight:700; }
+
+  .quote-block { margin-top:10px; padding:11px 13px; background:#f8fafc; border-left:3px solid #0369a1; border-radius:0 10px 10px 0; }
+  .quote-lb { font-size:11px; font-weight:800; color:#0369a1; margin-bottom:3px; }
+
+  /* ── 상태 · 메모 ── */
+  .actions { display:flex; gap:7px; flex-wrap:wrap; margin-top:11px; padding-top:11px; border-top:1px dashed var(--line); align-items:center; }
+  .abtn {
+    font-family:inherit; font-size:11.5px; font-weight:700; cursor:pointer;
+    padding:11px 14px; min-height:44px; border-radius:8px; border:1.5px solid var(--line-ctl);
+    background:var(--card); color:var(--ink2); transition:.15s;
+  }
+  .abtn:hover { border-color:#0369a1; color:#0369a1; }
+  .abtn.on { background:#0369a1; border-color:#0369a1; color:#fff; }
+  .abtn.on.s-done { background:#047857; border-color:#047857; }
+  .abtn.on.s-hold { background:#475569; border-color:#475569; }
+  .memo {
+    width:100%; font-family:inherit; font-size:12.5px; color:var(--ink);
+    padding:9px 11px; border-radius:9px; border:1.5px solid var(--line-ctl);
+    background:#f8fafc; outline:none; margin-top:9px; min-height:54px; resize:vertical;
+  }
+  .memo:focus { border-color:#0369a1; background:#fff; }
+  .memo-save:not(.show) { visibility:hidden }
+  .memo-save { font-size:11px; color:#047857; font-weight:700; margin-left:8px; opacity:0; transition:.2s; }
+  .memo-save.show { opacity:1; }
+
+  /* ── 상태 표시 ── */
+  .empty { text-align:center; padding:52px 20px; color:var(--ink3); }
+  .empty i { font-size:34px; opacity:.35; display:block; margin-bottom:12px; }
+  .empty p { font-size:13.5px; font-weight:600; }
+  .loading { text-align:center; padding:70px 20px; color:var(--ink3); font-size:13px; font-weight:600; }
+  .loading i { font-size:26px; display:block; margin-bottom:12px; color:var(--sky); }
+
+
+  .hint {
+    font-size:12px; color:#92400e; background:#fffbeb; border:1px solid #fde68a;
+    padding:10px 13px; border-radius:10px; margin-bottom:14px; line-height:1.65;
+  }
+  .hint i { margin-right:5px; }
+
+  .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0 }
+  .tab:focus-visible, .hbtn:focus-visible, .abtn:focus-visible,
+  .fsel:focus-visible, .fclear:focus-visible, .memo:focus-visible,
+  .tbl-wrap:focus-visible { outline:3px solid var(--sky); outline-offset:2px }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration:.01ms !important; animation-iteration-count:1 !important;
+      transition-duration:.01ms !important; scroll-behavior:auto !important;
+    }
+  }
+
+  @media (max-width:700px) {
+    .hd-title { font-size:16px; }
+    .tabs { top:0; position:static; }
+    .hd { position:static; }
+    .wrap, .filters { padding-left:12px; padding-right:12px; }
+    .fnote { margin-left:0; width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <div class="hd-row">
+    <div>
+      <h1 class="hd-title"><span class="hd-sun" aria-hidden="true"></span>썸머핫습 리뷰 · 관리자</h1>
+      <div class="hd-sub">SUMMER 2026 (7.20–8.16) 만족도 설문 · 응답 <span id="hdCount">–</span>건</div>
+    </div>
+    <div class="hd-btns">
+      <button class="hbtn" onclick="location.href='summer.html'"><i class="fas fa-eye" aria-hidden="true"></i> 학생 화면</button>
+      <button class="hbtn" onclick="location.href='admin.html'"><i class="fas fa-arrow-left" aria-hidden="true"></i> 말해보살 대시보드</button>
+      <button class="hbtn" onclick="exportCSV()"><i class="fas fa-file-csv" aria-hidden="true"></i> CSV (보이는 응답만)</button>
+      <button class="hbtn" onclick="loadAll(true)"><i class="fas fa-rotate" aria-hidden="true"></i> 새로고침</button>
+      <button class="hbtn danger" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> 로그아웃</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="대시보드 화면 전환">
+  <div class="tabs-in" id="tabs"></div>
+</nav>
+
+<div class="filters" role="search">
+  <select class="fsel" id="fGrade" aria-label="학년 필터" onchange="applyFilter()"><option value="">전체 학년</option></select>
+  <input class="fsel" id="fSearch" type="search" style="cursor:text;min-width:170px"
+         aria-label="이름·내용·메모 검색" placeholder="🔎 이름·내용·메모 검색" oninput="applyFilter()">
+  <select class="fsel" id="fStatus" aria-label="처리 상태 필터" onchange="applyFilter()">
+    <option value="">전체 상태</option>
+    <option value="new">신규</option>
+    <option value="review">검토중</option>
+    <option value="hold">보류</option>
+    <option value="done">완료</option>
+  </select>
+  <select class="fsel" id="fRoom" aria-label="자습관 필터" onchange="applyFilter()"><option value="">전체 자습관</option></select>
+  <button class="fclear" onclick="clearFilter()"><i class="fas fa-xmark" aria-hidden="true"></i> 필터 해제</button>
+  <div class="fnote" role="status" aria-live="polite">지금 보는 응답 <b id="fCount">0</b>건 / 전체 <span id="fTotal">0</span>건</div>
+</div>
+
+<main class="wrap" id="wrap">
+  <div class="loading" id="loading" role="status" aria-live="polite"><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>응답을 불러오는 중…</div>
+
+  <!-- 한눈에 -->
+  <div class="pane" id="p-summary"></div>
+  <!-- 아하포인트 -->
+  <div class="pane" id="p-aha"></div>
+  <!-- 학원생활 -->
+  <div class="pane" id="p-life"></div>
+  <!-- 자습관 -->
+  <div class="pane" id="p-room"></div>
+  <!-- 케어 필요 -->
+  <div class="pane" id="p-care"></div>
+  <!-- 자유서술 -->
+  <div class="pane" id="p-text"></div>
+  <!-- 전체 응답 -->
+  <div class="pane" id="p-all"></div>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc }
+    from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+  const app = initializeApp({
+    apiKey: "AIzaSyCUpVlY5al5uvH4wRv7WQxWrbV_OnvfPQg",
+    authDomain: "jasup-feedback.firebaseapp.com",
+    projectId: "jasup-feedback",
+    storageBucket: "jasup-feedback.firebasestorage.app",
+    messagingSenderId: "242775000792",
+    appId: "1:242775000792:web:78e5c222aa9d7891b479ad"
+  });
+  window.__fb = { db: getFirestore(app), collection, getDocs, doc, updateDoc, deleteDoc };
+  window.dispatchEvent(new Event('fbready'));
+</script>
+
+<script>
+/* ══════════ 인증 가드 ══════════ */
+// location 대입은 스크립트를 멈추지 않는다.
+// throw 하지 않으면 미인증 상태로 컬렉션 전체를 읽어 화면에 그려버린다.
+if (localStorage.getItem('jasupFeedback_auth') !== '1') {
+  sessionStorage.setItem('jasupFeedback_returnTo', location.pathname + location.search);
+  location.replace('login.html');
+  throw new Error('unauthorized');
+}
+
+const COLLECTION = 'summer_survey_2026';
+
+/* ══════════ 라벨 사전 ══════════ */
+const L_AHA_USED = { many:'여러 번 해봤다', few:'한두 번 해봤다', none:'아직 안 해봤다', idk:'뭔지 잘 모른다' };
+const L_AHA_AGAIN = { sure:'또 쓸 것', maybe:'아마도', unsure:'모르겠다', no:'안 쓸 것' };
+const L_AHA_WHEN = { thisweek:'이번 주에', remain:'남은 기간에', chance:'기회 되면', noplan:'쓸 생각 없다', dunno:'모르겠다' };
+const L_AHA_INTRO = { try:'해보고 싶다', more:'더 알아보고 싶다', nonow:'지금은 필요 없다', unsure:'모르겠다', later:'모르겠다(구)' };
+const L_QR_USED = { many:'여러 번 써봤다', few:'한두 번 써봤다', none:'아직 안 써봤다', idk:'뭔지 잘 모른다',
+  /* 구버전 응답 호환 */ often:'여러 번 써봤다(구)' };
+const L_OVERALL = { 5:'진짜 좋다', 4:'힘들지만 좋다', 3:'나쁘지 않다', 2:'조금 아쉽다', 1:'힘들기만 하다' };
+const L_ROOM_SAT = { 5:'아주 만족', 4:'만족', 3:'무난', 2:'조금 아쉽다', 1:'아쉬운 점 많다' };
+const L_COND = { great:'좋다', ok:'괜찮다', tired:'좀 지쳤다', hard:'많이 힘들다' };
+const L_LIFE_IMPROVE = { none:'지금도 충분', class:'수업', balance:'수업·자습 배분', rest:'쉬는 시간·회복', meal:'밥·간식', comm:'안내·소통', other:'기타' };
+const L_ROOM_IMPROVE = { noise:'소음·잡담', seat:'자리·책상', air:'냉난방·환기', facility:'시설', rule:'규칙·지도', other:'기타', none:'지금이 좋다',
+  /* 구버전 응답 호환 */ focus:'집중 환경(구)', living:'생활 편의(구)' };
+const L_STATUS = { new:'신규', review:'검토중', done:'완료', hold:'보류' };
+
+// 자습관별 재원 인원. 응답 '수'가 아니라 '응답률'로 봐야 독려 대상이 나온다.
+const ROOM_CAPACITY = {
+  '1관': 41, '2관': 35, '3관': 36, '419관': 11, '420관(블랙관)': 19,
+  'B2관': 49, 'B7관': 28, 'B8관': 31, 'B9관': 56
+};
+const TOTAL_CAPACITY = Object.values(ROOM_CAPACITY).reduce((a, b) => a + b, 0);
+const capOf = k => ROOM_CAPACITY[k] || null;
+// 응답률 셀: 정원을 모르는 그룹(미기재·구버전)은 '–'
+function rateCell(k, n) {
+  const cap = capOf(k);
+  if (cap == null) return '<span style="color:var(--ink3)">–</span>';
+  const p = pct(n, cap);
+  return `<b style="color:${p < 40 ? 'var(--rose)' : p >= 70 ? '#047857' : 'var(--ink)'}">${p}%</b>`
+       + ` <span style="color:var(--ink4)">${n}/${cap}</span>`;
+}
+
+const TABS = [
+  { k:'summary', t:'한눈에',      i:'fa-chart-pie' },
+  { k:'aha',     t:'아하·질문방',  i:'fa-lightbulb' },
+  { k:'life',    t:'학원생활',     i:'fa-school' },
+  { k:'room',    t:'자습관',      i:'fa-book-open-reader' },
+  { k:'care',    t:'케어 필요',    i:'fa-heart-pulse', badge:'care' },
+  { k:'text',    t:'자유서술',     i:'fa-comment-dots', badge:'text' },
+  { k:'all',     t:'응답 전체',    i:'fa-table-list', badge:'all' }
+];
+
+let ALL = [];      // 전체 응답
+let VIEW = [];     // 필터 적용된 응답
+let curTab = 'summary';
+
+/* ══════════ 유틸 ══════════ */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const pct = (n, d) => d ? Math.round(n / d * 100) : 0;
+const motionOK = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// 임의 문서가 주입될 수 있으므로 숫자로 가정한 필드도 반드시 검사한다
+const num = v => Number.isFinite(v) ? v : '–';
+// null <= 2 는 true 다. 무응답이 '부정'으로 집계되지 않게 반드시 숫자를 확인한다.
+const lowScore = v => typeof v === 'number' && v <= 2;
+// 응답이 적은 집단을 전체 평균 쪽으로 끌어당기는 강도
+const SHRINK_K = 5;
+
+// 학생 기기 시계가 앞서 있으면 '-137분 전'이 되므로 서버 타임스탬프를 우선한다
+function whenOf(r) {
+  const ms = r.created_ts && typeof r.created_ts.toMillis === 'function' ? r.created_ts.toMillis() : null;
+  return ms != null ? new Date(ms).toISOString() : (r.created_at || '');
+}
+
+function fmtWhen(iso) {
+  if (!iso) return '–';
+  const d = new Date(iso);
+  if (isNaN(d)) return '–';
+  const mins = Math.round((Date.now() - d) / 60000);
+  const stamp = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  if (mins < 0) return stamp;
+  if (mins < 60) return `${mins}분 전 · ${stamp}`;
+  if (mins < 1440) return `${Math.floor(mins/60)}시간 전 · ${stamp}`;
+  return stamp;
+}
+
+function tally(rows, getter) {
+  const m = new Map();
+  rows.forEach(r => {
+    const v = getter(r);
+    (Array.isArray(v) ? v : [v]).forEach(x => {
+      if (x === '' || x === null || x === undefined) return;
+      m.set(x, (m.get(x) || 0) + 1);
+    });
+  });
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+function avg(rows, getter) {
+  const vals = rows.map(getter).filter(v => typeof v === 'number' && !isNaN(v));
+  if (!vals.length) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
+// 평균에 실제로 기여한 관측 수 (구버전·오염 문서 때문에 집단 인원과 다를 수 있다)
+function obs(rows, getter) {
+  return rows.map(getter).filter(v => typeof v === 'number' && !isNaN(v)).length;
+}
+
+function bars(pairs, total, cls, keepZero) {
+  if (!keepZero) pairs = pairs.filter(p => p[1] > 0);
+  if (!pairs.some(p => p[1] > 0)) return `<p style="font-size:12.5px;color:var(--ink3)">아직 응답이 없어요.</p>`;
+  return `<div class="bars">` + pairs.map(([lb, n]) => `
+    <div>
+      <div class="bar-row">
+        <div class="bar-lb">${esc(lb)}</div>
+        <div class="bar-num">${n}명 · ${pct(n, total)}%</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill ${cls||''}" style="width:${pct(n, total)}%"></div></div>
+    </div>`).join('') + `</div>`;
+}
+
+function relabel(pairs, dict) {
+  return pairs.map(([k, n]) => [dict[k] || k, n]);
+}
+
+// 5→1, 좋음→나쁨처럼 순서가 있는 문항은 빈도순으로 섞으면 분포를 읽을 수 없다.
+// 주의: Object.keys 는 정수형 키를 오름차순으로 재정렬하므로 순서를 배열로 명시해야 한다.
+const ORD_SCORE = [5, 4, 3, 2, 1];
+const ORD_COND  = ['great', 'ok', 'tired', 'hard'];
+function ordered(rows, getter, dict, keys) {
+  return keys.map(k =>
+    [dict[k] || k, rows.filter(r => String(getter(r)) === String(k)).length]);
+}
+
+/* ══════════ 데이터 로드 ══════════ */
+async function loadAll(force) {
+  if (!window.__fb) { window.addEventListener('fbready', () => loadAll(force), { once:true }); return; }
+  const ld = document.getElementById('loading');
+  ld.style.display = 'block';
+  ld.innerHTML = `<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>응답을 불러오는 중…`;
+  try {
+    const snap = await window.__fb.getDocs(window.__fb.collection(window.__fb.db, COLLECTION));
+    ALL = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    ALL.sort((a, b) => whenOf(b).localeCompare(whenOf(a)));
+    ld.style.display = 'none';
+    buildFilters();
+    applyFilter();
+  } catch (e) {
+    console.error(e);
+    ld.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true" style="color:var(--rose)"></i>불러오지 못했어요.<br><span style="font-size:12px">${esc(e.message)}</span>`;
+  }
+}
+
+function buildFilters() {
+  const fill = (id, vals, label) => {
+    const sel = document.getElementById(id);
+    const keep = sel.value;
+    sel.innerHTML = `<option value="">${label}</option>` +
+      vals.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+    if (vals.includes(keep)) sel.value = keep;
+  };
+  const uniq = arr => [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'));
+  fill('fGrade', uniq(ALL.map(r => r.grade)), '전체 학년');
+  fill('fRoom',  uniq(ALL.map(r => r.jasup?.room)), '전체 자습관');
+}
+
+function applyFilter() {
+  const g = document.getElementById('fGrade').value;
+  const rm = document.getElementById('fRoom').value;
+  const st = document.getElementById('fStatus').value;
+  const q  = document.getElementById('fSearch').value.trim().toLowerCase();
+  VIEW = ALL.filter(r =>
+    (!g  || r.grade === g) &&
+    (!rm || r.jasup?.room === rm) &&
+    (!st || (r.status || 'new') === st) &&
+    (!q  || textOf(r).includes(q))
+  );
+  document.getElementById('fCount').textContent = VIEW.length;
+  document.getElementById('fTotal').textContent = ALL.length;
+  document.getElementById('hdCount').textContent = ALL.length;
+  renderTabs();
+  render();
+}
+
+function clearFilter() {
+  ['fGrade','fRoom','fStatus','fSearch'].forEach(id => document.getElementById(id).value = '');
+  applyFilter();
+}
+
+/* ══════════ 탭 ══════════ */
+// 면담 희망(실명 우선) > 많이 힘들다 > 만족도 낮음 순으로 급한 것부터.
+// 처리 끝난 건(완료·보류)은 목록과 배지에서 빼야 매일 같은 목록을 다시 읽지 않는다.
+function careWeight(r) {
+  const ov = typeof r.academy?.overall === 'number' ? r.academy.overall : null;
+  return (r.closing?.want_talk ? (r.is_named ? 100 : 80) : 0)
+       + (r.academy?.condition === 'hard' ? 40 : r.academy?.condition === 'tired' ? 10 : 0)
+       + (lowScore(ov) ? 20 : 0);
+}
+// 검색 대상 — 관리자 메모까지 포함해야 면담 기록을 다시 찾을 수 있다
+function textOf(r) {
+  return [r.closing?.message, r.closing?.thanks_to, r.aha?.note, r.aha?.wish,
+          r.qroom?.note, r.academy?.improve_note, r.jasup?.improve_note,
+          r.admin_memo, r.name, r.grade, r.jasup?.room]
+    .filter(Boolean).join(' ').toLowerCase();
+}
+
+function careRows() {
+  // tired(10점) 단독으로는 목록에 넣지 않는다 — 여름엔 다수가 '좀 지쳤다'를 고른다.
+  // 면담 희망·많이 힘들다·만족도 2점 이하 중 하나는 있어야 한다.
+  return VIEW.filter(r => careWeight(r) >= 20 && !['done', 'hold'].includes(r.status || 'new'))
+             .sort((a, b) => careWeight(b) - careWeight(a));
+}
+function textRows()  { return VIEW.filter(r => (r.closing?.message||'').trim() || (r.aha?.note||'').trim() || (r.aha?.wish||'').trim() || (r.qroom?.note||'').trim() || (r.academy?.improve_note||'').trim() || (r.jasup?.improve_note||'').trim() || (r.closing?.thanks_to||'').trim()); }
+
+function renderTabs() {
+  const counts = { care: careRows().length, text: textRows().length, all: VIEW.length };
+  const host = document.getElementById('tabs');
+  host.setAttribute('role', 'tablist');
+  host.innerHTML = TABS.map(t => `
+    <button class="tab ${t.k===curTab?'on':''}" id="tab-${t.k}" role="tab"
+            aria-selected="${t.k===curTab}" aria-controls="p-${t.k}"
+            tabindex="${t.k===curTab?0:-1}" data-tab="${t.k}">
+      <i class="fas ${t.i}" aria-hidden="true"></i> ${t.t}${t.badge ? `<span class="cnt">${counts[t.badge]}</span>` : ''}
+    </button>`).join('');
+  if (!host._kb) {
+    host._kb = true;
+    host.addEventListener('click', e => {
+      const b = e.target.closest('[data-tab]');
+      if (b) setTab(b.dataset.tab);
+    });
+    // 탭 목록은 화살표로 이동하는 것이 표준 동작
+    host.addEventListener('keydown', e => {
+      if (!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
+      e.preventDefault();
+      const i = TABS.findIndex(t => t.k === curTab);
+      const j = e.key === 'Home' ? 0 : e.key === 'End' ? TABS.length - 1
+              : (i + (e.key === 'ArrowRight' ? 1 : -1) + TABS.length) % TABS.length;
+      setTab(TABS[j].k);
+    });
+  }
+}
+
+function setTab(k) {
+  curTab = k;
+  renderTabs();
+  render();
+  // 탭 버튼을 새로 그리면 포커스가 body 로 튀므로 되돌려준다
+  const btn = document.getElementById('tab-' + k);
+  if (btn && document.activeElement !== btn && document.activeElement === document.body) btn.focus();
+  window.scrollTo({ top:0, behavior: motionOK() ? 'smooth' : 'auto' });
+}
+
+function render() {
+  // 비활성 pane을 비우지 않으면 memo-{id}가 여러 개 생겨
+  // saveMemo()가 화면에 안 보이는 입력칸의 값을 저장한다
+  TABS.forEach(t => {
+    const el = document.getElementById('p-' + t.k);
+    if (t.k !== curTab) el.innerHTML = '';
+    el.classList.toggle('on', t.k === curTab);
+    el.setAttribute('role', 'tabpanel');
+    el.setAttribute('aria-labelledby', 'tab-' + t.k);
+    el.setAttribute('tabindex', '-1');
+  });
+  ({ summary:renderSummary, aha:renderAha, life:renderLife, room:renderRoom,
+     care:renderCare, text:renderText, all:renderAllTab })[curTab]();
+}
+
+/* ══════════ 1. 한눈에 ══════════ */
+function renderSummary() {
+  const el = document.getElementById('p-summary');
+  const n = VIEW.length;
+  if (!n) { el.innerHTML = emptyBox('아직 응답이 없어요'); return; }
+
+  const ahaTried = VIEW.filter(r => ['many','few'].includes(r.aha?.used)).length;
+  const ahaMany  = VIEW.filter(r => r.aha?.used === 'many').length;
+  const qrWent   = VIEW.filter(r => ['many','often','few'].includes(r.qroom?.used)).length;
+  const neither  = VIEW.filter(r => !['many','few'].includes(r.aha?.used)
+                                 && !['many','often','few'].includes(r.qroom?.used)).length;
+  const ovAvg    = avg(VIEW, r => r.academy?.overall);
+  const fcAvg    = avg(VIEW, r => r.jasup?.satisfaction);
+  const hard     = VIEW.filter(r => r.academy?.condition === 'hard').length;
+  const tired    = VIEW.filter(r => ['tired','hard'].includes(r.academy?.condition)).length;
+  const talk     = VIEW.filter(r => r.closing?.want_talk).length;
+  const named    = VIEW.filter(r => r.is_named).length;
+
+  el.innerHTML = `
+    ${actionBrief()}
+
+    <div class="grid g4" style="margin-bottom:14px">
+      ${kpi('응답률', pct(n, TOTAL_CAPACITY) + '<small>%</small>', `${n}명 / 전체 ${TOTAL_CAPACITY}명`, pct(n, TOTAL_CAPACITY) < 40 ? 'k-rose' : '')}
+      ${kpi('응답 수', n, `${named}명 실명 · ${n-named}명 익명`, '')}
+      ${kpi('아하포인트 경험률', pct(ahaTried, n) + '<small>%</small>', `${ahaTried}명 중 여러 번 ${ahaMany}명`, 'k-sun')}
+      ${kpi('질문방 이용률', pct(qrWent, n) + '<small>%</small>', `${qrWent}명`, 'k-sun')}
+      ${kpi('둘 다 안 씀', neither, '막혀도 혼자 버티는 학생', neither ? 'k-rose' : 'k-mint')}
+      ${kpi('썸머핫습 만족도', ovAvg ? ovAvg.toFixed(1) + '<small>/5</small>' : '–', ovAvg ? scoreWord(ovAvg) : '', 'k-mint')}
+      ${kpi('자습관 만족도', fcAvg ? fcAvg.toFixed(1) + '<small>/5</small>' : '–', fcAvg ? scoreWord(fcAvg) : '', '')}
+      ${kpi('지친 학생', tired, `그중 "많이 힘들다" ${hard}명`, hard ? 'k-rose' : '')}
+      ${kpi('면담 희망', talk, talk ? `미처리 ${careRows().filter(r => r.closing?.want_talk).length}명 · 케어 필요 탭` : '없음', talk ? 'k-violet' : '')}
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <div class="card-h"><i class="fas fa-lightbulb" aria-hidden="true"></i> 아하포인트 · 질문방 경험</div>
+        <div class="card-sub">막혔을 때 실제로 어디로 가는지</div>
+        <div style="font-size:12px;font-weight:800;color:var(--ink2);margin-bottom:7px">아하포인트</div>
+        ${bars(relabel(tally(VIEW, r => r.aha?.used), L_AHA_USED), n, 'warm')}
+        <div style="font-size:12px;font-weight:800;color:var(--ink2);margin:14px 0 7px">질문방</div>
+        ${bars(relabel(tally(VIEW, r => r.qroom?.used), L_QR_USED), n)}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-face-smile" aria-hidden="true"></i> 썸머핫습 전체 느낌</div>
+        <div class="card-sub">평균 ${ovAvg ? ovAvg.toFixed(1) : '–'} / 5점</div>
+        ${bars(ordered(VIEW, r => r.academy?.overall, L_OVERALL, ORD_SCORE), n, '', true)}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-battery-half" aria-hidden="true"></i> 요즘 컨디션</div>
+        <div class="card-sub">환경 지표보다 먼저 봐야 하는 숫자</div>
+        ${bars(ordered(VIEW, r => r.academy?.condition, L_COND, ORD_COND), n, hard ? 'bad' : 'good', true)}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-users" aria-hidden="true"></i> 학년·자습관별 응답</div>
+        <div class="card-sub">막대는 응답 수입니다. 정원 대비 비율은 아래 <b>자습관별 요약</b>의 응답률 열을 보세요.</div>
+        ${bars(tally(VIEW, r => `${r.grade||'?'} · ${r.jasup?.room||'?'}`), n, '', true)}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><i class="fas fa-scale-balanced" aria-hidden="true"></i> 학년별 요약</div>
+      <div class="card-sub">썸머핫습 만족도 · 자습관 만족도 · 아하 경험률을 학년 단위로 비교</div>
+      ${groupTable(r => r.grade || '(미기재)', '학년')}
+    </div>
+
+    <div class="card">
+      <div class="card-h"><i class="fas fa-building" aria-hidden="true"></i> 자습관별 요약</div>
+      <div class="card-sub">자습관 만족도 낮은 순 — 자세한 건 자습관 탭에서</div>
+      ${groupTable(r => r.jasup?.room || '(미기재)', '자습관', 'jasup')}
+    </div>
+  `;
+}
+
+// 숫자 8개를 나열하는 것보다 "오늘 무엇을 할지" 한 문단이 실제 판단에 쓰인다
+function actionBrief() {
+  const n = VIEW.length;
+  if (!n) return '';
+  const care = careRows();
+  const careTalk = care.filter(r => r.closing?.want_talk);
+  const notYet = VIEW.filter(r => r.aha?.used === 'none');   // 아하 탭과 같은 모집단
+  const blk = tally(notYet, r => r.aha?.blockers)[0];
+
+  const rooms = new Map();
+  VIEW.forEach(r => {
+    const k = r.jasup?.room || '(미기재)';   // 자습관 탭과 같은 모집단
+    if (!rooms.has(k)) rooms.set(k, []);
+    rooms.get(k).push(r);
+  });
+  const prior = avg(VIEW, r => r.jasup?.satisfaction) ?? 3;
+  const worst = [...rooms.entries()]
+    .map(([k, rs]) => {
+      const fc = avg(rs, r => r.jasup?.satisfaction);
+      const kObs = obs(rs, r => r.jasup?.satisfaction);
+      const top = tally(rs.filter(r => r.jasup?.improve_one && r.jasup.improve_one !== 'none'), r => r.jasup.improve_one)[0];
+      // 자습관 탭 표와 같은 분모를 써야 두 화면이 같은 관을 지목한다
+      return { k, n: rs.length, kObs, fc, top, shrunk: fc == null ? 9 : (fc * kObs + prior * SHRINK_K) / (kObs + SHRINK_K) };
+    })
+    .sort((a, b) => a.shrunk - b.shrunk)[0];
+
+  // 응답률이 낮은 관은 데이터 자체를 믿기 어려우므로 독려가 먼저다
+  const lowRate = Object.keys(ROOM_CAPACITY)
+    .map(k => ({ k, n: VIEW.filter(r => r.jasup?.room === k).length, cap: ROOM_CAPACITY[k] }))
+    .map(x => ({ ...x, rate: pct(x.n, x.cap) }))
+    .filter(x => x.rate < 40)
+    .sort((a, b) => a.rate - b.rate);
+
+  const items = [];
+  if (care.length) items.push(`<b>① 오늘 찾아갈 학생 ${care.length}명</b> — 면담 희망 ${careTalk.length}명(실명 ${careTalk.filter(r => r.is_named).length}명) 포함. `
+    + `<button class="abtn" data-go="care">케어 필요 탭 열기</button>`);
+  else items.push('<b>① 즉시 케어가 필요한 미처리 응답은 없습니다.</b>');
+
+  if (blk) items.push(`<b>② 아하포인트 미경험 ${notYet.length}명(${pct(notYet.length, n)}%)</b>의 걸림돌 1위는 `
+    + `"${esc(blk[0])}" ${blk[1]}명 — 이걸 없애는 안내부터 붙이면 경험률이 올라갑니다. `
+    + `<button class="abtn" data-go="aha">아하·질문방 탭</button>`);
+
+  if (worst && worst.fc != null) items.push(`<b>③ 자습관 만족도 최하위는 ${esc(worst.k)}</b> (${worst.fc.toFixed(1)}점, 응답 ${worst.n}명${worst.kObs < 5 ? ' — 표본이 적어 참고만' : ''})`
+    + (worst.top && worst.top[1] >= 2 ? `, 개선 1순위 "${esc(L_ROOM_IMPROVE[worst.top[0]] || worst.top[0])}" ${worst.top[1]}명.` : '.')
+    + ` <button class="abtn" data-go="room">자습관 탭</button>`);
+
+  if (lowRate.length) items.push(`<b>④ 응답률이 낮은 자습관 ${lowRate.length}곳</b> — `
+    + lowRate.slice(0, 3).map(x => `${esc(x.k)} ${x.rate}%(${x.n}/${x.cap})`).join(', ')
+    + `. 표본이 적어 위 판단에서 빠질 수 있으니 먼저 독려하세요.`);
+
+  return `<div class="card" style="border-color:#bae6fd;background:linear-gradient(180deg,#f0f9ff,#fff 40%)">
+    <div class="card-h"><i class="fas fa-list-check" aria-hidden="true"></i> 오늘 할 일</div>
+    <div class="card-sub" style="color:var(--ink4)">응답 ${n}건을 바탕으로 자동 정리했습니다. 숫자 근거는 아래 카드에 있습니다.</div>
+    <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;line-height:1.75;color:var(--ink)">
+      ${items.map(t => `<div>${t}</div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function scoreWord(v) {
+  if (v >= 4.5) return '아주 좋음';
+  if (v >= 4.0) return '좋음';
+  if (v >= 3.5) return '무난함';
+  if (v >= 3.0) return '보통 — 살펴볼 필요';
+  return '낮음 — 원인 확인 필요';
+}
+
+function kpi(lb, v, note, cls) {
+  return `<div class="kpi ${cls||''}">
+    <div class="kpi-lb">${lb}</div>
+    <div class="kpi-v">${v}</div>
+    <div class="kpi-note">${note || '&nbsp;'}</div>
+  </div>`;
+}
+
+function emptyBox(msg) {
+  return `<div class="card"><div class="empty"><i class="fas fa-inbox" aria-hidden="true"></i><p>${esc(msg)}</p></div></div>`;
+}
+
+function groupTable(keyFn, keyLabel, sortBy) {
+  const groups = new Map();
+  VIEW.forEach(r => {
+    const k = keyFn(r);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(r);
+  });
+  const rows = [...groups.entries()].map(([k, rs]) => {
+    const ov = avg(rs, r => r.academy?.overall);
+    const fc = avg(rs, r => r.jasup?.satisfaction);
+    const tried = rs.filter(r => ['many','few'].includes(r.aha?.used)).length;
+    const hard = rs.filter(r => r.academy?.condition === 'hard').length;
+    const tired = rs.filter(r => ['tired','hard'].includes(r.academy?.condition)).length;
+    return { k, n: rs.length, kObs: obs(rs, r => r.academy?.overall),
+             fcObs: obs(rs, r => r.jasup?.satisfaction), ov, fc,
+             triedPct: pct(tried, rs.length), hard, tired };
+  });
+  // 응답 1~2건인 집단이 최상위로 올라와 우선순위를 뒤집는 것을 막는다 (전체평균으로 축소)
+  // 어떤 만족도로 줄 세울지 호출부가 정한다 (자습관 표는 자습관 만족도 기준이어야 한다)
+  const byRoom = sortBy === 'jasup';
+  const prior = (byRoom ? avg(VIEW, r => r.jasup?.satisfaction) : avg(VIEW, r => r.academy?.overall)) ?? 3;
+  rows.forEach(r => {
+    const m = byRoom ? r.fc : r.ov;
+    const k = byRoom ? r.fcObs : r.kObs;
+    r.shrunk = m == null ? 9 : (m * k + prior * SHRINK_K) / (k + SHRINK_K);
+  });
+  rows.sort((a, b) => a.shrunk - b.shrunk);
+
+  if (!rows.length) return `<p style="font-size:12.5px;color:var(--ink3)">데이터가 없어요.</p>`;
+
+  return `<div class="tbl-wrap" tabindex="0" role="region" aria-label="${esc(keyLabel)}별 요약"><table>
+    <thead><tr>
+      <th scope="col">${keyLabel}</th><th class="num" scope="col">응답</th>${byRoom?'<th class="num" scope="col">응답률</th>':''}<th class="num" scope="col">썸머핫습 만족</th>
+      <th class="num" scope="col">자습관 만족</th><th class="num" scope="col">아하 경험률</th><th class="num" scope="col">지침</th>
+    </tr></thead>
+    <tbody>${rows.map(r => `<tr>
+      <td style="font-weight:700">${esc(r.k)}</td>
+      <td class="num">${r.n}${r.kObs<5?' <span class="pill">표본 적음</span>':''}</td>
+      ${byRoom?`<td class="num">${rateCell(r.k, r.n)}</td>`:''}
+      <td class="num" style="font-weight:800;color:${r.ov==null?'var(--ink3)':r.ov<3.2?'var(--rose)':r.ov>=4?'#047857':'var(--ink)'}">${r.ov!=null?r.ov.toFixed(1):'–'}</td>
+      <td class="num" style="font-weight:700">${r.fc!=null?r.fc.toFixed(1):'–'}</td>
+      <td class="num">${r.triedPct}%</td>
+      <td class="num">${pct(r.tired, r.n)}%${r.hard?` <span style="color:var(--rose);font-weight:800">(${r.hard})</span>`:''}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>
+  <p style="font-size:11.5px;color:var(--ink4);margin-top:9px">만족도 낮은 순 정렬(응답이 적은 집단은 전체 평균 쪽으로 보정). "지침" 괄호는 <b>많이 힘들다</b> 응답 수.
+  <b>표본 적음</b>은 <b>평균에 실제로 쓰인 응답</b>이 5건 미만이라는 뜻입니다(무응답·구버전 문서 제외).
+  만족도는 유효 응답 기준, 경험률·지침률은 전체 응답 기준입니다.</p>`;
+}
+
+/* ══════════ 2. 아하포인트 ══════════ */
+function renderAha() {
+  const el = document.getElementById('p-aha');
+  const n = VIEW.length;
+  if (!n) { el.innerHTML = emptyBox('아직 응답이 없어요'); return; }
+
+  const tried = VIEW.filter(r => ['many','few'].includes(r.aha?.used));
+  const notYet = VIEW.filter(r => r.aha?.used === 'none');
+  const idk = VIEW.filter(r => r.aha?.used === 'idk');
+  const willAgain = tried.filter(r => ['sure','maybe'].includes(r.aha?.will_use_again)).length;
+
+  const notes = VIEW.filter(r => (r.aha?.note||'').trim());
+  const wishes = VIEW.filter(r => (r.aha?.wish||'').trim());
+
+  el.innerHTML = `
+    <div class="hint"><i class="fas fa-circle-info" aria-hidden="true"></i>
+      아하포인트는 학원 핵심 자산이에요. <b>안 쓰는 이유</b>가 이 탭의 핵심 — 걸림돌을 없애면 경험률이 올라갑니다.
+    </div>
+
+    <div class="grid g4" style="margin-bottom:14px">
+      ${kpi('경험률', pct(tried.length, n) + '<small>%</small>', `${tried.length}명 / ${n}명`, 'k-sun')}
+      ${kpi('아직 안 해봄', notYet.length, `전체의 ${pct(notYet.length, n)}%`, notYet.length ? 'k-rose' : '')}
+      ${kpi('뭔지 모름', idk.length, idk.length ? '안내 자체가 안 닿았음' : '전원 인지', idk.length ? 'k-rose' : 'k-mint')}
+      ${kpi('재사용 의향', tried.length ? pct(willAgain, tried.length) + '<small>%</small>' : '–', `해본 학생 중 ${willAgain}명`, 'k-mint')}
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <div class="card-h"><i class="fas fa-chart-simple" aria-hidden="true"></i> 사용 경험 분포</div>
+        ${bars(relabel(tally(VIEW, r => r.aha?.used), L_AHA_USED), n, 'warm')}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-rotate-right" aria-hidden="true"></i> 또 쓸 것 같은지</div>
+        <div class="card-sub">해본 학생 ${tried.length}명 기준</div>
+        ${bars(relabel(tally(tried, r => r.aha?.will_use_again), L_AHA_AGAIN), tried.length, 'good')}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-thumbs-up" aria-hidden="true"></i> 해보니 어땠는지</div>
+        <div class="card-sub">해본 학생 ${tried.length}명 · 복수 응답</div>
+        ${bars(tally(tried, r => r.aha?.experience), tried.length, 'good')}
+      </div>
+      <div class="card">
+        <div class="card-h" style="color:#be123c"><i class="fas fa-triangle-exclamation" aria-hidden="true" style="color:#be123c"></i> 안 쓰는 이유 (걸림돌)</div>
+        <div class="card-sub">아직 안 해본 학생 ${notYet.length}명 · 복수 응답 — <b>여기가 개선 포인트</b></div>
+        ${bars(tally(notYet, r => r.aha?.blockers), notYet.length, 'bad')}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-clock" aria-hidden="true"></i> 언제 해볼 것 같은지</div>
+        <div class="card-sub">아직 안 해본 학생 ${notYet.length}명</div>
+        ${bars(relabel(tally(notYet, r => r.aha?.when_try), L_AHA_WHEN), notYet.length, 'warm')}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-circle-question" aria-hidden="true"></i> 설명 듣고 난 반응</div>
+        <div class="card-sub">"뭔지 잘 모른다" 학생 ${idk.length}명</div>
+        ${bars(relabel(tally(idk, r => r.aha?.after_intro), L_AHA_INTRO), idk.length)}
+      </div>
+    </div>
+
+    ${crossSection()}
+
+    ${qroomSection()}
+
+    <div class="card">
+      <div class="card-h"><i class="fas fa-quote-left" aria-hidden="true"></i> 아하포인트 관련 학생 목소리</div>
+      <div class="card-sub">기억에 남는 순간 ${notes.length}건 · "이렇게 해주면 쓸 것 같다" ${wishes.length}건</div>
+      ${(notes.length || wishes.length) ? [...notes.map(r => voice(r, r.aha.note, '기억에 남는 순간')),
+        ...wishes.map(r => voice(r, r.aha.wish, '이렇게 해주면 써볼 것 같다'))].join('')
+        : `<p style="font-size:12.5px;color:var(--ink3)">아직 서술 응답이 없어요.</p>`}
+    </div>
+  `;
+}
+
+/* ── 아하포인트 사용 여부별 대조 ── */
+function crossSection() {
+  const used = VIEW.filter(r => ['many','few'].includes(r.aha?.used));
+  const not  = VIEW.filter(r => !['many','few'].includes(r.aha?.used));
+  if (!used.length || !not.length) {
+    return `<div class="card"><div class="card-h"><i class="fas fa-code-compare" aria-hidden="true"></i> 쓰는 학생 vs 안 쓰는 학생</div>
+      <div class="card-sub">두 집단이 모두 모이면 비교가 나타납니다 (현재 사용 ${used.length}명 / 미사용 ${not.length}명).</div></div>`;
+  }
+  // goodDir: +1 이면 높을수록 좋음, -1 이면 높을수록 나쁨 (지친 비율)
+  const row = (lb, f, suffix, goodDir) => {
+    const a = f(used), b = f(not);
+    const d = (a == null || b == null) ? null : a - b;
+    const good = d == null || d === 0 ? 0 : (d * (goodDir || 1) > 0 ? 1 : -1);
+    return `<tr><td style="font-weight:700">${lb}</td>
+      <td class="num" style="font-weight:800">${a == null ? '–' : a.toFixed(1) + (suffix||'')}</td>
+      <td class="num">${b == null ? '–' : b.toFixed(1) + (suffix||'')}</td>
+      <td class="num" style="font-weight:800;color:${good === 0 ? 'var(--ink3)' : good > 0 ? '#047857' : 'var(--rose)'}">${d == null ? '–' : (d > 0 ? '+' : '') + d.toFixed(1) + (suffix ? '%p' : '점')}</td></tr>`;
+  };
+  const small = used.length < 5 || not.length < 5;
+  return `<div class="card">
+    <div class="card-h"><i class="fas fa-code-compare" aria-hidden="true"></i> 아하포인트를 쓰는 학생은 실제로 다를까</div>
+    <div class="card-sub">경험자 ${used.length}명 vs 미경험자 ${not.length}명. 인과가 아니라 상관이지만, 확산을 설득할 때 쓸 수 있는 근거입니다.
+      ${small ? '<b style="color:#be123c"> 아직 한쪽 표본이 5명 미만이라 참고만 하세요.</b>' : ''}</div>
+    <div class="tbl-wrap" tabindex="0" role="region" aria-label="아하포인트 경험 여부별 비교">
+      <table><thead><tr><th scope="col">지표</th><th class="num" scope="col">경험자</th><th class="num" scope="col">미경험자</th><th class="num" scope="col">차이 (경험자−미경험자)</th></tr></thead>
+      <tbody>
+        ${row('썸머핫습 만족도', rs => avg(rs, r => r.academy?.overall))}
+        ${row('자습관 만족도', rs => avg(rs, r => r.jasup?.satisfaction))}
+        ${row('지친 학생 비율', rs => pct(rs.filter(r => ['tired','hard'].includes(r.academy?.condition)).length, rs.length), '%', -1)}
+      </tbody></table>
+    </div>
+  </div>`;
+}
+
+/* ── 질문방 ── */
+function qroomSection() {
+  const n = VIEW.length;
+  const went = VIEW.filter(r => ['many','often','few'].includes(r.qroom?.used));
+  const notYet = VIEW.filter(r => r.qroom?.used === 'none');
+  const idk = VIEW.filter(r => r.qroom?.used === 'idk');
+  const often = VIEW.filter(r => ['many','often'].includes(r.qroom?.used)).length;
+
+  // 두 경로 중 아무것도 안 쓰는 학생 = 막혀도 혼자 버티는 학생
+  const neither = VIEW.filter(r =>
+    !['many','few'].includes(r.aha?.used) && !['many','often','few'].includes(r.qroom?.used)).length;
+
+  return `
+    <div class="card" style="border-color:#bae6fd;background:linear-gradient(180deg,#f0f9ff,#fff 30%)">
+      <div class="card-h"><i class="fas fa-door-open" aria-hidden="true"></i> 질문방</div>
+      <div class="card-sub" style="color:var(--ink4)">질문방 앱 이용 현황 — 아하포인트와 함께 봐야 전체 그림이 나옵니다</div>
+      <div class="grid g4" style="margin-bottom:14px">
+        ${kpi('질문방 이용률', pct(went.length, n) + '<small>%</small>', `${went.length}명 중 여러 번 쓴 학생 ${often}명`, 'k-mint')}
+        ${kpi('아직 안 써봄', notYet.length, `전체의 ${pct(notYet.length, n)}%`, notYet.length ? 'k-rose' : '')}
+        ${kpi('뭔지 모름', idk.length, idk.length ? '안내가 안 닿았음' : '전원 인지', idk.length ? 'k-rose' : 'k-mint')}
+        ${kpi('둘 다 안 씀', neither, '막혀도 혼자 버티는 학생', neither ? 'k-rose' : 'k-mint')}
+      </div>
+      <div class="grid g2">
+        <div>
+          <div class="card-h" style="font-size:13px"><i class="fas fa-chart-simple" aria-hidden="true"></i> 이용 경험</div>
+          ${bars(relabel(tally(VIEW, r => r.qroom?.used), L_QR_USED), n)}
+        </div>
+        <div>
+          <div class="card-h" style="font-size:13px"><i class="fas fa-thumbs-up" aria-hidden="true"></i> 써보니 어땠는지</div>
+          <div class="card-sub">써본 학생 ${went.length}명 · 복수 응답</div>
+          ${bars(tally(went, r => r.qroom?.experience), went.length, 'good')}
+        </div>
+        <div>
+          <div class="card-h" style="font-size:13px"><i class="fas fa-rotate-right" aria-hidden="true"></i> 또 쓸 것 같은지</div>
+          <div class="card-sub" style="color:var(--ink4)">써본 학생 ${went.length}명 기준</div>
+          ${bars(relabel(tally(went, r => r.qroom?.will_use_again), L_AHA_AGAIN), went.length, 'good')}
+        </div>
+        <div>
+          <div class="card-h" style="font-size:13px"><i class="fas fa-circle-question" aria-hidden="true"></i> 설명 듣고 난 반응</div>
+          <div class="card-sub" style="color:var(--ink4)">"뭔지 잘 모른다" 학생 ${idk.length}명</div>
+          ${bars(relabel(tally(idk, r => r.qroom?.after_intro), L_AHA_INTRO), idk.length)}
+        </div>
+        <div>
+          <div class="card-h" style="font-size:13px;color:#be123c"><i class="fas fa-triangle-exclamation" aria-hidden="true" style="color:#be123c"></i> 안 쓰는 이유</div>
+          <div class="card-sub" style="color:var(--ink4)">안 써본 학생 ${notYet.length}명 · <b>개선 포인트</b></div>
+          ${bars(tally(notYet, r => r.qroom?.blockers), notYet.length, 'bad')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function voice(r, text, label) {
+  return `<div class="quote-block">
+    <div class="quote-lb">${esc(label)} · ${esc(r.grade||'')} ${esc(r.jasup?.room||'')} ${r.is_named?esc(r.name):'익명'}</div>
+    <div class="resp-body">${esc(text)}</div>
+  </div>`;
+}
+
+/* ══════════ 3. 학원생활 ══════════ */
+function renderLife() {
+  const el = document.getElementById('p-life');
+  const n = VIEW.length;
+  if (!n) { el.innerHTML = emptyBox('아직 응답이 없어요'); return; }
+
+  const ovAvg = avg(VIEW, r => r.academy?.overall);
+  const low = VIEW.filter(r => lowScore(r.academy?.overall)).length;
+  const high = VIEW.filter(r => r.academy?.overall >= 4).length;
+  const notes = VIEW.filter(r => (r.academy?.improve_note||'').trim());
+
+  el.innerHTML = `
+    <div class="grid g4" style="margin-bottom:14px">
+      ${kpi('전체 만족도', ovAvg ? ovAvg.toFixed(1) + '<small>/5</small>' : '–', ovAvg ? scoreWord(ovAvg) : '', 'k-mint')}
+      ${kpi('긍정 (4점 이상)', pct(high, n) + '<small>%</small>', `${high}명`, 'k-mint')}
+      ${kpi('부정 (2점 이하)', pct(low, n) + '<small>%</small>', `${low}명`, low ? 'k-rose' : '')}
+      ${kpi('개선 1순위', topImprove(VIEW, r => r.academy?.improve_one, L_LIFE_IMPROVE), '가장 많이 지목된 항목', 'k-sun')}
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <div class="card-h"><i class="fas fa-face-smile" aria-hidden="true"></i> 전체 느낌 분포</div>
+        ${bars(ordered(VIEW, r => r.academy?.overall, L_OVERALL, ORD_SCORE), n, '', true)}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-heart" aria-hidden="true"></i> "이건 좋다" 싶은 것</div>
+        <div class="card-sub">복수 응답 · 지금 잘 되고 있는 것 = 지켜야 할 것</div>
+        ${bars(tally(VIEW, r => r.academy?.goods), n, 'good')}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-wrench" aria-hidden="true"></i> 딱 하나 더 좋아진다면</div>
+        <div class="card-sub">개선 우선순위 — 위에서부터 손보면 됩니다</div>
+        ${bars(relabel(tally(VIEW, r => r.academy?.improve_one), L_LIFE_IMPROVE), n, 'warm')}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-battery-half" aria-hidden="true"></i> 컨디션</div>
+        ${bars(ordered(VIEW, r => r.academy?.condition, L_COND, ORD_COND), n, '', true)}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><i class="fas fa-quote-left" aria-hidden="true"></i> 개선 요청 상세 (${notes.length}건)</div>
+      <div class="card-sub">"어떻게 바뀌면 좋을지" 직접 쓴 내용</div>
+      ${notes.length ? notes.map(r => voice(r, r.academy.improve_note,
+        L_LIFE_IMPROVE[r.academy.improve_one] || '개선 요청')).join('')
+        : `<p style="font-size:12.5px;color:var(--ink3)">아직 없어요.</p>`}
+    </div>
+  `;
+}
+
+function topImprove(rows, getter, dict) {
+  const valid = rows.filter(r => getter(r) && getter(r) !== 'none');
+  const t = tally(valid, getter);
+  if (!t.length) return '없음';
+  // 1위가 동률이면 하나로 단정하지 않고 병기한다
+  const top = t.filter(x => x[1] === t[0][1]).map(x => esc(dict[x[0]] || x[0]));
+  const label = top.length > 1 ? top.join(' · ') : top[0];
+  return `<span style="font-size:${top.length > 1 ? 15 : 19}px">${label}</span>`
+       + `<span style="font-size:12px;color:var(--ink4)"> 각 ${t[0][1]}명 / ${valid.length}명</span>`;
+}
+
+/* ══════════ 4. 자습관 ══════════ */
+function renderRoom() {
+  const el = document.getElementById('p-room');
+  const n = VIEW.length;
+  if (!n) { el.innerHTML = emptyBox('아직 응답이 없어요'); return; }
+
+  const fcAvg = avg(VIEW, r => r.jasup?.satisfaction);
+  const lowFocus = VIEW.filter(r => lowScore(r.jasup?.satisfaction)).length;
+  const notes = VIEW.filter(r => (r.jasup?.improve_note||'').trim());
+
+  // 자습관별 집계
+  const byRoom = new Map();
+  VIEW.forEach(r => {
+    const k = r.jasup?.room || '(미기재)';
+    if (!byRoom.has(k)) byRoom.set(k, []);
+    byRoom.get(k).push(r);
+  });
+  const roomRows = [...byRoom.entries()].map(([k, rs]) => ({
+    k, n: rs.length,
+    fc: avg(rs, r => r.jasup?.satisfaction),
+    ov: avg(rs, r => r.academy?.overall),
+    low: rs.filter(r => lowScore(r.jasup?.satisfaction)).length,
+    top: (tally(rs.filter(r => r.jasup?.improve_one && r.jasup.improve_one !== 'none'), r => r.jasup.improve_one)[0] || [null])[0],
+    tired: rs.filter(r => ['tired','hard'].includes(r.academy?.condition)).length,
+    topN: (tally(rs.filter(r => r.jasup?.improve_one && r.jasup.improve_one !== 'none'), r => r.jasup.improve_one)[0] || [null, 0])[1],
+    valid: rs.filter(r => r.jasup?.improve_one && r.jasup.improve_one !== 'none').length,
+    kObs: obs(rs, r => r.jasup?.satisfaction)
+  }));
+  const priorR = avg(VIEW, r => r.jasup?.satisfaction) ?? 3;
+  roomRows.forEach(r => { r.shrunk = r.fc == null ? 9 : (r.fc * r.kObs + priorR * SHRINK_K) / (r.kObs + SHRINK_K); });
+  roomRows.sort((a, b) => a.shrunk - b.shrunk);
+
+  el.innerHTML = `
+    <div class="hint"><i class="fas fa-circle-info" aria-hidden="true"></i>
+      이 탭은 <b>불만 목록</b>이 아니라 <b>개선 요청 순위</b>예요. 설문에서 부정 선택지를 나열하지 않았으니,
+      "딱 하나만 더 좋아진다면"에 몰린 항목이 실제로 학생들이 가장 답답해하는 지점입니다.
+    </div>
+
+    <div class="grid g4" style="margin-bottom:14px">
+      ${kpi('자습관 만족도', fcAvg ? fcAvg.toFixed(1) + '<small>/5</small>' : '–', fcAvg ? scoreWord(fcAvg) : '', '')}
+      ${kpi('아쉬움 응답', pct(lowFocus, n) + '<small>%</small>', `${lowFocus}명 (2점 이하)`, lowFocus ? 'k-rose' : 'k-mint')}
+      ${kpi('개선 1순위', topImprove(VIEW, r => r.jasup?.improve_one, L_ROOM_IMPROVE), '가장 많이 지목된 항목', 'k-sun')}
+      ${kpi('"지금이 좋다"', VIEW.filter(r => r.jasup?.improve_one === 'none').length,
+        `전체의 ${pct(VIEW.filter(r => r.jasup?.improve_one === 'none').length, n)}%`, 'k-mint')}
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <div class="card-h"><i class="fas fa-bullseye" aria-hidden="true"></i> 자습관 만족도 분포</div>
+        ${bars(ordered(VIEW, r => r.jasup?.satisfaction, L_ROOM_SAT, ORD_SCORE), n, '', true)}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-thumbs-up" aria-hidden="true"></i> 자습관에서 도움 된 것</div>
+        <div class="card-sub">복수 응답 · 자습관의 강점</div>
+        ${bars(tally(VIEW, r => r.jasup?.helps), n, 'good')}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-wrench" aria-hidden="true"></i> 딱 하나 더 좋아진다면</div>
+        <div class="card-sub">개선 우선순위</div>
+        ${bars(relabel(tally(VIEW, r => r.jasup?.improve_one), L_ROOM_IMPROVE), n, 'warm')}
+      </div>
+      <div class="card">
+        <div class="card-h"><i class="fas fa-building" aria-hidden="true"></i> 응답한 자습관</div>
+        ${bars(tally(VIEW, r => r.jasup?.room), n)}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><i class="fas fa-table-list" aria-hidden="true"></i> 자습관별 비교</div>
+      <div class="card-sub">만족도 낮은 순 정렬 — 위쪽 관부터 살펴보세요</div>
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="자습관별 비교"><table>
+        <thead><tr><th scope="col">자습관</th><th class="num" scope="col">응답</th><th class="num" scope="col">응답률</th><th class="num" scope="col">자습관 만족</th><th class="num" scope="col">썸머핫습 만족</th><th class="num" scope="col">아쉬움</th><th class="num" scope="col">지침률</th><th scope="col">개선 1순위</th></tr></thead>
+        <tbody>${roomRows.map(r => `<tr>
+          <td style="font-weight:800">${esc(r.k)}</td>
+          <td class="num">${r.n}${r.kObs<5?' <span class="pill">표본 적음</span>':''}</td>
+          <td class="num">${rateCell(r.k, r.n)}</td>
+          <td class="num" style="font-weight:800;color:${r.fc==null?'var(--ink3)':r.fc<3.2?'var(--rose)':r.fc>=4?'#047857':'var(--ink)'}">${r.fc!=null?r.fc.toFixed(1):'–'}</td>
+          <td class="num">${r.ov!=null?r.ov.toFixed(1):'–'}</td>
+          <td class="num">${r.low}명</td>
+          <td class="num">${pct(r.tired, r.n)}%</td>
+          <td>${r.top && r.topN >= 2 ? `${esc(L_ROOM_IMPROVE[r.top] || r.top)} <span style="color:var(--ink4)">(${r.topN}/${r.valid})</span>` : '<span style="color:var(--ink3)">판단 보류</span>'}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><i class="fas fa-quote-left" aria-hidden="true"></i> 자습관 개선 요청 상세 (${notes.length}건)</div>
+      ${notes.length ? notes.map(r => voice(r, r.jasup.improve_note,
+        `${r.jasup.room||''} · ${L_ROOM_IMPROVE[r.jasup.improve_one] || '개선 요청'}`)).join('')
+        : `<p style="font-size:12.5px;color:var(--ink3)">아직 없어요.</p>`}
+    </div>
+  `;
+}
+
+/* ══════════ 5. 케어 필요 ══════════ */
+function renderCare() {
+  const el = document.getElementById('p-care');
+  const rows = careRows();
+  if (!rows.length) {
+    el.innerHTML = `<div class="card"><div class="empty"><i class="fas fa-face-smile-beam" aria-hidden="true"></i>
+      <p>지금은 즉시 케어가 필요한 응답이 없어요.</p></div></div>`;
+    return;
+  }
+  const talk = rows.filter(r => r.closing?.want_talk);
+  const hard = rows.filter(r => r.academy?.condition === 'hard');
+
+  el.innerHTML = `
+    <div class="hint"><i class="fas fa-heart-pulse" aria-hidden="true"></i>
+      <b>면담 희망</b>, <b>"많이 힘들다"</b>, <b>만족도 2점 이하</b> 응답을 모았어요.
+      <b>급한 순</b>으로 정렬했습니다 (면담 희망·실명 → 면담 희망·익명 → 많이 힘들다 → 만족도 낮음).
+      면담 희망 ${talk.length}명 · 많이 힘들다 ${hard.length}명. 상태를 <b>완료</b>나 <b>보류</b>로 바꾸면 이 목록에서 빠집니다
+      (보류해 둔 건은 위 <b>처리 상태 필터</b>를 '보류'로 두고 <b>응답 전체</b> 탭에서 다시 볼 수 있습니다).
+    </div>
+    ${rows.map(r => respCard(r, { care:true, expand:true })).join('')}
+  `;
+}
+
+/* ══════════ 6. 자유서술 ══════════ */
+function renderText() {
+  const el = document.getElementById('p-text');
+  const rows = textRows();
+  if (!rows.length) { el.innerHTML = emptyBox('조건에 맞는 서술 응답이 없어요'); return; }
+  const thanks = rows.filter(r => (r.closing?.thanks_to||'').trim());
+
+  el.innerHTML = `
+    <div class="hint"><i class="fas fa-comment-dots" aria-hidden="true"></i>
+      글로 쓴 응답만 모았어요 (<b>${rows.length}</b>건). ${thanks.length ? `고맙다고 전하고 싶은 사람이 적힌 응답 <b>${thanks.length}건</b> — 실제로 전해주면 효과가 큽니다.` : ''}
+      내용·이름·관리자 메모로 찾으려면 위쪽 <b>검색창</b>을 쓰세요.
+    </div>
+    ${rows.map(r => respCard(r, { expand:true })).join('')}
+  `;
+}
+
+/* ══════════ 7. 전체 응답 ══════════ */
+function renderAllTab() {
+  const el = document.getElementById('p-all');
+  if (!VIEW.length) { el.innerHTML = emptyBox('아직 응답이 없어요'); return; }
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-h"><i class="fas fa-table-list" aria-hidden="true"></i> 전체 응답 ${VIEW.length}건</div>
+      <div class="card-sub">최신순. 카드를 눌러 상세를 펼치고, 상태·메모를 바로 저장할 수 있어요.</div>
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="전체 응답 목록"><table>
+        <thead><tr>
+          <th scope="col">시각</th><th scope="col">학년</th><th scope="col">이름</th><th scope="col">아하</th>
+          <th class="num" scope="col">핫습 만족</th><th class="num" scope="col">자습관 만족</th>
+          <th scope="col">컨디션</th><th scope="col">자습관</th><th scope="col">상태</th>
+          <th scope="col"><span class="sr-only">상세 보기</span></th>
+        </tr></thead>
+        <tbody>${VIEW.map((r, i) => `<tr>
+          <td style="white-space:nowrap;color:var(--ink4);font-size:11.5px">${esc(fmtWhen(whenOf(r)))}</td>
+          <td style="font-weight:700;white-space:nowrap">${esc(r.grade||'')}</td>
+          <td>${r.is_named ? `<b>${esc(r.name)}</b>` : '<span style="color:var(--ink3)">익명</span>'}</td>
+          <td style="white-space:nowrap"><span class="pill ${['many','few'].includes(r.aha?.used)?'p-mint':'p-sun'}">${esc(L_AHA_USED[r.aha?.used]||'–')}</span></td>
+          <td class="num" style="font-weight:800">${num(r.academy?.overall)}</td>
+          <td class="num" style="font-weight:700">${num(r.jasup?.satisfaction)}</td>
+          <td style="white-space:nowrap">${r.academy?.condition === 'hard'
+            ? `<span class="pill p-rose">${esc(L_COND[r.academy.condition])}</span>`
+            : esc(L_COND[r.academy?.condition] || '–')}</td>
+          <td style="white-space:nowrap">${esc(r.jasup?.room||'–')}</td>
+          <td><span class="pill ${r.status==='done'?'p-mint':r.status==='new'?'p-sky':''}">${esc(L_STATUS[r.status||'new'])}</span>${(r.admin_memo||'').trim()?' <i class="fas fa-note-sticky" aria-hidden="true" title="관리자 메모 있음" style="color:var(--ink4)"></i><span class="sr-only">관리자 메모 있음</span>':''}</td>
+          <td><button class="abtn" data-act="detail" data-id="${esc(r.id)}">보기</button></td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+    <div id="detailHost"></div>
+  `;
+  if (openId) { if (VIEW.some(r => r.id === openId)) openDetail(openId); else openId = null; }
+}
+
+let openId = null;
+function openDetail(id, opt) {
+  const r = VIEW.find(x => x.id === id);          // 필터에서 빠진 응답을 남겨두지 않는다
+  if (!r) { openId = null; return; }
+  openId = id;
+  const host = document.getElementById('detailHost');
+  if (!host) return;
+  host.innerHTML = respCard(r, { expand:true });
+  if (opt && opt.move) {                          // 스크롤·포커스는 사용자가 직접 눌렀을 때만
+    host.scrollIntoView({ behavior: motionOK() ? 'smooth' : 'auto', block:'start' });
+    const card = host.querySelector('.resp');
+    if (card) card.focus({ preventScroll:true });
+  }
+}
+
+/* ══════════ 응답 카드 ══════════ */
+function respCard(r, o) {
+  o = o || {};
+  const talk = r.closing?.want_talk;
+  const hard = r.academy?.condition === 'hard';
+  const ov = typeof r.academy?.overall === 'number' ? r.academy.overall : null;
+  const cls = talk ? 'talk' : (hard || (ov !== null && ov <= 2)) ? 'care' : '';
+
+  const quotes = [
+    ['하고 싶은 말', r.closing?.message],
+    ['고맙다고 전하고 싶은 사람', r.closing?.thanks_to],
+    ['아하포인트 · 기억에 남는 순간', r.aha?.note],
+    ['질문방 · 하고 싶은 말', r.qroom?.note],
+    ['질문방 · 설명 듣고 난 반응', L_AHA_INTRO[r.qroom?.after_intro]],
+    ['아하포인트 · 이렇게 해주면 쓸 것 같다', r.aha?.wish],
+    [`학원생활 개선 (${L_LIFE_IMPROVE[r.academy?.improve_one] || '기타'})`, r.academy?.improve_note],
+    [`자습관 개선 (${L_ROOM_IMPROVE[r.jasup?.improve_one] || '기타'})`, r.jasup?.improve_note]
+  ].filter(([, v]) => (v || '').trim());
+
+  return `<div class="resp ${cls}" data-resp="${esc(r.id)}" tabindex="-1">
+    <div class="resp-top">
+      <span class="pill p-sky">${esc(r.grade||'?')} · ${esc(r.jasup?.room||'?')}</span>
+      ${r.is_named ? `<span class="pill p-violet"><i class="fas fa-user" aria-hidden="true"></i> ${esc(r.name)}</span>`
+                   : `<span class="pill">익명</span>`}
+      ${talk ? `<span class="pill ${r.is_named ? 'p-mint' : 'p-sun'}"><i class="fas fa-comments" aria-hidden="true"></i> 면담 희망${r.is_named ? '' : ' · 익명'}</span>` : ''}
+      ${hard ? `<span class="pill p-rose"><i class="fas fa-heart-crack" aria-hidden="true"></i> 많이 힘들다</span>` : ''}
+      ${ov !== null && ov <= 2 ? `<span class="pill p-rose">만족도 ${ov}점</span>` : ''}
+      <span class="pill ${['many','few'].includes(r.aha?.used)?'p-mint':'p-sun'}">아하 ${esc(L_AHA_USED[r.aha?.used]||'–')}</span>
+      <span class="pill ${['many','often','few'].includes(r.qroom?.used)?'p-mint':'p-sun'}">질문방 ${esc(L_QR_USED[r.qroom?.used]||'–')}</span>
+      <span class="resp-when">${esc(fmtWhen(whenOf(r)))}${Number.isFinite(r.duration_sec) ? ` · ${r.duration_sec}초 응답` : ''}</span>
+    </div>
+
+    <div class="resp-meta">
+      <span>만족도 <b>${num(r.academy?.overall)}/5</b> (${esc(L_OVERALL[r.academy?.overall]||'–')})</span>
+      <span>자습관 <b>${esc(r.jasup?.room||'–')}</b> 만족 <b>${num(r.jasup?.satisfaction)}/5</b> (${esc(L_ROOM_SAT[r.jasup?.satisfaction]||'–')})</span>
+      <span>컨디션 <b>${esc(L_COND[r.academy?.condition]||'–')}</b></span>
+      ${r.aha?.will_use_again ? `<span>아하 재사용 <b>${esc(L_AHA_AGAIN[r.aha.will_use_again])}</b></span>` : ''}
+      ${r.qroom?.will_use_again ? `<span>질문방 재사용 <b>${esc(L_AHA_AGAIN[r.qroom.will_use_again])}</b></span>` : ''}
+      ${r.aha?.when_try ? `<span>해볼 시점 <b>${esc(L_AHA_WHEN[r.aha.when_try])}</b></span>` : ''}
+    </div>
+
+    ${o.expand && (r.aha?.blockers||[]).length ? `<div class="resp-meta" style="margin-top:6px">
+      <span style="color:#be123c">걸림돌: <b style="color:#be123c">${r.aha.blockers.map(esc).join(' · ')}</b></span></div>` : ''}
+    ${o.expand && (r.aha?.experience||[]).length ? `<div class="resp-meta" style="margin-top:6px">
+      <span style="color:#047857">아하 경험: <b style="color:#047857">${r.aha.experience.map(esc).join(' · ')}</b></span></div>` : ''}
+    ${o.expand && (r.qroom?.blockers||[]).length ? `<div class="resp-meta" style="margin-top:6px">
+      <span style="color:#be123c">질문방 걸림돌: <b style="color:#be123c">${r.qroom.blockers.map(esc).join(' · ')}</b></span></div>` : ''}
+    ${o.expand && (r.qroom?.experience||[]).length ? `<div class="resp-meta" style="margin-top:6px">
+      <span style="color:#047857">질문방 경험: <b style="color:#047857">${r.qroom.experience.map(esc).join(' · ')}</b></span></div>` : ''}
+    ${o.expand && (r.academy?.goods||[]).length ? `<div class="resp-meta" style="margin-top:6px">
+      <span>학원 좋은 점: <b>${r.academy.goods.map(esc).join(' · ')}</b></span></div>` : ''}
+    ${o.expand && (r.jasup?.helps||[]).length ? `<div class="resp-meta" style="margin-top:6px">
+      <span>자습관 도움: <b>${r.jasup.helps.map(esc).join(' · ')}</b></span></div>` : ''}
+
+    ${quotes.map(([lb, v]) => `<div class="quote-block">
+      <div class="quote-lb">${esc(lb)}</div>
+      <div class="resp-body">${esc(v)}</div></div>`).join('')}
+
+    <div class="actions">
+      ${['new','review','done','hold'].map(s => `<button class="abtn ${(r.status||'new')===s?'on s-'+s:''}"
+        data-act="status" data-id="${esc(r.id)}" data-v="${s}">${L_STATUS[s]}</button>`).join('')}
+      <span class="memo-save" role="status" aria-live="polite"><i class="fas fa-check" aria-hidden="true"></i> 저장됨</span>
+      <button class="abtn" style="margin-left:auto;margin-top:6px;color:#be123c;border-color:#be123c"
+        data-act="remove" data-id="${esc(r.id)}"><i class="fas fa-trash" aria-hidden="true"></i> 삭제</button>
+    </div>
+    <textarea class="memo" data-act="memo" data-id="${esc(r.id)}" maxlength="2000"
+      placeholder="관리자 메모 (면담 결과, 처리 내역 등)"
+      aria-label="관리자 메모">${esc(r.admin_memo||'')}</textarea>
+  </div>`;
+}
+
+/* ══════════ 상태 · 메모 · 삭제 ══════════ */
+async function setStatus(id, s) {
+  const r = ALL.find(x => x.id === id);
+  if (!r) return;
+  const prev = r.status;
+  r.status = s;
+  try {
+    await window.__fb.updateDoc(window.__fb.doc(window.__fb.db, COLLECTION, id), { status: s, updated_at: new Date().toISOString() });
+    renderTabs(); render();
+    // 카드가 목록에서 빠지면 포커스가 body 로 떨어진다 — 같은 카드나 현재 탭으로 되돌린다
+    const back = document.querySelector(`[data-resp="${CSS.escape(id)}"]`) || document.getElementById('p-' + curTab);
+    if (back && document.activeElement === document.body) back.focus({ preventScroll: true });
+  } catch (e) {
+    r.status = prev;   // 쓰기 실패 시 화면도 원래대로
+    alert('상태 저장 실패: ' + e.message);
+  }
+}
+
+async function saveMemo(ta, id) {
+  const v = ta.value.slice(0, 2000);   // 규칙 상한과 맞춰 원인 불명 실패를 없앤다
+  if (ta.value !== v) ta.value = v;
+  const r = ALL.find(x => x.id === id);
+  const prev = r ? r.admin_memo : '';
+  if (r) r.admin_memo = v;
+  try {
+    await window.__fb.updateDoc(window.__fb.doc(window.__fb.db, COLLECTION, id), { admin_memo: v, updated_at: new Date().toISOString() });
+    const el = ta.parentElement.querySelector('.memo-save');
+    if (el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 1800); }
+  } catch (e) {
+    if (r) r.admin_memo = prev;   // 실패했는데 저장된 것처럼 보이면 안 된다
+    alert('메모 저장 실패: ' + e.message);
+  }
+}
+
+async function removeResp(id) {
+  if (!confirm('이 응답을 삭제할까요? 되돌릴 수 없어요.')) return;
+  try {
+    await window.__fb.deleteDoc(window.__fb.doc(window.__fb.db, COLLECTION, id));
+    ALL = ALL.filter(x => x.id !== id);
+    applyFilter();
+  } catch (e) { alert('삭제 실패: ' + e.message); }
+}
+
+/* ══════════ CSV ══════════ */
+function exportCSV() {
+  if (!VIEW.length) { alert('내보낼 응답이 없어요.'); return; }
+  const head = ['시각','문서ID','학년','자습관','자습관정원','이름','아하_사용','아하_경험','아하_재사용','아하_기억','아하_해볼시점',
+    '아하_걸림돌','아하_바람','질문방_사용','질문방_경험','질문방_걸림돌','질문방_한마디','질문방_재사용','질문방_설명후반응','아하_설명후반응','학원_만족도','학원_좋은점','학원_개선1순위','학원_개선메모','컨디션',
+    '자습관_만족도','자습관_만족도_라벨','자습관_도움','자습관_개선1순위','자습관_개선메모',
+    '하고싶은말','고마운사람','면담희망','상태','관리자메모','응답시간(초)'];
+  const rows = VIEW.map(r => [
+    whenOf(r), r.id, r.grade||'', r.jasup?.room||'', capOf(r.jasup?.room) ?? '', r.name||'',
+    L_AHA_USED[r.aha?.used]||'', (r.aha?.experience||[]).join(' / '), L_AHA_AGAIN[r.aha?.will_use_again]||'',
+    r.aha?.note||'', L_AHA_WHEN[r.aha?.when_try]||'', (r.aha?.blockers||[]).join(' / '), r.aha?.wish||'',
+    L_QR_USED[r.qroom?.used]||'', (r.qroom?.experience||[]).join(' / '),
+    (r.qroom?.blockers||[]).join(' / '), r.qroom?.note||'',
+    L_AHA_AGAIN[r.qroom?.will_use_again]||'', L_AHA_INTRO[r.qroom?.after_intro]||'', L_AHA_INTRO[r.aha?.after_intro]||'',
+    r.academy?.overall ?? '', (r.academy?.goods||[]).join(' / '),
+    L_LIFE_IMPROVE[r.academy?.improve_one]||'', r.academy?.improve_note||'', L_COND[r.academy?.condition]||'',
+    r.jasup?.satisfaction ?? '', L_ROOM_SAT[r.jasup?.satisfaction]||'', (r.jasup?.helps||[]).join(' / '),
+    L_ROOM_IMPROVE[r.jasup?.improve_one]||'', r.jasup?.improve_note||'',
+    r.closing?.message||'', r.closing?.thanks_to||'', r.closing?.want_talk?'O':'',
+    L_STATUS[r.status||'new'], r.admin_memo||'', r.duration_sec ?? ''
+  ]);
+  // 엑셀은 = + - @ 로 시작하는 셀을 수식으로 실행한다 (학생 자유서술이 그대로 들어옴)
+  const q = v => {
+    let t = String(v);
+    if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+    return `"${t.replace(/"/g,'""')}"`;
+  };
+  const csv = '﻿' + [head, ...rows].map(r => r.map(q).join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8;' }));
+  const d = new Date();
+  a.download = `썸머핫습리뷰_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function logout() {
+  if (!confirm('로그아웃할까요?')) return;
+  localStorage.removeItem('jasupFeedback_auth');
+  localStorage.removeItem('jasupFeedback_loginAt');
+  sessionStorage.removeItem('jasupFeedback_auth');
+  location.href = 'login.html';
+}
+
+/* ══════════ 이벤트 위임 ══════════ */
+// 문서 ID를 onclick 문자열에 넣으면 ID 자체가 스크립트가 될 수 있으므로 data 속성 + 위임으로 처리한다
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act],[data-go]');
+  if (!b) return;
+  const id = b.dataset.id;
+  if (b.dataset.go) { setTab(b.dataset.go); return; }
+  if (b.dataset.act === 'detail') openDetail(id, { move: true });
+  else if (b.dataset.act === 'status') setStatus(id, b.dataset.v);
+  else if (b.dataset.act === 'remove') removeResp(id);
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.matches('textarea[data-act="memo"]')) saveMemo(t, t.dataset.id);
+});
+
+/* ══════════ 시작 ══════════ */
+// 인라인 onclick 에서 부르는 것만 노출한다 (나머지는 이벤트 위임으로 처리)
+Object.assign(window, { applyFilter, clearFilter, loadAll, exportCSV, logout });
+// .tabs 의 sticky top 을 실제 헤더 높이에 맞춘다 (버튼이 줄바꿈되면 높이가 변한다)
+function syncHeaderHeight() {
+  const hd = document.querySelector('.hd');
+  if (hd) document.documentElement.style.setProperty('--hd-h', hd.offsetHeight + 'px');
+}
+syncHeaderHeight();
+window.addEventListener('resize', syncHeaderHeight);
+if (window.ResizeObserver) new ResizeObserver(syncHeaderHeight).observe(document.querySelector('.hd'));
+
+renderTabs();
+loadAll();
+</script>
+</body>
+</html>

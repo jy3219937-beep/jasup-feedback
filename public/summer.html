@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f2a3d">
+<meta name="robots" content="noindex, nofollow">
+<title>썸머핫습 리뷰 · 정율사관학원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --ink:        #0d2233;
+    --ink-soft:   #3d5a6d;
+    --ink-faint:  #55697c;   /* 흰 5.53:1 · 페이지배경 #eaf4f9 5.09:1 */
+    --line:       #d6e6ef;   /* 장식용 카드 경계 */
+    --line-ctl:   #748f9f;   /* 조작 요소 표시자 3.23:1 */
+    --paper:      #ffffff;
+    --bg:         #eaf4f9;
+    --sky:        #0284c7;
+    --sky-deep:   #075985;
+    --cyan:       #06b6d4;
+    --sun:        #f59e0b;
+    --sun-deep:   #d97706;
+    --mint:       #10b981;
+  }
+
+  html { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(900px 500px at 100% -5%, rgba(6,182,212,0.14), transparent 60%),
+      radial-gradient(700px 420px at -10% 8%, rgba(245,158,11,0.10), transparent 62%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--ink);
+    line-height: 1.7;
+    overflow-x: hidden;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom));
+  }
+
+  /* ══════════ 상단 바 : 세그먼트 진행 표시 ══════════ */
+  .topbar {
+    position: sticky; top: 0; z-index: 60;
+    background: rgba(234,244,249,0.88);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    border-bottom: 1px solid rgba(13,34,51,0.06);
+    padding: 12px 18px 11px;
+  }
+  .topbar-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 900; letter-spacing: -0.02em;
+    color: var(--sky-deep);
+  }
+  .brand-sun {
+    width: 20px; height: 20px; border-radius: 50%; flex: none;
+    background: radial-gradient(circle at 34% 32%, #fde68a, var(--sun) 62%, var(--sun-deep));
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.16);
+  }
+  .step-count { font-size: 11px; font-weight: 700; color: var(--ink-faint); letter-spacing: 0.02em; }
+  .step-count b { color: #0369a1; font-weight: 900; }
+
+  .segs { display: flex; gap: 5px; margin-top: 9px; }
+  .seg {
+    flex: 1; height: 5px; border-radius: 99px;
+    background: #b9d2e0; overflow: hidden; position: relative;
+  }
+  .seg::after {
+    content: ''; position: absolute; inset: 0;
+    background: #0369a1;
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .55s cubic-bezier(.16,1,.3,1);
+  }
+  /* 상태 클래스에 seg- 접두사를 붙여 다른 컴포넌트(.done 완료카드 등)와 겹치지 않게 한다 */
+  .seg.seg-done::after { transform: scaleX(1); }
+  .seg.seg-now::after  { transform: scaleX(1); background: #b45309; }
+
+  .autosave {
+    font-size: 10.5px; color: var(--ink-faint); text-align: right;
+    margin-top: 5px; height: 14px; opacity: 0; transition: opacity .3s;
+  }
+  .autosave.show { opacity: 1; }
+  .autosave:not(.show) { visibility: hidden; }
+
+  /* ══════════ 레이아웃 ══════════ */
+  .wrap { max-width: 620px; margin: 0 auto; padding: 0 18px; }
+  .screen { display: none; animation: slideIn .42s cubic-bezier(.16,1,.3,1); }
+  .screen.on { display: block; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* ══════════ 인트로 ══════════ */
+  .hero {
+    margin-top: 22px; padding: 34px 26px 30px;
+    border-radius: 26px; position: relative; overflow: hidden;
+    background: linear-gradient(155deg, #0e3a52 0%, #0f2a3d 55%, #14384d 100%);
+    color: #eaf6fb;
+    box-shadow: 0 22px 48px rgba(7,89,133,0.28);
+  }
+  .hero::before {
+    content: ''; position: absolute; width: 220px; height: 220px; border-radius: 50%;
+    top: -86px; right: -66px;
+    background: radial-gradient(circle at 38% 34%, rgba(253,230,138,.95), rgba(245,158,11,.55) 55%, transparent 72%);
+    filter: blur(2px);
+  }
+  .hero::after {
+    content: ''; position: absolute; left: -30px; bottom: -70px;
+    width: 260px; height: 140px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(6,182,212,.32), transparent 68%);
+  }
+  .hero > * { position: relative; z-index: 1; }
+  .hero-kicker {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+    padding: 5px 12px; border-radius: 99px;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);
+    color: #bae6fd; margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-size: 27px; font-weight: 900; line-height: 1.38; letter-spacing: -0.035em;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(100deg, #fcd34d, #fbbf24);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p { font-size: 14px; color: #b6d5e4; margin-top: 13px; line-height: 1.78; }
+
+  .intro-notes {
+    margin-top: 16px; padding: 20px 20px 18px;
+    background: var(--paper); border-radius: 22px;
+    border: 1px solid var(--line);
+    box-shadow: 0 6px 22px rgba(13,34,51,0.05);
+  }
+  .note { display: flex; gap: 12px; padding: 9px 0; align-items: flex-start; }
+  .note + .note { border-top: 1px dashed var(--line); }
+  .note-ico {
+    flex: none; width: 30px; height: 30px; border-radius: 10px;
+    display: grid; place-items: center; font-size: 15px;
+    background: #e6f4fb; margin-top: 1px;
+  }
+  .note-tx { font-size: 13.5px; color: var(--ink-soft); line-height: 1.65; }
+  .note-tx b { color: var(--ink); font-weight: 800; }
+
+  /* ══════════ 스텝 헤더 ══════════ */
+  .sh { margin-top: 26px; margin-bottom: 20px; }
+  .sh-tag {
+    display: inline-block; font-size: 10.5px; font-weight: 900;
+    letter-spacing: 0.09em; padding: 5px 11px; border-radius: 8px;
+    background: #0369a1; color: #fff; margin-bottom: 11px;
+  }
+  /* 흰 글씨가 얹히므로 그라데이션 양 끝 모두 4.5:1 이상이어야 한다 */
+  .sh-tag.t-aha   { background: linear-gradient(100deg, #92400e, #b45309); }
+  .sh-tag.t-life  { background: linear-gradient(100deg, var(--sky-deep), #0369a1); }
+  .sh-tag.t-room  { background: linear-gradient(100deg, #0c4a6e, #0e7490); }
+  .sh-tag.t-last  { background: linear-gradient(100deg, #065f46, #047857); }
+  .sh h2 { font-size: 22px; font-weight: 900; letter-spacing: -0.035em; line-height: 1.42; }
+  .sh p { font-size: 13.5px; color: var(--ink-soft); margin-top: 9px; line-height: 1.72; }
+
+  /* ══════════ 질문 블록 ══════════ */
+  .q {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 20px; padding: 20px 18px 18px; margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(13,34,51,0.04);
+  }
+  .q-title {
+    font-size: 15.5px; font-weight: 800; letter-spacing: -0.02em;
+    line-height: 1.55; margin-bottom: 4px;
+  }
+  .q-req { color: #dc2626; font-weight: 900; margin-left: 3px; }
+  .q-hint { font-size: 12.5px; color: var(--ink-faint); margin-bottom: 13px; line-height: 1.6; }
+  .q-hint:last-child { margin-bottom: 0; }
+  .q-multi-tag {
+    display: inline-block; font-size: 10px; font-weight: 800; color: #0369a1;
+    background: #e0f2fe; padding: 2px 8px; border-radius: 6px; margin-left: 6px;
+    vertical-align: 2px; letter-spacing: 0.02em;
+  }
+
+  /* '안 써도 돼요'(임의 응답)는 '여러 개 가능'과 다른 톤으로 구분 */
+  .q-opt-tag { color: var(--ink-soft); background: #eef4f7; }
+  /* 복수선택 목록 안에서 긍정/아쉬움 블록을 시각 분리 */
+  .checks-sub {
+    grid-column: 1 / -1; font-size: 11.5px; font-weight: 800;
+    color: var(--ink-soft); letter-spacing: -0.01em; margin: 4px 0 -1px;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  /* 키보드 포커스는 항상 또렷하게 */
+  .chip:focus-visible, .check:focus-visible, .opt:focus-visible,
+  .scale-btn:focus-visible, .checkline:focus-visible, .btn:focus-visible,
+  .tx:focus-visible, .ta:focus-visible {
+    outline: 3px solid var(--sky-deep); outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important; scroll-behavior: auto !important;
+    }
+  }
+
+  /* ── 칩(태그) 선택 ── */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: inherit; font-size: 13.5px; font-weight: 600;
+    padding: 11px 14px; border-radius: 13px; cursor: pointer;
+    min-height: 44px; display: inline-flex; align-items: center;
+    background: #f4fafd; border: 1.5px solid var(--line-ctl); color: var(--ink-soft);
+    transition: all .16s; text-align: left; line-height: 1.45;
+  }
+  .chip:active { transform: scale(.97); }
+  .chip.on {
+    background: linear-gradient(140deg, #0e7490, #0369a1); border-color: #0369a1;
+    color: #fff; font-weight: 700; box-shadow: 0 5px 16px rgba(3,105,161,0.28);
+  }
+
+  /* ── 복수 선택 : 체크 목록 ── */
+  .checks { display: grid; grid-template-columns: 1fr; gap: 7px; }
+  @media (min-width: 520px) { .checks { grid-template-columns: 1fr 1fr; } }
+  .check {
+    font-family: inherit; font-size: 13.5px; font-weight: 600; text-align: left;
+    padding: 12px 13px; border-radius: 12px; cursor: pointer; min-height: 46px;
+    background: #f4fafd; border: 1.5px solid var(--line-ctl); color: var(--ink-soft);
+    display: flex; align-items: center; gap: 10px; transition: all .16s;
+    line-height: 1.4; word-break: keep-all;
+  }
+  .check:active { transform: scale(.985); }
+  .check-box {
+    flex: none; width: 20px; height: 20px; border-radius: 6px;
+    border: 2px solid var(--line-ctl); background: #fff;
+    display: grid; place-items: center; transition: all .16s;
+    font-size: 11px; color: transparent; font-weight: 900;
+  }
+  .check.on { background: #e8f6fd; border-color: var(--sky); color: var(--sky-deep); font-weight: 700; }
+  .check.on .check-box { border-color: var(--sky); background: var(--sky); color: #fff; }
+  .checks.good .check.on { background: #f0fdf4; border-color: var(--mint); color: #065f46; }
+  .checks.good .check.on .check-box { border-color: #047857; background: #047857; }
+  .checks.warm .check.on { background: #fffbeb; border-color: var(--sun); color: #92400e; }
+  .checks.warm .check.on .check-box { border-color: #92400e; background: #b45309; }
+
+  /* ── 리스트형 단일 선택 ── */
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    font-family: inherit; font-size: 14px; font-weight: 600; text-align: left;
+    padding: 14px 15px; border-radius: 14px; cursor: pointer;
+    background: #f4fafd; border: 1.5px solid var(--line-ctl); color: var(--ink-soft);
+    display: flex; align-items: center; gap: 11px; transition: all .16s;
+    line-height: 1.5;
+  }
+  .opt:active { transform: scale(.985); }
+  .opt-dot {
+    flex: none; width: 19px; height: 19px; border-radius: 50%;
+    border: 2px solid var(--line-ctl); background: #fff; transition: all .16s;
+    position: relative;
+  }
+  .opt.on { background: #e8f6fd; border-color: var(--sky); color: var(--sky-deep); font-weight: 800; }
+  .opt.on .opt-dot { border-color: var(--sky); background: var(--sky); box-shadow: inset 0 0 0 3.5px #fff; }
+  .opt-sub { font-size: 12px; font-weight: 500; color: var(--ink-faint); display: block; margin-top: 1px; }
+  .opt.on .opt-sub { color: #0369a1; }
+
+  /* ── 5점 스케일 ── */
+  .scale { display: flex; gap: 6px; }
+  .scale-btn {
+    flex: 1; min-width: 0; font-family: inherit; cursor: pointer;
+    padding: 13px 3px 11px; border-radius: 15px;
+    background: #f4fafd; border: 1.5px solid var(--line-ctl);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    transition: all .16s;
+  }
+  .scale-btn:active { transform: scale(.95); }
+  .scale-emo { font-size: 24px; line-height: 1; filter: grayscale(.55); transition: filter .16s, transform .16s; }
+  .scale-lb {
+    font-size: 10.5px; font-weight: 700; color: var(--ink-faint); letter-spacing: -0.03em;
+    line-height: 1.28; text-align: center; word-break: keep-all;
+    min-height: 2.6em; display: flex; align-items: center;
+  }
+  /* 선택 표시를 채도만으로 두면 명도차가 0이라 구분이 안 된다 */
+  .scale-btn.on {
+    background: #fff1cf; border: 2.5px solid #b45309;
+    box-shadow: inset 0 0 0 2px #fff, 0 6px 18px rgba(180,83,9,0.22);
+  }
+  .scale-btn.on .scale-emo { filter: none; transform: scale(1.18); }
+  .scale-btn.on .scale-lb { color: #92400e; font-weight: 900; }
+
+  /* ── 텍스트 입력 ── */
+  .tx, .ta {
+    width: 100%; font-family: inherit; font-size: 14px; color: var(--ink);
+    padding: 13px 14px; border-radius: 13px;
+    background: #f8fcfe; border: 1.5px solid var(--line-ctl);
+    outline: none; transition: all .18s; line-height: 1.65;
+  }
+  .ta { min-height: 96px; resize: vertical; }
+  .tx:focus, .ta:focus { border-color: var(--sky); background: #fff; box-shadow: 0 0 0 3.5px rgba(2,132,199,0.11); }
+  .tx::placeholder, .ta::placeholder { color: #5b7387; font-weight: 400; }
+  .field-lb { font-size: 12.5px; font-weight: 800; color: var(--ink-soft); margin-bottom: 7px; display: block; }
+  .field-lb span { font-weight: 500; color: var(--ink-faint); }
+
+  /* ── 후속(조건부) 영역 ── */
+  .followup {
+    margin-top: 13px; padding-top: 14px;
+    border-top: 1.5px dashed #cfe3ee;
+    animation: slideIn .34s cubic-bezier(.16,1,.3,1);
+  }
+  .followup.hide { display: none; }
+
+  /* ── 안내 카드 ── */
+  .info {
+    margin-top: 12px; padding: 15px 16px; border-radius: 15px;
+    background: linear-gradient(150deg, #f0f9ff, #e0f2fe);
+    border: 1.5px solid #bae6fd; font-size: 13px; color: #075985; line-height: 1.72;
+  }
+  .info b { font-weight: 800; }
+  .info.care {
+    background: linear-gradient(150deg, #f0fdf4, #dcfce7);
+    border-color: #a7f3d0; color: #065f46;
+  }
+
+  /* ── 체크박스 (면담 희망) ── */
+  .checkline {
+    display: flex; align-items: flex-start; gap: 12px; cursor: pointer;
+    padding: 15px 15px; border-radius: 15px; margin-top: 4px;
+    background: #f4fafd; border: 1.5px solid var(--line-ctl); transition: all .16s;
+  }
+  .checkline.on { background: #f0fdf4; border-color: var(--mint); }
+  .cbox {
+    flex: none; width: 21px; height: 21px; border-radius: 7px; margin-top: 1px;
+    border: 2px solid var(--line-ctl); background: #fff;
+    display: grid; place-items: center; transition: all .16s;
+    font-size: 12px; color: transparent; font-weight: 900;
+  }
+  .checkline.on .cbox { border-color: #047857; background: #047857; color: #fff; }
+  .checkline-tx { font-size: 13.5px; font-weight: 700; color: var(--ink-soft); line-height: 1.55; }
+  .checkline.on .checkline-tx { color: #065f46; }
+  .checkline-sub { font-size: 12px; font-weight: 500; color: var(--ink-faint); display: block; margin-top: 3px; }
+
+  /* ══════════ 하단 버튼 ══════════ */
+  .foot { display: flex; gap: 9px; margin-top: 22px; }
+  .btn {
+    font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer;
+    padding: 16px 20px; border-radius: 15px; border: none;
+    transition: all .18s; letter-spacing: -0.02em;
+  }
+  .btn:active { transform: translateY(1.5px); }
+  .btn-main {
+    flex: 1;
+    background: linear-gradient(135deg, #0369a1, var(--sky-deep));
+    color: #fff; box-shadow: 0 9px 24px rgba(3,105,161,0.34);
+  }
+  .btn-main:disabled { opacity: .42; box-shadow: none; cursor: not-allowed; transform: none; }
+  .btn-send {
+    background: linear-gradient(135deg, #047857, #065f46);
+    box-shadow: 0 9px 24px rgba(4,120,87,0.34);
+  }
+  .btn-back {
+    flex: none; width: 58px; padding: 16px 0;
+    background: #fff; border: 1.5px solid var(--line-ctl); color: var(--ink-soft);
+    font-size: 18px;
+  }
+  .errline {
+    font-size: 12.5px; font-weight: 700; color: #b91c1c;
+    margin-top: 11px; text-align: center; min-height: 18px;
+  }
+
+  /* ══════════ 완료 화면 ══════════ */
+  .done {
+    margin-top: 46px; padding: 42px 26px 36px; text-align: center;
+    background: var(--paper); border-radius: 28px; border: 1px solid var(--line);
+    box-shadow: 0 16px 44px rgba(13,34,51,0.08);
+  }
+  .done-sun {
+    width: 78px; height: 78px; border-radius: 50%; margin: 0 auto 20px;
+    background: radial-gradient(circle at 34% 32%, #fef3c7, var(--sun) 58%, var(--sun-deep));
+    box-shadow: 0 0 0 10px rgba(245,158,11,0.13), 0 10px 30px rgba(217,119,6,0.28);
+    display: grid; place-items: center; font-size: 34px;
+    animation: pop .7s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes pop { from { transform: scale(0) rotate(-40deg); } to { transform: none; } }
+  .done h2 { font-size: 24px; font-weight: 900; letter-spacing: -0.035em; }
+  .done p { font-size: 14px; color: var(--ink-soft); margin-top: 13px; line-height: 1.8; }
+  .done-badge {
+    display: inline-block; margin-top: 20px; padding: 11px 20px; border-radius: 99px;
+    background: #e6f4fb; color: var(--sky-deep); font-size: 12.5px; font-weight: 800;
+  }
+
+  .footer-note {
+    text-align: center; font-size: 11.5px; color: var(--ink-faint);
+    margin-top: 26px; line-height: 1.7;
+  }
+
+  @media (max-width: 400px) {
+    .hero h1 { font-size: 24px; }
+    .sh h2 { font-size: 20px; }
+    .chip { font-size: 13px; padding: 10px 12px; min-height: 44px; }
+    .check { font-size: 13px; padding: 11px 12px; min-height: 46px; }
+    .scale-emo { font-size: 21px; }
+    .scale-lb { font-size: 9.5px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ 상단 진행 표시 ═══════════ -->
+<div class="topbar" id="topbar" style="display:none">
+  <div class="topbar-row">
+    <div class="brand"><span class="brand-sun"></span>썸머핫습 리뷰</div>
+    <div class="step-count"><b id="stepNow">1</b> / 5</div>
+  </div>
+  <div class="segs" id="segs"></div>
+  <div class="autosave" id="autosave">자동 저장됐어요</div>
+</div>
+
+<div class="wrap">
+
+  <!-- ═══════════ 인트로 ═══════════ -->
+  <section class="screen on" id="sc-intro">
+    <div class="hero">
+      <div class="hero-kicker"><span aria-hidden="true">☀️</span> SUMMER 2026 · 7.20 – 8.16</div>
+      <h1>여기까지 오는 동안,<br><em>어땠어요?</em></h1>
+      <p>여기서 들은 얘기는 남은 기간과 다음 특강을<br>더 좋게 만드는 데 쓸게요.</p>
+    </div>
+
+    <div class="intro-notes">
+      <div class="note">
+        <div class="note-ico" aria-hidden="true">⏱️</div>
+        <div class="note-tx"><b>3~4분이면 끝나요.</b> 대부분 탭만 하면 되고, 글로 쓰는 건 거의 다 선택이에요 ("다른 게 있어요"를 고를 때만 한 줄 필요해요).</div>
+      </div>
+      <div class="note">
+        <div class="note-ico" aria-hidden="true">😌</div>
+        <div class="note-tx"><b>편하게 얘기해줘도 돼요.</b> 좋은 말만 골라 쓸 필요 없어요. 불편했던 것도, 사소한 것도 있는 그대로 들려주면 그게 제일 도움이 돼요.</div>
+      </div>
+      <div class="note">
+        <div class="note-ico" aria-hidden="true">👀</div>
+        <div class="note-tx"><b>사감장이 직접 다 읽어요.</b> 성적이나 상벌점하고는 아무 관계 없어요. 이름은 맨 마지막에 <b>선택</b>으로만 물어봐요.</div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <button class="btn btn-main" onclick="go(1)">시작할게요 →</button>
+    </div>
+    <p class="footer-note">정율사관학원 종합반 · 자습관</p>
+  </section>
+
+  <!-- ═══════════ STEP 1 · 기본 ═══════════ -->
+  <section class="screen" id="sc-who">
+    <div class="sh">
+      <span class="sh-tag">STEP 1 · 기본</span>
+      <h2 tabindex="-1">먼저, 두 개만 골라주세요</h2>
+      <p>학년과 자습관만 받아요. 10초면 돼요.</p>
+    </div>
+
+    <div class="q">
+      <div class="q-title">학년<span class="q-req">*</span></div>
+      <div class="chips" id="gradeChips"></div>
+    </div>
+
+    <div class="q">
+      <div class="q-title">주로 어느 자습관에서 공부해요?<span class="q-req">*</span></div>
+      <div class="q-hint">가장 자주 쓰는 자습관 하나만 골라주세요.</div>
+      <div class="chips" id="roomChips"></div>
+    </div>
+
+    <div class="errline" id="err-who" role="alert"></div>
+    <div class="foot">
+      <button class="btn btn-back" onclick="go(0)">←</button>
+      <button class="btn btn-main" onclick="next('who')">다음 →</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ STEP 2 · 학원생활 ═══════════ -->
+  <section class="screen" id="sc-life">
+    <div class="sh">
+      <span class="sh-tag t-life">STEP 2 · 학원생활</span>
+      <h2 tabindex="-1"><span aria-hidden="true">🏫</span> 요즘 학원생활은 어때요?</h2>
+      <p>수업·시간표·분위기를 <strong>다 합쳐서</strong> 어떤지 들려주세요.</p>
+    </div>
+
+    <div class="q">
+      <div class="q-title">요즘 학원생활, 한마디로 어때요?<span class="q-req">*</span></div>
+      <div class="scale" id="lifeOverall"></div>
+    </div>
+
+    <div class="q">
+      <div class="q-title">학원생활에서 "이건 좋다" 싶은 거 <span class="q-multi-tag">여러 개 가능</span></div>
+      <div class="q-hint">해당되는 거 다 골라주세요. 없으면 넘어가도 돼요.</div>
+      <div class="checks good" id="lifeGood"></div>
+    </div>
+
+    <div class="q">
+      <div class="q-title">딱 하나만 더 좋아질 수 있다면, 어디?<span class="q-req">*</span></div>
+      <div class="q-hint">전부 고치겠다는 건 아니고, 뭐부터 볼지 순서를 정하려고요. 고를 게 없으면 <strong>맨 아래 "지금도 충분해요"</strong>로요.</div>
+      <div class="opts" id="lifeImprove"></div>
+      <div class="followup hide" id="lifeImproveWrap">
+        <label class="field-lb" for="lifeImproveNote">어떻게 바뀌면 좋을지 한 줄만 <span id="lifeNoteOpt">(선택)</span></label>
+        <textarea class="ta" id="lifeImproveNote" placeholder="구체적으로 적어주면 진짜 도움돼요" maxlength="500"></textarea>
+      </div>
+    </div>
+
+    <div class="errline" id="err-life" role="alert"></div>
+    <div class="foot">
+      <button class="btn btn-back" onclick="go(1)">←</button>
+      <button class="btn btn-main" onclick="next('life')">다음 →</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ STEP 3 · 자습관 ═══════════ -->
+  <section class="screen" id="sc-room">
+    <div class="sh">
+      <span class="sh-tag t-room">STEP 3 · 자습관</span>
+      <h2 tabindex="-1"><span aria-hidden="true">📚</span> 자습관은 어때요?</h2>
+      <p>하루에 제일 오래 앉아 있는 곳이니까, <strong>여기가 편해야</strong> 공부가 되죠.</p>
+      <p id="roomEcho" style="font-weight:700;color:var(--sky-deep)"></p>
+    </div>
+
+    <div class="q">
+      <div class="q-title">내가 쓰는 자습관, 전체적으로 어때요?<span class="q-req">*</span></div>
+      <div class="opts" id="roomSat"></div>
+    </div>
+
+    <div class="q">
+      <div class="q-title">자습관에서 도움 된 건? <span class="q-multi-tag">여러 개 가능</span></div>
+      <div class="q-hint">해당되는 거 다 골라주세요. 없으면 넘어가도 돼요.</div>
+      <div class="checks good" id="roomHelp"></div>
+    </div>
+
+    <div class="q">
+      <div class="q-title">딱 하나만 더 좋아질 수 있다면?<span class="q-req">*</span></div>
+      <div class="q-hint">다 고치겠다는 게 아니라 순서를 정하려고요. 바꿀 게 없으면 <strong>맨 아래 "지금이 좋아요"</strong>를 골라주세요.</div>
+      <div class="opts" id="roomImprove"></div>
+      <div class="followup hide" id="roomImproveWrap">
+        <label class="field-lb" for="roomImproveNote">어떤 점인지 한 줄만 <span id="roomNoteOpt">(선택)</span></label>
+        <textarea class="ta" id="roomImproveNote" placeholder="예) 오후에 창가 자리가 좀 더워요" maxlength="500"></textarea>
+      </div>
+    </div>
+
+    <div class="errline" id="err-room" role="alert"></div>
+    <div class="foot">
+      <button class="btn btn-back" onclick="go(2)">←</button>
+      <button class="btn btn-main" onclick="next('room')">다음 →</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ STEP 4 · 아하포인트 · 질문방 ═══════════ -->
+  <section class="screen" id="sc-aha">
+    <div class="sh">
+      <span class="sh-tag t-aha">STEP 4 · 아하포인트 · 질문방</span>
+      <h2 tabindex="-1"><span aria-hidden="true">🙋</span> 막혔을 때, 어디로 가요?</h2>
+      <p>써봤든 안 써봤든 <strong>둘 다 괜찮아요.</strong> 안 했다고 뭐라고 하려고 묻는 게 아니라, 쓰기 편하게 고치려고 묻는 거예요.</p>
+    </div>
+
+    <div class="q">
+      <div class="q-title">썸머핫습 기간에 아하포인트 써봤어요?<span class="q-req">*</span></div>
+      <div class="opts" id="ahaUsed"></div>
+    </div>
+
+    <!-- ── 해본 학생 ── -->
+    <div id="ahaBranchYes" style="display:none">
+      <div class="q">
+        <div class="q-title">써보니까 어땠어요? <span class="q-multi-tag">여러 개 가능</span></div>
+        <div class="q-hint">좋았던 것도, 아쉬웠던 것도 있는 그대로 골라주세요.</div>
+        <div class="checks" id="ahaExp"></div>
+      </div>
+
+      <div class="q">
+        <div class="q-title">남은 기간에 또 쓸 것 같아요? <span class="q-multi-tag q-opt-tag">안 골라도 돼요</span></div>
+        <div class="opts" id="ahaAgain"></div>
+      </div>
+
+      <div class="q">
+        <div class="q-title">기억에 남는 순간이 있으면 한 줄만 <span class="q-multi-tag q-opt-tag">안 써도 돼요</span></div>
+        <div class="q-hint">"이 질문 답변 받고 진짜 뚫렸다" 같은 것도, "이건 좀 아쉬웠다" 같은 것도 좋아요.</div>
+        <textarea class="ta" id="ahaNote" aria-label="아하포인트 쓰면서 기억에 남는 순간" placeholder="한 줄이면 충분해요" maxlength="500"></textarea>
+      </div>
+    </div>
+
+    <!-- ── 아직 안 해본 학생 ── -->
+    <div id="ahaBranchNo" style="display:none">
+      <div class="q">
+        <div class="q-title">언제쯤 써볼 것 같아요? <span class="q-multi-tag q-opt-tag">안 골라도 돼요</span></div>
+        <div class="q-hint">약속하는 거 아니에요. 지금 느껴지는 대로 편하게요.</div>
+        <div class="opts" id="ahaWhen"></div>
+      </div>
+
+      <div class="q">
+        <div class="q-title">뭐가 좀 걸려요? <span class="q-multi-tag">여러 개 가능</span></div>
+        <div class="q-hint">이게 제일 궁금한 부분이에요. 걸리는 게 뭔지 알아야 그걸 없앨 수 있어서요.</div>
+        <div class="checks warm" id="ahaBlock"></div>
+      </div>
+
+      <div class="q">
+        <div class="q-title">"이렇게 해주면 써볼 것 같은데" 하는 게 있으면 <span class="q-multi-tag q-opt-tag">안 써도 돼요</span></div>
+        <textarea class="ta" id="ahaWish" aria-label="이렇게 해주면 아하포인트를 써볼 것 같다" placeholder="예) 질문 예시를 몇 개 붙여주면 좋겠어요" maxlength="500"></textarea>
+      </div>
+    </div>
+
+    <!-- ── 잘 모르는 학생 ── -->
+    <div id="ahaBranchIdk" style="display:none">
+      <div class="q">
+        <div class="info">
+          자세한 건 <b>자습관 사감선생님</b>께 물어보면 바로 알려주실 거예요.
+        </div>
+      </div>
+      <div class="q">
+        <div class="q-title">설명 들으니 어때요? <span class="q-multi-tag q-opt-tag">안 골라도 돼요</span></div>
+        <div class="opts" id="ahaIntro"></div>
+      </div>
+    </div>
+
+    <!-- ── 질문방 ── -->
+    <div class="q" style="border-color:#bae6fd;background:linear-gradient(180deg,#f0f9ff,#fff 32%)">
+      <div class="q-title">질문방은 써봤어요?<span class="q-req">*</span></div>
+      <div class="opts" id="qrUsed"></div>
+    </div>
+
+    <div id="qrBranchYes" style="display:none">
+      <div class="q">
+        <div class="q-title">질문방 써보니 어땠어요? <span class="q-multi-tag">여러 개 가능</span></div>
+        <div class="q-hint">좋았던 것도, 아쉬웠던 것도 있는 그대로요.</div>
+        <div class="checks" id="qrExp"></div>
+      </div>
+    </div>
+
+    <div id="qrBranchYesNote" style="display:none">
+      <div class="q">
+        <div class="q-title">남은 기간에 또 쓸 것 같아요? <span class="q-multi-tag q-opt-tag">안 골라도 돼요</span></div>
+        <div class="opts" id="qrAgain"></div>
+      </div>
+      <div class="q">
+        <div class="q-title">질문방에 대해 더 하고 싶은 말 <span class="q-multi-tag q-opt-tag">안 써도 돼요</span></div>
+        <textarea class="ta" id="qrNote" aria-label="질문방에 대해 하고 싶은 말" placeholder="한 줄이면 충분해요" maxlength="500"></textarea>
+      </div>
+    </div>
+
+    <div id="qrBranchNo" style="display:none">
+      <div class="q">
+        <div class="q-title">질문방은 뭐가 좀 걸려요? <span class="q-multi-tag">여러 개 가능</span></div>
+        <div class="q-hint">이유를 알면 그걸 없앨 수 있어서 물어보는 거예요.</div>
+        <div class="checks warm" id="qrBlock"></div>
+      </div>
+    </div>
+
+    <div id="qrBranchIdk" style="display:none">
+      <div class="q">
+        <div class="info">
+          어떻게 쓰는지는 <b>자습관 사감선생님</b>께 물어보면 바로 알려주실 거예요.
+        </div>
+      </div>
+      <div class="q">
+        <div class="q-title">설명 들으니 어때요? <span class="q-multi-tag q-opt-tag">안 골라도 돼요</span></div>
+        <div class="opts" id="qrIntro"></div>
+      </div>
+    </div>
+
+    <div class="errline" id="err-aha" role="alert"></div>
+    <div class="foot">
+      <button class="btn btn-back" onclick="go(3)">←</button>
+      <button class="btn btn-main" onclick="next('aha')">다음 →</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ STEP 5 · 본인 얘기 ═══════════ -->
+  <section class="screen" id="sc-last">
+    <div class="sh">
+      <span class="sh-tag t-last">마지막 · 본인 얘기</span>
+      <h2 tabindex="-1"><span aria-hidden="true">🌿</span> 마지막으로, 본인 얘기 좀</h2>
+      <p>환경보다 <strong>본인 상태가 더 중요할 때</strong>가 많아요. 여기까지 와줘서 고마워요.</p>
+    </div>
+
+    <div class="q">
+      <div class="q-title">요즘 본인 컨디션은요?<span class="q-req">*</span></div>
+      <div class="opts" id="lifeCond"></div>
+      <div class="followup hide" id="condCareWrap">
+        <div class="info care" id="condCareMsg"></div>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title">하고 싶은 말 <span class="q-multi-tag q-opt-tag">안 써도 돼요</span></div>
+      <textarea class="ta" id="lastMsg" aria-label="마지막으로 하고 싶은 말" maxlength="1000" style="min-height:130px" placeholder="칭찬, 건의, 불편한 점, 아무거나요"></textarea>
+    </div>
+
+    <div class="q">
+      <div class="q-title">고맙다고 전하고 싶은 사람 있어요? <span class="q-multi-tag q-opt-tag">안 써도 돼요</span></div>
+      <div class="q-hint">선생님이든 친구든요. 사감장이 대신 전해줄게요.</div>
+      <input class="tx" id="lastThanks" aria-label="고맙다고 전하고 싶은 사람" placeholder="예) ○○ 선생님, 옆자리 △△" maxlength="100" autocomplete="off">
+    </div>
+
+    <div class="q">
+      <div class="q-title">이름 <span class="q-multi-tag q-opt-tag">안 써도 돼요</span></div>
+      <div class="q-hint">답을 듣고 싶은 얘기를 썼거나, 따로 이야기 나누고 싶으면 적어주세요. 안 적어도 전혀 문제 없어요.</div>
+      <input class="tx" id="nameIn" aria-label="이름 (선택)" placeholder="적지 않아도 괜찮아요" maxlength="20" autocomplete="off">
+    </div>
+
+    <div class="q">
+      <div class="q-title">따로 이야기 나누고 싶어요?</div>
+      <button type="button" class="checkline" id="wantTalkBox"
+              role="checkbox" aria-checked="false" onclick="toggleTalk()" style="width:100%;text-align:left">
+        <span class="cbox" aria-hidden="true">✓</span>
+        <span class="checkline-tx">네, 사감장님과 조용히 얘기하고 싶어요
+          <span class="checkline-sub">위에 이름을 적어주면 찾아갈 수 있어요. 안 적어도 보낼 수 있고, 다른 학생은 모르게 조용히 갑니다.</span>
+        </span>
+      </button>
+    </div>
+
+    <div class="errline" id="err-last" role="alert"></div>
+    <div class="foot">
+      <button class="btn btn-back" onclick="go(4)">←</button>
+      <button class="btn btn-main btn-send" id="sendBtn" onclick="submitSurvey()">제출할게요 ✓</button>
+    </div>
+    <p class="footer-note">제출하면 수정할 수 없어요. 한 번만 확인해주세요.</p>
+  </section>
+
+  <!-- ═══════════ 완료 ═══════════ -->
+  <section class="screen" id="sc-done">
+    <div class="done">
+      <div class="done-sun" aria-hidden="true">☀️</div>
+      <h2 tabindex="-1">고마워요, 잘 받았어요!</h2>
+      <p>여기 적어준 얘기는 <strong>남은 썸머핫습 운영에 바로 반영</strong>할게요.<br>
+        고칠 수 있는 건 고치고, 당장 어려운 건 왜 어려운지 알려줄게요.</p>
+      <div class="done-badge" id="doneBadge">남은 기간도 같이 달려요 <span aria-hidden="true">🏃</span></div>
+    </div>
+    <p class="footer-note">정율사관학원 종합반 · 자습관<br>궁금한 건 언제든 사감선생님께</p>
+  </section>
+
+
+</div>
+
+<!-- ═══════════ Firebase ═══════════ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+  const app = initializeApp({
+    apiKey: "AIzaSyCUpVlY5al5uvH4wRv7WQxWrbV_OnvfPQg",
+    authDomain: "jasup-feedback.firebaseapp.com",
+    projectId: "jasup-feedback",
+    storageBucket: "jasup-feedback.firebasestorage.app",
+    messagingSenderId: "242775000792",
+    appId: "1:242775000792:web:78e5c222aa9d7891b479ad"
+  });
+  window.__fb = { db: getFirestore(app), collection, doc, setDoc, serverTimestamp };
+  window.dispatchEvent(new Event('fbready'));
+</script>
+
+<script>
+/* ══════════ 설정 ══════════ */
+const GRADES = ['고1', '고2', '고3'];
+const ROOMS = ['1관', '2관', '3관', '419관', '420관(블랙관)', 'B2관', 'B7관', 'B8관', 'B9관'];
+
+const COLLECTION = 'summer_survey_2026';
+const DRAFT_KEY  = 'summerReview2026_draft_v1';
+const SENT_KEY   = 'summerReview2026_sent_v1';
+const SCREENS = ['intro', 'who', 'life', 'room', 'aha', 'last', 'done'];
+
+/* ══════════ 문항 정의 ══════════ */
+const OPT_AHA_USED = [
+  { v: 'many',  t: '여러 번 써봤어요' },
+  { v: 'few',   t: '한두 번 써봤어요' },
+  { v: 'none',  t: '아직 안 써봤어요', s: '괜찮아요, 그냥 솔직하게요' },
+  { v: 'idk',   t: '아하포인트가 뭔지 잘 몰라요' }
+];
+// '--' 로 시작하는 항목은 선택지가 아니라 목록 안의 소제목
+// EXCL 에 든 항목은 다른 항목과 동시에 고를 수 없는 배타 선택지
+const SUBHEAD = '--';
+const EXCL = new Set(['특별한 이유는 없어요', '딱히 궁금한 게 없었어요']);
+
+const CHIP_AHA_EXP = [
+  SUBHEAD + '좋았던 점',
+  '궁금한 게 확실히 풀렸어요',
+  '선생님 답변이 자세했어요',
+  '물어보는 게 생각보다 안 어려웠어요',
+  '혼자 헤매는 시간이 줄었어요',
+  '답변 받고 그 문제를 다시 풀어봤어요',
+  '공부에 자신감이 좀 붙었어요',
+  SUBHEAD + '아쉬웠던 점',
+  '답변 기다리는 시간이 좀 길었어요',
+  '질문을 어떻게 쓸지가 어려웠어요',
+  '답변이 내 질문과 좀 어긋났어요',
+  '한 번 쓰고 나선 안 쓰게 됐어요',
+  '기대한 것과는 좀 달랐어요'
+];
+const OPT_AHA_AGAIN = [
+  { v: 'sure',  t: '네, 또 쓸 거예요' },
+  { v: 'maybe', t: '아마도요' },
+  { v: 'unsure',t: '잘 모르겠어요' },
+  { v: 'no',    t: '안 쓸 것 같아요' }
+];
+const OPT_AHA_WHEN = [
+  { v: 'thisweek', t: '이번 주에 써볼 생각이에요' },
+  { v: 'remain',   t: '남은 기간에 한 번은 써볼 것 같아요' },
+  { v: 'chance',   t: '기회가 되면요' },
+  { v: 'noplan',   t: '당장은 쓸 생각이 없어요', s: '이것도 괜찮은 답이에요' },
+  { v: 'dunno',    t: '아직 잘 모르겠어요' }
+];
+const CHIP_AHA_BLOCK = [
+  '뭘 물어봐야 할지 모르겠어요',
+  '어디서 어떻게 하는지 잘 몰라요',
+  '질문 쓰는 데 시간이 걸려요',
+  '혼자 해결하는 게 편해요',
+  '이런 걸 물어봐도 되나 싶어요',
+  '선생님한테 직접 묻는 게 빨라요',
+  '답변이 늦을까 봐요',
+  SUBHEAD + '↓ 이 아래는 하나만 골라요 (위 항목과 같이 못 골라요)',
+  '딱히 궁금한 게 없었어요',
+  '특별한 이유는 없어요'
+];
+const OPT_AHA_INTRO = [
+  { v: 'try',    t: '한번 써보고 싶어요' },
+  { v: 'more',   t: '좀 더 알아보고 싶어요' },
+  { v: 'nonow',  t: '지금은 필요할 것 같지 않아요', s: '이렇게 답해도 전혀 문제없어요' },
+  { v: 'unsure', t: '아직 잘 모르겠어요' }
+];
+
+/* ── 질문방 ── */
+const OPT_QR_USED = [
+  { v: 'many',  t: '여러 번 써봤어요' },
+  { v: 'few',   t: '한두 번 써봤어요' },
+  { v: 'none',  t: '아직 안 써봤어요', s: '괜찮아요, 솔직하게요' },
+  { v: 'idk',   t: '질문방이 뭔지 잘 몰라요' }
+];
+// 아하포인트와 같은 축은 같은 문장으로 둔다 (두 경로를 나란히 비교하기 위해).
+// 대신 개수를 줄여 같은 화면에서 같은 목록을 두 번 읽는 피로를 낮춘다.
+const CHIP_QR_EXP = [
+  SUBHEAD + '좋았던 점',
+  '막힌 게 바로 풀렸어요',
+  '답변이 이해가 잘 됐어요',
+  '혼자 고민하는 시간이 줄었어요',
+  SUBHEAD + '아쉬웠던 점',
+  '답변 기다리는 시간이 좀 길었어요',
+  '질문을 어떻게 쓸지가 어려웠어요',
+  '기대한 것과는 좀 달랐어요'
+];
+const CHIP_QR_BLOCK = [
+  '어떻게 쓰는지 잘 몰라요',
+  '뭘 물어봐야 할지 모르겠어요',
+  '앱 켜는 게 번거로워요',
+  '질문 쓰는 데 시간이 걸려요',
+  '혼자 해결하는 게 편해요',
+  '답변이 늦을까 봐요',
+  SUBHEAD + '↓ 이 아래는 하나만 골라요 (위 항목과 같이 못 골라요)',
+  '딱히 궁금한 게 없었어요',
+  '특별한 이유는 없어요'
+];
+
+const SCALE_OVERALL = [
+  { v: 5, e: '🔥', t: '진짜 좋아요' },
+  { v: 4, e: '💪', t: '힘들지만 좋아요' },
+  { v: 3, e: '🙂', t: '나쁘지 않아요' },
+  { v: 2, e: '😥', t: '조금 아쉬워요' },
+  { v: 1, e: '😔', t: '힘들기만 해요' }
+];
+const CHIP_LIFE_GOOD = [
+  '공부 리듬이 잡혔어요',
+  '시간표가 촘촘해서 딴짓을 안 해요',
+  '수업이 도움이 돼요',
+  '같이 하는 친구들이 있어서 힘이 나요',
+  '선생님들이 신경 써줘요',
+  '사감선생님이 잘 관리해줘요',
+  '실력이 오르는 느낌이 있어요',
+  '집에 있을 때보다 훨씬 나아요',
+  '규칙적으로 생활하게 됐어요'
+];
+const OPT_LIFE_IMPROVE = [
+  { v: 'class',    t: '수업 내용·난이도' },
+  { v: 'balance',  t: '하루 시간표 (수업·자습 배분)' },
+  { v: 'rest',     t: '쉬는 시간·회복' },
+  { v: 'grade',    t: '성적 관리·상담' },
+  { v: 'meal',     t: '밥·간식' },
+  { v: 'comm',     t: '안내·소통' },
+  { v: 'other',    t: '다른 게 있어요', s: '고르면 한 줄 적어주세요' },
+  { v: 'none',     t: '지금도 충분해요', s: '고를 게 딱히 없으면 이걸로' }
+];
+const OPT_LIFE_COND = [
+  { v: 'great', t: '좋아요, 잘 굴러가요' },
+  { v: 'ok',    t: '괜찮아요' },
+  { v: 'tired', t: '좀 지쳤어요' },
+  { v: 'hard',  t: '많이 힘들어요', s: '말해줘도 괜찮아요' }
+];
+
+const OPT_ROOM_SAT = [
+  { v: 5, t: '아주 만족해요' },
+  { v: 4, t: '만족해요' },
+  { v: 3, t: '무난해요' },
+  { v: 2, t: '조금 아쉬워요' },
+  { v: 1, t: '아쉬운 점이 많아요' }
+];
+const CHIP_ROOM_HELP = [
+  '조용해서 몰입이 돼요',
+  '고정석이라 편해요',
+  '다들 하니까 나도 해요',
+  '사감선생님이 있어서 든든해요',
+  '출결·시간 관리가 잡혀요',
+  '집보다 훨씬 나아요',
+  '내 자리가 있다는 게 좋아요'
+];
+const OPT_ROOM_IMPROVE = [
+  { v: 'noise',    t: '소음·잡담' },
+  { v: 'seat',     t: '자리·책상' },
+  { v: 'air',      t: '냉난방·환기' },
+  { v: 'facility', t: '시설 (화장실·정수기 등)' },
+  { v: 'rule',     t: '규칙·지도 방식' },
+  { v: 'other',    t: '다른 게 있어요', s: '고르면 한 줄 적어주세요' },
+  { v: 'none',     t: '지금이 좋아요', s: '바꿀 게 딱히 없으면 이걸로' }
+];
+
+/* ══════════ 상태 ══════════ */
+const S = {
+  grade: '', name: '',
+  ahaUsed: '', ahaExp: [], ahaAgain: '', ahaNote: '',
+  ahaWhen: '', ahaBlock: [], ahaWish: '', ahaIntro: '',
+  qrUsed: '', qrExp: [], qrBlock: [], qrNote: '', qrIntro: '', qrAgain: '',
+  lifeOverall: null, lifeGood: [], lifeImprove: '', lifeImproveNote: '', lifeCond: '',
+  room: '', roomSat: null, roomHelp: [], roomImprove: '', roomImproveNote: '',
+  lastMsg: '', lastThanks: '', wantTalk: false
+};
+let cur = 0;
+const startedAt = Date.now();
+
+const motionOK = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ══════════ 렌더 헬퍼 ══════════ */
+// 문항 제목을 선택지 묶음의 접근 가능한 이름으로 연결
+function labelGroup(el, multi) {
+  const t = el.closest('.q') && el.closest('.q').querySelector('.q-title');
+  el.setAttribute('role', multi ? 'group' : 'radiogroup');
+  if (t) el.setAttribute('aria-label', t.textContent.replace(/\s+/g, ' ').trim());
+}
+
+// 선택이 자동으로 지워졌을 때 조용히 넘어가면 오조작을 알 수 없다
+function notify(el, text) {
+  const q = el.closest('.q');
+  if (!q) return;
+  let n = q.querySelector('.q-notify');
+  if (!n) {
+    n = document.createElement('div');
+    n.className = 'q-hint q-notify';
+    n.setAttribute('role', 'status');
+    n.style.cssText = 'margin-top:10px;margin-bottom:0;color:#b45309;font-weight:700';
+    q.appendChild(n);
+  }
+  n.textContent = text;
+  clearTimeout(n._t);
+  n._t = setTimeout(() => { n.textContent = ''; }, 3500);
+}
+
+function syncPressed(el, key, multi) {
+  const items = [...el.children].filter(c => c.dataset.v);
+  let firstOn = -1;
+  items.forEach((c, i) => {
+    const on = multi ? S[key].includes(c.dataset.v) : String(S[key]) === c.dataset.v;
+    c.classList.toggle('on', on);
+    c.setAttribute(multi ? 'aria-pressed' : 'aria-checked', String(on));
+    if (on && firstOn < 0) firstOn = i;
+  });
+  // radiogroup 은 탭 스톱이 하나여야 하고 화살표로 이동해야 한다
+  if (!multi) items.forEach((c, i) => { c.tabIndex = (i === (firstOn < 0 ? 0 : firstOn)) ? 0 : -1; });
+}
+
+// radiogroup 안에서 ← → ↑ ↓ 로 이동 + 선택
+function radioKeys(el, key) {
+  el.addEventListener('keydown', e => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    const items = [...el.children].filter(c => c.dataset.v);
+    const cur = items.indexOf(document.activeElement);
+    if (cur < 0) return;
+    e.preventDefault();
+    const step = ['ArrowRight', 'ArrowDown'].includes(e.key) ? 1 : -1;
+    const next = items[(cur + step + items.length) % items.length];
+    next.click();
+    next.focus();
+  });
+}
+
+function renderChips(el, items, key, opts) {
+  const multi = !(opts && opts.single);
+  el.innerHTML = '';
+  labelGroup(el, multi);
+  items.forEach(txt => {
+    if (txt.startsWith(SUBHEAD)) {
+      const h = document.createElement('div');
+      h.className = 'checks-sub';
+      h.textContent = txt.slice(SUBHEAD.length);
+      el.appendChild(h);
+      return;
+    }
+    const b = document.createElement('button');
+    b.type = 'button';
+    if (multi) {
+      b.className = 'check';
+      b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = '<span class="check-box" aria-hidden="true">✓</span><span></span>';
+      b.lastChild.textContent = txt;
+    } else {
+      b.className = 'chip';
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', 'false');
+      b.textContent = txt;
+    }
+    b.dataset.v = txt;
+    b.onclick = () => {
+      if (multi) {
+        if (EXCL.has(txt)) {
+          // 배타 선택지는 단독 선택 (예: '특별한 이유는 없어요')
+          const wiped = S[key].filter(v => v !== txt).length;
+          S[key] = S[key].includes(txt) ? [] : [txt];
+          if (wiped) notify(el, '함께 고른 ' + wiped + '개는 지웠어요');
+        } else {
+          const i = S[key].indexOf(txt);
+          if (i >= 0) S[key].splice(i, 1); else S[key].push(txt);
+          const before = S[key].length;
+          S[key] = S[key].filter(v => !EXCL.has(v));
+          // 반대 방향(배타 → 일반)도 똑같이 알려야 원칙이 일관된다
+          if (S[key].length < before) notify(el, '같이 못 고르는 항목이라 하나는 지웠어요');
+        }
+      } else {
+        // 재탭으로 해제되면 필수 문항 답이 조용히 사라진다. role=radio 의미와도 어긋난다.
+        S[key] = txt;
+        if (opts && opts.onPick) opts.onPick(S[key]);
+      }
+      syncPressed(el, key, multi);
+      save();
+    };
+    el.appendChild(b);
+  });
+  syncPressed(el, key, multi);
+  if (!multi) radioKeys(el, key);
+}
+
+// required=false 인 문항은 재탭으로 해제할 수 있어야 한다.
+// '안 골라도 돼요'라고 안내해 놓고 오탭을 되돌릴 수 없으면 약속이 깨진다.
+function renderOpts(el, items, key, onPick, optional) {
+  el.innerHTML = '';
+  labelGroup(el, false);
+  items.forEach(o => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'opt';
+    b.setAttribute('role', 'radio');
+    b.setAttribute('aria-checked', 'false');
+    b.dataset.v = o.v;
+    b.innerHTML = `<span class="opt-dot" aria-hidden="true"></span><span>${o.t}${o.s ? `<span class="opt-sub">${o.s}</span>` : ''}</span>`;
+    b.onclick = () => {
+      S[key] = (optional && S[key] === o.v) ? '' : o.v;
+      syncPressed(el, key, false);
+      if (onPick) onPick(S[key]);
+      save();
+    };
+    el.appendChild(b);
+  });
+  syncPressed(el, key, false);
+  radioKeys(el, key);
+}
+
+function renderScale(el, items, key) {
+  el.innerHTML = '';
+  labelGroup(el, false);
+  items.forEach(o => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'scale-btn';
+    b.setAttribute('role', 'radio');
+    b.setAttribute('aria-checked', 'false');
+    b.setAttribute('aria-label', o.t);
+    b.dataset.v = o.v;
+    b.innerHTML = `<span class="scale-emo" aria-hidden="true">${o.e}</span><span class="scale-lb">${o.t}</span>`;
+    b.onclick = () => {
+      S[key] = o.v;
+      syncPressed(el, key, false);
+      save();
+    };
+    el.appendChild(b);
+  });
+  syncPressed(el, key, false);
+  radioKeys(el, key);
+}
+
+function bindText(id, key) {
+  const el = document.getElementById(id);
+  el.value = S[key] || '';
+  el.addEventListener('input', () => { S[key] = el.value; saveDebounced(); });
+}
+
+/* ══════════ 컨디션 후속 안내 ══════════ */
+// 'tired' 에 아무 반응이 없으면 "많이 힘들다를 고르면 일이 커진다"는 신호가 된다
+function condCare(v) {
+  const wrap = document.getElementById('condCareWrap');
+  const msg = document.getElementById('condCareMsg');
+  if (v === 'hard') {
+    msg.innerHTML = '솔직하게 말해줘서 고마워요. 여름 특강 기간엔 누구나 지쳐요 — 혼자 버티지 않아도 돼요.<br>'
+      + '아래 <b>"따로 이야기 나누고 싶어요"</b>를 눌러주면 사감장이 조용히 찾아갈게요.';
+  } else if (v === 'tired') {
+    msg.innerHTML = '이 시기엔 다들 그래요. 그래도 얘기하고 싶은 게 있으면 아래 체크만 해줘도 돼요.';
+  }
+  wrap.classList.toggle('hide', !['hard', 'tired'].includes(v));
+}
+
+/* ══════════ 자습관 선택 반영 ══════════ */
+function echoRoom(v) {
+  const el = document.getElementById('roomEcho');
+  el.textContent = v ? `${v} 기준으로 답해주세요.` : '';
+}
+
+/* ══════════ 아하포인트 · 질문방 분기 ══════════ */
+// 숨긴 분기의 응답은 반드시 비운다.
+// 안 그러면 "여러 번 해봤다 + 걸림돌 2개" 같은 모순 레코드가 저장된다.
+function resetBranch(keys) {
+  keys.forEach(k => {
+    S[k] = Array.isArray(S[k]) ? [] : '';
+    const el = document.getElementById(k);
+    if (el && 'value' in el) el.value = '';
+  });
+}
+
+function ahaBranch(v) {
+  const yes = ['many', 'few'].includes(v);
+  if (!yes)         resetBranch(['ahaExp', 'ahaAgain', 'ahaNote']);
+  if (v !== 'none') resetBranch(['ahaWhen', 'ahaBlock', 'ahaWish']);
+  if (v !== 'idk')  resetBranch(['ahaIntro']);
+  document.getElementById('ahaBranchYes').style.display = yes ? 'block' : 'none';
+  document.getElementById('ahaBranchNo').style.display  = v === 'none' ? 'block' : 'none';
+  document.getElementById('ahaBranchIdk').style.display = v === 'idk' ? 'block' : 'none';
+  syncPressed(document.getElementById('ahaExp'), 'ahaExp', true);
+  syncPressed(document.getElementById('ahaBlock'), 'ahaBlock', true);
+  syncPressed(document.getElementById('ahaAgain'), 'ahaAgain', false);
+  syncPressed(document.getElementById('ahaWhen'), 'ahaWhen', false);
+  syncPressed(document.getElementById('ahaIntro'), 'ahaIntro', false);
+}
+
+function qrBranch(v) {
+  const yes = ['many', 'few'].includes(v);
+  if (!yes)         resetBranch(['qrExp', 'qrNote', 'qrAgain']);
+  if (v !== 'none') resetBranch(['qrBlock']);
+  if (v !== 'idk')  resetBranch(['qrIntro']);
+  document.getElementById('qrBranchYes').style.display = yes ? 'block' : 'none';
+  document.getElementById('qrBranchYesNote').style.display = yes ? 'block' : 'none';
+  document.getElementById('qrBranchNo').style.display  = v === 'none' ? 'block' : 'none';
+  document.getElementById('qrBranchIdk').style.display = v === 'idk' ? 'block' : 'none';
+  syncPressed(document.getElementById('qrExp'), 'qrExp', true);
+  syncPressed(document.getElementById('qrBlock'), 'qrBlock', true);
+  syncPressed(document.getElementById('qrIntro'), 'qrIntro', false);
+  syncPressed(document.getElementById('qrAgain'), 'qrAgain', false);
+}
+
+// '지금도 충분해요'로 바꾸면 이미 적은 메모도 함께 비운다
+// 카테고리를 바꾸면 앞서 적은 메모가 엉뚱한 카테고리로 전송되므로 같이 비운다
+const lastImprove = { life: null, room: null };
+function improveNote(kind, v) {
+  const noteKey = kind + 'ImproveNote';
+  const wrap = document.getElementById(kind + 'ImproveWrap');
+  const ta = document.getElementById(noteKey);
+  const opt = document.getElementById(kind + 'NoteOpt');
+  const changed = lastImprove[kind] !== null && lastImprove[kind] !== v;
+  const hadNote = !!(S[noteKey] || '').trim();
+  if (v === 'none' || changed) { S[noteKey] = ''; ta.value = ''; }
+  if (changed && hadNote) notify(document.getElementById(kind + 'Improve'), '항목을 바꿔서 적어둔 메모는 지웠어요');
+  lastImprove[kind] = v;
+  wrap.classList.toggle('hide', v === 'none');
+  // '다른 게 있어요'는 무엇인지 알아야 처리할 수 있으므로 필수
+  if (opt) opt.textContent = v === 'other' ? '(필수)' : '(선택)';
+  ta.setAttribute('aria-required', String(v === 'other'));
+  // other 일 때 예시 placeholder 를 남겨두면 그 방향으로 응답을 유도한다
+  ta.placeholder = v === 'other' ? '어떤 건지 짧게 적어주세요'
+    : (kind === 'room' ? '예) 오후에 창가 자리가 좀 더워요' : '구체적으로 적어주면 진짜 도움돼요');
+}
+
+/* ══════════ 초기화 ══════════ */
+function init() {
+  // 진행 세그먼트
+  const segs = document.getElementById('segs');
+  segs.innerHTML = '';
+  for (let i = 0; i < 5; i++) segs.appendChild(Object.assign(document.createElement('div'), { className: 'seg' }));
+
+  renderChips(document.getElementById('gradeChips'), GRADES, 'grade', { single: true });
+  renderChips(document.getElementById('roomChips'), ROOMS, 'room', { single: true, onPick: echoRoom });
+  echoRoom(S.room);
+
+  renderOpts(document.getElementById('ahaUsed'), OPT_AHA_USED, 'ahaUsed', ahaBranch);
+  renderChips(document.getElementById('ahaExp'), CHIP_AHA_EXP, 'ahaExp');
+  renderOpts(document.getElementById('ahaAgain'), OPT_AHA_AGAIN, 'ahaAgain', null, true);
+  bindText('ahaNote', 'ahaNote');
+  renderOpts(document.getElementById('ahaWhen'), OPT_AHA_WHEN, 'ahaWhen', null, true);
+  renderChips(document.getElementById('ahaBlock'), CHIP_AHA_BLOCK, 'ahaBlock');
+  bindText('ahaWish', 'ahaWish');
+  renderOpts(document.getElementById('ahaIntro'), OPT_AHA_INTRO, 'ahaIntro', null, true);
+  if (S.ahaUsed) ahaBranch(S.ahaUsed);
+
+  renderOpts(document.getElementById('qrUsed'), OPT_QR_USED, 'qrUsed', qrBranch);
+  renderChips(document.getElementById('qrExp'), CHIP_QR_EXP, 'qrExp');
+  renderChips(document.getElementById('qrBlock'), CHIP_QR_BLOCK, 'qrBlock');
+  bindText('qrNote', 'qrNote');
+  renderOpts(document.getElementById('qrIntro'), OPT_AHA_INTRO, 'qrIntro', null, true);
+  renderOpts(document.getElementById('qrAgain'), OPT_AHA_AGAIN, 'qrAgain', null, true);
+  if (S.qrUsed) qrBranch(S.qrUsed);
+
+  renderScale(document.getElementById('lifeOverall'), SCALE_OVERALL, 'lifeOverall');
+  renderChips(document.getElementById('lifeGood'), CHIP_LIFE_GOOD, 'lifeGood');
+  renderOpts(document.getElementById('lifeImprove'), OPT_LIFE_IMPROVE, 'lifeImprove', v => improveNote('life', v));
+  bindText('lifeImproveNote', 'lifeImproveNote');
+  renderOpts(document.getElementById('lifeCond'), OPT_LIFE_COND, 'lifeCond', condCare);
+  if (S.lifeImprove) improveNote('life', S.lifeImprove);
+  if (S.lifeCond) condCare(S.lifeCond);
+
+  renderOpts(document.getElementById('roomSat'), OPT_ROOM_SAT, 'roomSat');
+  renderChips(document.getElementById('roomHelp'), CHIP_ROOM_HELP, 'roomHelp');
+  renderOpts(document.getElementById('roomImprove'), OPT_ROOM_IMPROVE, 'roomImprove', v => improveNote('room', v));
+  bindText('roomImproveNote', 'roomImproveNote');
+  if (S.roomImprove) improveNote('room', S.roomImprove);
+
+  bindText('lastMsg', 'lastMsg');
+  bindText('lastThanks', 'lastThanks');
+  bindText('nameIn', 'name');
+  if (S.wantTalk) {
+    document.getElementById('wantTalkBox').classList.add('on');
+    document.getElementById('wantTalkBox').setAttribute('aria-checked', 'true');
+  }
+}
+
+/* ══════════ 화면 이동 ══════════ */
+function go(i) {
+  const prev = document.getElementById('err-' + SCREENS[cur]);
+  if (prev) prev.textContent = '';   // 화면을 옮기면 이전 오류 문구는 정리
+  cur = i;
+  SCREENS.forEach((n, idx) => document.getElementById('sc-' + n).classList.toggle('on', idx === i));
+  const bar = document.getElementById('topbar');
+  bar.style.display = (i >= 1 && i <= 5) ? 'block' : 'none';
+  if (i >= 1 && i <= 5) {
+    document.getElementById('stepNow').textContent = i;
+    [...document.getElementById('segs').children].forEach((s, idx) => {
+      s.classList.toggle('seg-done', idx < i - 1);
+      s.classList.toggle('seg-now', idx === i - 1);
+    });
+  }
+  window.scrollTo({ top: 0, behavior: motionOK() ? 'smooth' : 'auto' });
+  // 키보드·스크린리더 사용자를 위해 새 화면 제목으로 포커스를 옮긴다
+  const h = document.querySelector('#sc-' + SCREENS[i] + ' h2');
+  if (h && i >= 1) h.focus({ preventScroll: true });
+  // 인트로(0)에서 저장하면 빈 초안이 생겨 '이미 응답했어요' 안내가 사라지고,
+  // 완료(6)에서 저장하면 방금 지운 초안이 되살아난다
+  if (i >= 1 && i <= 5) save();
+}
+
+function fail(id, msg) {
+  const el = document.getElementById('err-' + id);
+  el.textContent = msg;
+  el.scrollIntoView({ behavior: motionOK() ? 'smooth' : 'auto', block: 'center' });
+  // 지우지 않는다 — 스크린리더 사용자가 놓치면 다시 들을 방법이 없다.
+  // 다음 이동/선택 때 자연스럽게 덮어써진다.
+  return false;
+}
+
+function next(from) {
+  if (from === 'who') {
+    if (!S.grade) return fail('who', '학년을 골라주세요');
+    if (!S.room)  return fail('who', '주로 쓰는 자습관을 골라주세요');
+    return go(2);
+  }
+  if (from === 'life') {
+    if (S.lifeOverall == null) return fail('life', '요즘 학원생활이 어떤지 골라주세요');
+    if (!S.lifeImprove) return fail('life', '딱 하나만 골라주세요 — 없으면 "지금도 충분해요"로요');
+    if (S.lifeImprove === 'other' && !S.lifeImproveNote.trim())
+      return fail('life', '"다른 게 있어요"는 어떤 건지 한 줄만 적어주세요');
+    return go(3);
+  }
+  if (from === 'room') {
+    if (S.roomSat == null) return fail('room', '자습관이 전체적으로 어떤지 골라주세요');
+    if (!S.roomImprove) return fail('room', '딱 하나만 골라주세요 — 없으면 "지금이 좋아요"로요');
+    if (S.roomImprove === 'other' && !S.roomImproveNote.trim())
+      return fail('room', '"다른 게 있어요"는 어떤 건지 한 줄만 적어주세요');
+    return go(4);
+  }
+  if (from === 'aha') {
+    if (!S.ahaUsed) return fail('aha', '아하포인트 써봤는지만 골라주세요');
+    if (!S.qrUsed)  return fail('aha', '질문방도 써봤는지만 골라주세요');
+    return go(5);
+  }
+}
+
+function toggleTalk() {
+  S.wantTalk = !S.wantTalk;
+  const box = document.getElementById('wantTalkBox');
+  box.classList.toggle('on', S.wantTalk);
+  box.setAttribute('aria-checked', String(S.wantTalk));
+  // 이름이 비어 있으면 바로 적을 수 있게 커서를 옮겨줌
+  const nm = document.getElementById('nameIn');
+  if (S.wantTalk && !nm.value.trim()) { nm.focus(); nm.scrollIntoView({ behavior: motionOK() ? 'smooth' : 'auto', block:'center' }); }
+  save();
+}
+
+/* ══════════ 임시 저장 ══════════ */
+let saveTimer = null;
+let submitted = false;   // 제출 후에는 어떤 경로로도 초안을 쓰지 않는다
+function save() {
+  if (submitted) return;
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ S, cur, at: Date.now() }));
+    const el = document.getElementById('autosave');
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 1400);
+  } catch (e) { /* 저장 실패는 무시 */ }
+}
+function saveDebounced() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 600); }
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    // 14일 지난 초안은 버림
+    if (!d || !d.S || Date.now() - (d.at || 0) > 14 * 864e5) { localStorage.removeItem(DRAFT_KEY); return null; }
+    // 손상된 초안이 배열/문자열 타입을 어기면 렌더가 throw 하므로 형태를 맞춘다
+    Object.keys(S).forEach(k => {
+      const v = d.S[k];
+      if (v === undefined) return;
+      if (Array.isArray(S[k])) S[k] = Array.isArray(v) ? v.filter(x => typeof x === 'string') : [];
+      else if (typeof S[k] === 'string') S[k] = typeof v === 'string' ? v : '';
+      else if (typeof S[k] === 'boolean') S[k] = !!v;
+      else S[k] = (typeof v === 'number' || v === null) ? v : null;
+    });
+    return d;
+  } catch (e) { return null; }
+}
+
+/* ══════════ 제출 ══════════ */
+let sending = false;
+let docId = null;      // 재시도 시 같은 문서를 덮어쓰기 위한 고정 ID
+let timedOut = false;  // 한 번 타임아웃되면 그 문서는 이미 서버에 있을 수 있다
+async function submitSurvey() {
+  if (sending) return;
+  const btn = document.getElementById('sendBtn');
+
+  S.name = document.getElementById('nameIn').value.trim();
+
+  if (!S.lifeCond) return fail('last', '요즘 컨디션을 골라주세요');
+  // 이름 없이도 보낼 수 있게 한다. 가장 도움이 필요한 학생을 막아서는 안 된다.
+  if (S.wantTalk && !S.name) {
+    if (!confirm('이름을 안 적으면 찾아가기 어려워요.\n그래도 이대로 보낼까요?')) {
+      document.getElementById('nameIn').focus();
+      return fail('last', '이름을 적어주면 조용히 찾아갈게요');
+    }
+  }
+
+  if (!window.__fb) {
+    return fail('last', '연결이 아직 안 됐어요. 잠깐 뒤에 다시 눌러주세요');
+  }
+
+  sending = true;
+  btn.disabled = true;
+  btn.textContent = '보내는 중…';
+  // 디바운스 대기 중인 저장이 제출 후에 발화해 초안을 되살리는 것을 막는다
+  clearTimeout(saveTimer);
+  saveTimer = null;
+
+  const payload = {
+    survey: 'summer_2026',
+    grade: S.grade,
+    name: S.name || '',
+    is_named: !!S.name,
+    aha: {
+      used: S.ahaUsed,
+      experience: S.ahaExp,
+      will_use_again: S.ahaAgain || '',
+      note: S.ahaNote || '',
+      when_try: S.ahaWhen || '',
+      blockers: S.ahaBlock,
+      wish: S.ahaWish || '',
+      after_intro: S.ahaIntro || ''
+    },
+    qroom: {
+      used: S.qrUsed,
+      experience: S.qrExp,
+      blockers: S.qrBlock,
+      note: S.qrNote || '',
+      will_use_again: S.qrAgain || '',
+      after_intro: S.qrIntro || ''
+    },
+    academy: {
+      overall: S.lifeOverall,
+      goods: S.lifeGood,
+      improve_one: S.lifeImprove || '',
+      improve_note: S.lifeImproveNote || '',
+      condition: S.lifeCond
+    },
+    jasup: {
+      room: S.room,
+      satisfaction: S.roomSat,
+      helps: S.roomHelp,
+      improve_one: S.roomImprove || '',
+      improve_note: S.roomImproveNote || ''
+    },
+    closing: {
+      message: S.lastMsg || '',
+      thanks_to: S.lastThanks || '',
+      want_talk: S.wantTalk,
+      // 익명 면담 희망 — 개인은 못 찾아도 학년·자습관 단위로는 대응할 수 있다
+      want_talk_anonymous: S.wantTalk && !S.name
+    },
+    created_at: new Date().toISOString(),
+    created_ts: window.__fb.serverTimestamp(),
+    duration_sec: Math.round((Date.now() - startedAt) / 1000),
+    ua: navigator.userAgent.slice(0, 200)
+  };
+
+  try {
+    // 문서 ID를 미리 정해두면 타임아웃 후 재시도해도 같은 문서에 덮어써져 중복이 생기지 않는다
+    if (!docId) docId = 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+    const ref = window.__fb.doc(window.__fb.db, COLLECTION, docId);
+    // 오프라인이면 Firestore가 Promise를 영원히 붙잡아 버튼이 '보내는 중…'에서 멈춘다
+    await Promise.race([
+      window.__fb.setDoc(ref, payload),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 12000))
+    ]);
+    submitted = true;
+    timedOut = false;
+    localStorage.removeItem(DRAFT_KEY);
+    localStorage.setItem(SENT_KEY, new Date().toISOString());
+    if (S.wantTalk) {
+      document.getElementById('doneBadge').textContent = '곧 조용히 찾아갈게요';
+    }
+    document.getElementById('topbar').style.display = 'none';
+    go(6);
+  } catch (e) {
+    console.error(e);
+    const denied = /permission|insufficient|unauthenticated/i.test(e && (e.code || e.message) || '');
+    // 타임아웃 뒤 같은 문서에 다시 쓰면 규칙상 '수정'이라 거부된다 = 이미 접수됐다는 뜻
+    if (timedOut && denied) {
+      submitted = true;
+      localStorage.removeItem(DRAFT_KEY);
+      localStorage.setItem(SENT_KEY, new Date().toISOString());
+      document.getElementById('topbar').style.display = 'none';
+      go(6);
+      return;
+    }
+    if (e && e.message === 'timeout') timedOut = true;
+    sending = false;
+    btn.disabled = false;
+    btn.textContent = '제출할게요 ✓';
+    fail('last', denied
+      ? '설문이 아직 열리지 않았어요. 사감선생님께 알려주세요 🙏'
+      : '전송이 안 됐어요. 잠깐 뒤에 다시 눌러주세요');
+  }
+}
+
+/* ══════════ 시작 ══════════ */
+window.go = go;
+window.next = next;
+window.toggleTalk = toggleTalk;
+window.submitSurvey = submitSurvey;
+
+const draft = loadDraft();
+init();
+if (draft && draft.cur >= 1 && draft.cur <= 5) {
+  go(draft.cur);
+} else {
+  go(0);
+}
+
+// 이미 제출한 학생 안내 (재응답은 막지 않음 — 반 단위로 다시 받을 수도 있으니)
+if (localStorage.getItem(SENT_KEY) && !draft) {
+  const h = document.querySelector('#sc-intro .hero p');
+  if (h) h.innerHTML = '이미 한 번 응답해줘서 고마워요!<br>더 하고 싶은 얘기가 생겼으면 다시 써도 괜찮아요.';
+}
+</script>
+</body>
+</html>

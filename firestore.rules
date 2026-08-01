@@ -1,10 +1,114 @@
 rules_version = '2';
+
+// ⚠️ 현재 관리자 인증은 클라이언트 세션(login.html)에서만 처리됩니다.
+// Firebase Auth가 붙기 전까지는 아래 규칙이 사실상 공개 상태입니다.
+// 학원 내부 도구 용도이므로 URL 비공개 + 관리자 계정 관리로 보호하세요.
+
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // === 학생 피드백 응답 ===
     match /study_room_reports/{doc} {
+      // 생성: 자습관 + 시각 필드는 필수 (클라이언트가 보내는 최소 조건)
       allow create: if request.resource.data.keys().hasAll(['study_room', 'created_at']);
+      // 읽기: 관리자 대시보드에서 사용 (URL 비공개로 보호)
       allow read: if true;
+      // 수정·삭제: 관리자 처리 상태·메모 편집용
       allow update, delete: if true;
+    }
+
+    // === 썸머핫습 2026 만족도 설문 (summer.html / summer-admin.html) ===
+    // API 키는 클라이언트에 공개되어 있으므로, 규칙이 유일한 방어선입니다.
+    // 임의 타입·거대 문서 주입(관리자 화면 XSS·비용 폭증)을 여기서 막습니다.
+    match /summer_survey_2026/{doc} {
+      // 문서 ID도 관리자 화면에 그려지므로 형식을 제한합니다.
+      // (클라이언트가 setDoc으로 ID를 정하기 때문에 임의 문자열이 들어올 수 있습니다)
+      function idOk() {
+        return doc.matches('^[A-Za-z0-9_-]{1,48}$');
+      }
+      // 배열 필드는 길이와 타입을 함께 봅니다. 리스트가 아니면 관리자 화면의 .map()이 깨집니다.
+      function listOk(v, maxLen) {
+        return v is list && v.size() <= maxLen;
+      }
+      function textOk(v, maxLen) {
+        return v is string && v.size() <= maxLen;
+      }
+      function scoreOk(v) {
+        return v is int && v >= 1 && v <= 5;
+      }
+      // 코드값·점수까지 검증한다. 오염된 한 건이 평균과 분포를 조용히 왜곡한다.
+      function valuesOk() {
+        return scoreOk(request.resource.data.academy.overall)
+            && scoreOk(request.resource.data.jasup.satisfaction)
+            && textOk(request.resource.data.academy.condition, 20)
+            && textOk(request.resource.data.aha.used, 20)
+            && textOk(request.resource.data.qroom.used, 20)
+            && textOk(request.resource.data.academy.improve_one, 20)
+            && textOk(request.resource.data.jasup.improve_one, 20);
+      }
+      function nestedOk() {
+        return listOk(request.resource.data.aha.experience, 20)
+            && listOk(request.resource.data.aha.blockers, 20)
+            && listOk(request.resource.data.qroom.experience, 20)
+            && listOk(request.resource.data.qroom.blockers, 20)
+            && listOk(request.resource.data.academy.goods, 20)
+            && listOk(request.resource.data.jasup.helps, 20)
+            && textOk(request.resource.data.aha.note, 2000)
+            && textOk(request.resource.data.aha.wish, 2000)
+            && textOk(request.resource.data.qroom.note, 2000)
+            && textOk(request.resource.data.academy.improve_note, 2000)
+            && textOk(request.resource.data.jasup.improve_note, 2000)
+            && textOk(request.resource.data.closing.thanks_to, 400)
+            && textOk(request.resource.data.jasup.room, 40);
+      }
+
+      // 학생 제출: 최상위 필드는 정확히 13개 (summer.html 의 payload 와 일치)
+      allow create: if idOk() && nestedOk() && valuesOk()
+                    && request.resource.data.keys().hasAll(['survey', 'grade', 'created_at'])
+                    && request.resource.data.keys().hasOnly([
+                         'survey', 'grade', 'name', 'is_named', 'aha', 'qroom', 'academy',
+                         'jasup', 'closing', 'created_at', 'created_ts', 'duration_sec', 'ua'
+                       ])
+                    && request.resource.data.survey == 'summer_2026'
+                    && request.resource.data.grade is string
+                    && request.resource.data.grade.size() <= 20
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() <= 80
+                    && request.resource.data.created_at is string
+                    && request.resource.data.created_at.size() <= 60
+                    && request.resource.data.ua is string
+                    && request.resource.data.ua.size() <= 400
+                    && request.resource.data.duration_sec is int
+                    // 관리자 전용 필드는 학생이 만들 때 넣을 수 없음
+                    && !request.resource.data.keys().hasAny(['status', 'admin_memo', 'updated_at'])
+                    && request.resource.data.closing.message is string
+                    && request.resource.data.closing.message.size() <= 4000;
+
+      // 읽기: summer-admin.html 대시보드 (URL 비공개 + 관리자 계정으로 보호)
+      allow read: if true;
+
+      // 수정: 관리자가 처리 상태·메모만 바꿀 수 있게 좁힘.
+      // 학생 응답 원본은 어떤 경로로도 변경되지 않습니다.
+      // status / admin_memo 는 각각 따로 갱신되므로, "이번에 바뀐 키"만 검사합니다.
+      // 병합 문서 전체를 보면 예전에 저장된 값 때문에 정상 수정이 거부됩니다.
+      allow update: if request.resource.data.diff(resource.data)
+                      .affectedKeys().hasOnly(['status', 'admin_memo', 'updated_at'])
+                    && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['status'])
+                        || request.resource.data.status in ['new', 'review', 'done', 'hold'])
+                    && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_memo'])
+                        || textOk(request.resource.data.admin_memo, 8000));   // 클라 상한 2000 대비 여유
+
+      allow delete: if true;
+    }
+
+    // === 관리자 설정 (지난 주 변화 등) ===
+    // /settings/announcements 문서 하나만 사용:
+    //   { items: [ "3관 냉방 세기 조정", "정수기 위치 옮김", ... ], updated_at: "..." }
+    match /settings/{doc} {
+      // 학생 인트로가 announcements를 익명으로 읽어야 하므로 read는 공개
+      allow read: if true;
+      // 쓰기: 관리자만 (현재는 클라이언트 세션 인증만 존재)
+      allow write: if true;
     }
   }
 }
