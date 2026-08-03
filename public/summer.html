@@ -159,6 +159,24 @@
   .note-tx { font-size: 13.5px; color: var(--ink-soft); line-height: 1.65; }
   .note-tx b { color: var(--ink); font-weight: 800; }
 
+  /* ══════════ 이어하기 안내 ══════════ */
+  .resume {
+    margin-top: 16px; padding: 20px 20px 18px;
+    background: linear-gradient(160deg, #fffbeb, #fff 55%);
+    border: 1.5px solid #fcd34d; border-radius: 22px;
+    box-shadow: 0 6px 22px rgba(180,83,9,.08);
+  }
+  .resume.hide { display: none; }
+  .resume-tx { font-size: 14px; color: var(--ink-soft); line-height: 1.7; }
+  .resume-tx b { color: var(--ink); font-weight: 800; }
+  .resume-tx .where { color: #92400e; font-weight: 800; }
+  .resume-btns { display: flex; gap: 9px; margin-top: 15px; }
+  .btn-restart {
+    flex: none; padding: 16px 18px;
+    background: #fff; border: 1.5px solid var(--line-ctl); color: var(--ink-soft);
+    font-size: 14px;
+  }
+
   /* ══════════ 스텝 헤더 ══════════ */
   .sh { margin-top: 26px; margin-bottom: 20px; }
   .sh-tag {
@@ -439,6 +457,17 @@
       <div class="hero-kicker"><span aria-hidden="true">☀️</span> SUMMER 2026 · 7.20 – 8.16</div>
       <h1>여기까지 오는 동안,<br><em>어땠어요?</em></h1>
       <p>여기서 들은 얘기는 남은 기간과 다음 특강을<br>더 좋게 만드는 데 쓸게요.</p>
+    </div>
+
+    <div class="resume hide" id="resumeCard">
+      <div class="resume-tx">
+        <b>지난번에 쓰다가 멈춘 게 남아 있어요.</b><br>
+        <span class="where" id="resumeWhere"></span>까지 답해두셨어요. 이어서 할까요?
+      </div>
+      <div class="resume-btns">
+        <button class="btn btn-main" id="resumeGo">이어서 할게요</button>
+        <button class="btn btn-restart" onclick="restartSurvey()">처음부터</button>
+      </div>
     </div>
 
     <div class="intro-notes">
@@ -970,8 +999,10 @@ const S = {
   room: '', roomSat: null, roomHelp: [], roomImprove: '', roomImproveNote: '',
   lastMsg: '', lastThanks: '', wantTalk: false
 };
+// '처음부터' 를 누르면 이 값으로 되돌린다
+const S_INIT = JSON.parse(JSON.stringify(S));
 let cur = 0;
-const startedAt = Date.now();
+let startedAt = Date.now();
 
 const motionOK = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1015,6 +1046,8 @@ function syncPressed(el, key, multi) {
 
 // radiogroup 안에서 ← → ↑ ↓ 로 이동 + 선택
 function radioKeys(el, key) {
+  if (el._rk) return;             // 두 번 붙으면 화살표 한 번에 두 칸 이동한다
+  el._rk = true;
   el.addEventListener('keydown', e => {
     if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
     const items = [...el.children].filter(c => c.dataset.v);
@@ -1134,6 +1167,8 @@ function renderScale(el, items, key) {
 function bindText(id, key) {
   const el = document.getElementById(id);
   el.value = S[key] || '';
+  if (el._bound) return;          // init() 재호출 시 리스너가 겹치지 않게
+  el._bound = true;
   el.addEventListener('input', () => { S[key] = el.value; saveDebounced(); });
 }
 
@@ -1505,16 +1540,38 @@ window.next = next;
 window.toggleTalk = toggleTalk;
 window.submitSurvey = submitSurvey;
 
-const draft = loadDraft();
-init();
-if (draft && draft.cur >= 1 && draft.cur <= 5) {
-  go(draft.cur);
-} else {
+const STEP_NAME = { 1: 'STEP 1 · 기본', 2: 'STEP 2 · 학원생활', 3: 'STEP 3 · 자습관',
+                    4: 'STEP 4 · 아하포인트·질문방', 5: '마지막 · 본인 얘기' };
+
+// 초안이 있어도 중간 화면으로 바로 던지지 않는다.
+// QR로 처음 들어온 학생이 남의 응답 중간부터 보게 되는 상황을 막아야 한다.
+function restartSurvey() {
+  if (!confirm('처음부터 다시 시작할까요?\n지금까지 고른 건 지워져요.')) return;
+  localStorage.removeItem(DRAFT_KEY);
+  Object.assign(S, JSON.parse(JSON.stringify(S_INIT)));
+  lastImprove.life = null; lastImprove.room = null;
+  submitted = false; sending = false; docId = null; timedOut = false;
+  startedAt = Date.now();
+  init();
+  document.getElementById('resumeCard').classList.add('hide');
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.disabled = false; sendBtn.textContent = '제출할게요 ✓';
   go(0);
 }
+window.restartSurvey = restartSurvey;
 
-// 이미 제출한 학생 안내 (재응답은 막지 않음 — 반 단위로 다시 받을 수도 있으니)
-if (localStorage.getItem(SENT_KEY) && !draft) {
+const draft = loadDraft();
+init();
+go(0);   // 항상 인트로에서 시작
+
+if (draft && draft.cur >= 1 && draft.cur <= 5) {
+  // 이어할지 처음부터 할지는 학생이 고른다
+  const card = document.getElementById('resumeCard');
+  document.getElementById('resumeWhere').textContent = STEP_NAME[draft.cur] || ('STEP ' + draft.cur);
+  card.classList.remove('hide');
+  document.getElementById('resumeGo').onclick = () => go(draft.cur);
+} else if (localStorage.getItem(SENT_KEY)) {
+  // 이미 제출한 학생 안내 (재응답은 막지 않음)
   const h = document.querySelector('#sc-intro .hero p');
   if (h) h.innerHTML = '이미 한 번 응답해줘서 고마워요!<br>더 하고 싶은 얘기가 생겼으면 다시 써도 괜찮아요.';
 }
