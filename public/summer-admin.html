@@ -1149,17 +1149,75 @@ function renderCare() {
 }
 
 /* ══════════ 6. 자유서술 ══════════ */
+function setTextKind(v) { textKind = v; renderText(); }
+
+// 한 종류만 골랐을 때는 카드 전체 대신 그 항목만 죽 늘어놓는다.
+// "고맙다고 전하고 싶은 사람"만 모아 읽고 실제로 전해주는 게 목적.
+function textList(kind, rows) {
+  const def = TEXT_KINDS.find(x => x.k === kind);
+  const items = rows
+    .map(r => ({ r, v: (def.get(r) || '').trim() }))
+    .filter(x => x.v);
+  if (!items.length) {
+    return `<div class="card"><div class="empty"><i class="fas fa-inbox" aria-hidden="true"></i>
+      <p>"${esc(def.label({}))}"에 쓴 응답이 아직 없어요.</p></div></div>`;
+  }
+  return `<div class="card">
+    <div class="card-h"><i class="fas fa-quote-left" aria-hidden="true"></i> ${esc(def.label({}))} · ${items.length}건</div>
+    <div class="card-sub" style="color:var(--ink4)">이 항목만 모아서 봅니다. 아래 <b>목록 복사</b>로 한 번에 옮길 수 있어요.</div>
+    ${items.map(({ r, v }) => `<div class="quote-block">
+      <div class="quote-lb">${esc(r.grade || '')} ${esc(r.jasup?.room || '')} · ${r.is_named ? esc(r.name) : '익명'}
+        <span style="color:var(--ink4);font-weight:600"> · ${esc(fmtWhen(whenOf(r)))}</span></div>
+      <div class="resp-body">${esc(v)}</div>
+    </div>`).join('')}
+    <div style="margin-top:14px">
+      <button class="abtn" data-act="copytext"><i class="fas fa-copy" aria-hidden="true"></i> 목록 복사</button>
+      <span class="memo-save" id="copyDone" role="status" aria-live="polite"><i class="fas fa-check" aria-hidden="true"></i> 복사됐어요</span>
+    </div>
+  </div>`;
+}
+
+function copyTextList() {
+  const def = TEXT_KINDS.find(x => x.k === textKind);
+  if (!def) return;
+  const lines = textRows()
+    .map(r => ({ r, v: (def.get(r) || '').trim() })).filter(x => x.v)
+    .map(({ r, v }) => `[${r.grade || ''} ${r.jasup?.room || ''} ${r.is_named ? r.name : '익명'}] ${v}`);
+  const txt = `${def.label({})} (${lines.length}건)\n\n` + lines.join('\n');
+  navigator.clipboard.writeText(txt).then(() => {
+    const el = document.getElementById('copyDone');
+    if (el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 1800); }
+  }).catch(() => alert('복사에 실패했어요. 내용을 직접 드래그해서 복사해주세요.'));
+}
+
 function renderText() {
   const el = document.getElementById('p-text');
   const rows = textRows();
-  if (!rows.length) { el.innerHTML = emptyBox('조건에 맞는 서술 응답이 없어요'); return; }
-  const thanks = rows.filter(r => (r.closing?.thanks_to||'').trim());
+  const counts = Object.fromEntries(TEXT_KINDS.map(k =>
+    [k.k, rows.filter(r => (k.get(r) || '').trim()).length]));
 
+  const picker = `
+    <div class="card" style="padding:14px 16px;margin-bottom:12px">
+      <label class="card-h" for="textKind" style="margin-bottom:8px">
+        <i class="fas fa-layer-group" aria-hidden="true"></i> 항목별로 모아 보기</label>
+      <select class="fsel" id="textKind" style="width:100%;max-width:420px" onchange="setTextKind(this.value)">
+        <option value="all" ${textKind === 'all' ? 'selected' : ''}>전체 (응답 카드로 보기) · ${rows.length}건</option>
+        ${TEXT_KINDS.map(k => `<option value="${k.k}" ${textKind === k.k ? 'selected' : ''}
+          ${counts[k.k] ? '' : 'disabled'}>${esc(k.label({}))} · ${counts[k.k]}건</option>`).join('')}
+      </select>
+    </div>`;
+
+  if (!rows.length) { el.innerHTML = picker + emptyBox('조건에 맞는 서술 응답이 없어요'); return; }
+
+  if (textKind !== 'all') { el.innerHTML = picker + textList(textKind, rows); return; }
+
+  const thanks = counts.thanks;
   el.innerHTML = `
     <div class="hint"><i class="fas fa-comment-dots" aria-hidden="true"></i>
-      글로 쓴 응답만 모았어요 (<b>${rows.length}</b>건). ${thanks.length ? `고맙다고 전하고 싶은 사람이 적힌 응답 <b>${thanks.length}건</b> — 실제로 전해주면 효과가 큽니다.` : ''}
+      글로 쓴 응답만 모았어요 (<b>${rows.length}</b>건). ${thanks ? `고맙다고 전하고 싶은 사람이 적힌 응답 <b>${thanks}건</b> — 실제로 전해주면 효과가 큽니다.` : ''}
       내용·이름·관리자 메모로 찾으려면 위쪽 <b>검색창</b>을 쓰세요.
     </div>
+    ${picker}
     ${rows.map(r => respCard(r, { expand:true })).join('')}
   `;
 }
@@ -1231,6 +1289,23 @@ function openDetail(id, opt) {
   }
 }
 
+/* ══════════ 자유서술 종류 ══════════ */
+// respCard 의 인용 블록과 자유서술 탭의 드롭다운이 같은 정의를 쓴다
+const TEXT_KINDS = [
+  { k:'message',   label:() => '하고 싶은 말',                    get:r => r.closing?.message },
+  { k:'thanks',    label:() => '고맙다고 전하고 싶은 사람',        get:r => r.closing?.thanks_to },
+  { k:'ahaNote',   label:() => '아하포인트 · 기억에 남는 것',      get:r => r.aha?.note },
+  { k:'ahaWish',   label:() => '아하포인트 · 이렇게 해주면 만들 것 같다', get:r => r.aha?.wish },
+  { k:'qrNote',    label:() => '질문방 · 하고 싶은 말',            get:r => r.qroom?.note },
+  { k:'lifeNote',  label:r => `학원생활 개선 (${L_LIFE_IMPROVE[r.academy?.improve_one] || '기타'})`,
+                   get:r => r.academy?.improve_note },
+  { k:'roomNote',  label:r => `자습관 개선 (${L_ROOM_IMPROVE[r.jasup?.improve_one] || '기타'})`,
+                   get:r => r.jasup?.improve_note },
+  { k:'qrIntro',   label:() => '질문방 · 설명 듣고 난 반응',
+                   get:r => L_AHA_INTRO[r.qroom?.after_intro] },
+];
+let textKind = 'all';
+
 /* ══════════ 응답 카드 ══════════ */
 function respCard(r, o) {
   o = o || {};
@@ -1239,16 +1314,9 @@ function respCard(r, o) {
   const ov = typeof r.academy?.overall === 'number' ? r.academy.overall : null;
   const cls = talk ? 'talk' : (hard || (ov !== null && ov <= 2)) ? 'care' : '';
 
-  const quotes = [
-    ['하고 싶은 말', r.closing?.message],
-    ['고맙다고 전하고 싶은 사람', r.closing?.thanks_to],
-    ['아하포인트 · 기억에 남는 순간', r.aha?.note],
-    ['질문방 · 하고 싶은 말', r.qroom?.note],
-    ['질문방 · 설명 듣고 난 반응', L_AHA_INTRO[r.qroom?.after_intro]],
-    ['아하포인트 · 이렇게 해주면 쓸 것 같다', r.aha?.wish],
-    [`학원생활 개선 (${L_LIFE_IMPROVE[r.academy?.improve_one] || '기타'})`, r.academy?.improve_note],
-    [`자습관 개선 (${L_ROOM_IMPROVE[r.jasup?.improve_one] || '기타'})`, r.jasup?.improve_note]
-  ].filter(([, v]) => (v || '').trim());
+  const quotes = TEXT_KINDS
+    .map(k => [k.label(r), k.get(r)])
+    .filter(([, v]) => (v || '').trim());
 
   return `<div class="resp ${cls}" data-resp="${esc(r.id)}" tabindex="-1">
     <div class="resp-top">
@@ -1426,6 +1494,7 @@ document.addEventListener('click', e => {
   else if (b.dataset.act === 'status') setStatus(id, b.dataset.v);
   else if (b.dataset.act === 'remove') removeResp(id);
   else if (b.dataset.act === 'delsel') removeSelected();
+  else if (b.dataset.act === 'copytext') copyTextList();
 });
 document.addEventListener('change', e => {
   const t = e.target;
@@ -1443,7 +1512,7 @@ document.addEventListener('change', e => {
 
 /* ══════════ 시작 ══════════ */
 // 인라인 onclick 에서 부르는 것만 노출한다 (나머지는 이벤트 위임으로 처리)
-Object.assign(window, { applyFilter, clearFilter, loadAll, exportCSV, logout });
+Object.assign(window, { applyFilter, clearFilter, loadAll, exportCSV, logout, setTextKind });
 // .tabs 의 sticky top 을 실제 헤더 높이에 맞춘다 (버튼이 줄바꿈되면 높이가 변한다)
 function syncHeaderHeight() {
   const hd = document.querySelector('.hd');
