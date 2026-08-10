@@ -340,14 +340,14 @@ const L_ROOM_IMPROVE = { noise:'소음·잡담', seat:'자리·책상', air:'냉
   /* 구버전 응답 호환 */ focus:'집중 환경(구)', living:'생활 편의(구)' };
 const L_STATUS = { new:'신규', review:'검토중', done:'완료', hold:'보류' };
 
-// 자습관별 재원 인원. 응답 '수'가 아니라 '응답률'로 봐야 독려 대상이 나온다.
-const ROOM_CAPACITY = {
-  '1관': 41, '2관': 35, '3관': 36, '419관': 11, '420관(블랙관)': 19,
-  'B2관': 49, 'B7관': 28, 'B8관': 31, 'B9관': 56
+// 자습관별 재원 인원(실제 등원 학생 수). 좌석 수가 아니라 재원 기준으로 응답률을 봅니다.
+const ROOM_ENROLLED = {
+  '1관': 38, '2관': 34, '3관': 35, '419관': 9, '420관(블랙관)': 13,
+  'B2관': 39, 'B7관': 25, 'B8관': 30, 'B9관': 34
 };
-const TOTAL_CAPACITY = Object.values(ROOM_CAPACITY).reduce((a, b) => a + b, 0);
-const capOf = k => ROOM_CAPACITY[k] || null;
-// 응답률 셀: 정원을 모르는 그룹(미기재·구버전)은 '–'
+const TOTAL_ENROLLED = Object.values(ROOM_ENROLLED).reduce((a, b) => a + b, 0);
+const capOf = k => ROOM_ENROLLED[k] || null;
+// 응답률 셀: 재원 수를 모르는 그룹(미기재·구버전)은 '–'
 function rateCell(k, n) {
   const cap = capOf(k);
   if (cap == null) return '<span style="color:var(--ink3)">–</span>';
@@ -609,7 +609,7 @@ function renderSummary() {
     ${actionBrief()}
 
     <div class="grid g4" style="margin-bottom:14px">
-      ${kpi('응답률', pct(n, TOTAL_CAPACITY) + '<small>%</small>', `${n}명 / 전체 ${TOTAL_CAPACITY}명`, pct(n, TOTAL_CAPACITY) < 40 ? 'k-rose' : '')}
+      ${kpi('응답률', pct(n, TOTAL_ENROLLED) + '<small>%</small>', `${n}명 / 재원 ${TOTAL_ENROLLED}명`, pct(n, TOTAL_ENROLLED) < 40 ? 'k-rose' : '')}
       ${kpi('응답 수', n, `${named}명 실명 · ${n-named}명 익명`, '')}
       ${kpi('아하포인트 제작률', pct(ahaTried, n) + '<small>%</small>', `${ahaTried}명 중 여러 개 ${ahaMany}명`, 'k-sun')}
       ${kpi('질문방 이용률', pct(qrWent, n) + '<small>%</small>', `${qrWent}명`, 'k-sun')}
@@ -641,7 +641,7 @@ function renderSummary() {
       </div>
       <div class="card">
         <div class="card-h"><i class="fas fa-users" aria-hidden="true"></i> 학년·자습관별 응답</div>
-        <div class="card-sub">막대는 응답 수입니다. 정원 대비 비율은 아래 <b>자습관별 요약</b>의 응답률 열을 보세요.</div>
+        <div class="card-sub">막대는 응답 수입니다. 재원 대비 비율은 아래 <b>자습관별 요약</b>의 응답률 열을 보세요.</div>
         ${bars(tally(VIEW, r => `${r.grade||'?'} · ${r.jasup?.room||'?'}`), n, '', true)}
       </div>
     </div>
@@ -687,8 +687,8 @@ function actionBrief() {
     .sort((a, b) => a.shrunk - b.shrunk)[0];
 
   // 응답률이 낮은 관은 데이터 자체를 믿기 어려우므로 독려가 먼저다
-  const lowRate = Object.keys(ROOM_CAPACITY)
-    .map(k => ({ k, n: VIEW.filter(r => r.jasup?.room === k).length, cap: ROOM_CAPACITY[k] }))
+  const lowRate = Object.keys(ROOM_ENROLLED)
+    .map(k => ({ k, n: VIEW.filter(r => r.jasup?.room === k).length, cap: ROOM_ENROLLED[k] }))
     .map(x => ({ ...x, rate: pct(x.n, x.cap) }))
     .filter(x => x.rate < 40)
     .sort((a, b) => a.rate - b.rate);
@@ -1442,7 +1442,7 @@ async function removeSelected() {
 /* ══════════ CSV ══════════ */
 function exportCSV() {
   if (!VIEW.length) { alert('내보낼 응답이 없어요.'); return; }
-  const head = ['시각','문서ID','학년','자습관','자습관정원','이름','아하_제작','아하_개수','아하_난이도','아하_도움','아하_경험','아하_기억','아하_만들시점',
+  const head = ['시각','문서ID','학년','자습관','자습관재원','이름','아하_제작','아하_개수','아하_난이도','아하_도움','아하_경험','아하_기억','아하_만들시점',
     '아하_걸림돌','아하_바람','질문방_사용','질문방_질문빈도','질문방_답변빈도','질문방_경험','질문방_걸림돌','질문방_한마디','질문방_설명후반응','아하_설명후반응','학원_만족도','학원_좋은점','학원_개선1순위','학원_개선메모','컨디션',
     '자습관_만족도','자습관_만족도_라벨','자습관_도움','자습관_개선1순위','자습관_개선메모',
     '하고싶은말','고마운사람','면담희망','상태','관리자메모','응답시간(초)'];

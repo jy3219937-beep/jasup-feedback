@@ -179,13 +179,13 @@ const COLLECTION = 'summer_survey_2026';
 const NOTE_DOC   = 'summer_report_2026';      // settings/summer_report_2026
 const PERIOD     = '2026년 7월 20일 ~ 8월 16일';
 
-// 자습관 재원 인원 (응답률 분모)
-const ROOM_CAPACITY = {
-  '1관': 41, '2관': 35, '3관': 36, '419관': 11, '420관(블랙관)': 19,
-  'B2관': 49, 'B7관': 28, 'B8관': 31, 'B9관': 56
+// 자습관별 재원 인원(실제 등원 학생 수) — 응답률 분모
+const ROOM_ENROLLED = {
+  '1관': 38, '2관': 34, '3관': 35, '419관': 9, '420관(블랙관)': 13,
+  'B2관': 39, 'B7관': 25, 'B8관': 30, 'B9관': 34
 };
-const TOTAL_CAPACITY = Object.values(ROOM_CAPACITY).reduce((a, b) => a + b, 0);
-const ROOM_ORDER = Object.keys(ROOM_CAPACITY);
+const TOTAL_ENROLLED = Object.values(ROOM_ENROLLED).reduce((a, b) => a + b, 0);
+const ROOM_ORDER = Object.keys(ROOM_ENROLLED);
 
 /* ══════════ 라벨 (관리자 대시보드와 동일) ══════════ */
 const L_OVERALL   = { 5:'진짜 좋다', 4:'힘들지만 좋다', 3:'나쁘지 않다', 2:'조금 아쉽다', 1:'힘들기만 하다' };
@@ -329,7 +329,7 @@ function render() {
         n, ovAvg, stAvg, tired, hard, made, notMade, qrUsed, qrAns, neither, lifeImp, roomImp, ahaBlk })}</p>
   </div>
   <div class="kpis">
-    ${kpi('응답 인원', `${n}<small>명</small>`, `재원 ${TOTAL_CAPACITY}명 중 ${pct(n, TOTAL_CAPACITY)}%`)}
+    ${kpi('응답 인원', `${n}<small>명</small>`, `재원 ${TOTAL_ENROLLED}명 중 ${pct(n, TOTAL_ENROLLED)}%`)}
     ${kpi('썸머핫습 만족도', ovAvg ? `${ovAvg.toFixed(1)}<small>/5</small>` : '–', ovAvg ? scoreWord(ovAvg) : '')}
     ${kpi('자습관 만족도', stAvg ? `${stAvg.toFixed(1)}<small>/5</small>` : '–', stAvg ? scoreWord(stAvg) : '')}
     ${kpi('아하포인트 제작률', `${pct(made.length, n)}<small>%</small>`, `${made.length}명이 만들어봤다고 응답`)}
@@ -340,7 +340,7 @@ function render() {
 
   /* 2. 응답 현황 */
   + `<h2>2. 응답 현황</h2>
-  <p>재원 ${TOTAL_CAPACITY}명 중 <em>${n}명</em>이 응답하여 응답률은 <em>${pct(n, TOTAL_CAPACITY)}%</em>입니다.
+  <p>재원 ${TOTAL_ENROLLED}명 중 <em>${n}명</em>이 응답하여 응답률은 <em>${pct(n, TOTAL_ENROLLED)}%</em>입니다.
   ${lowRoomsSentence()}</p>
   ${roomTable()}
   ${gradeTable()}`
@@ -455,7 +455,7 @@ function todayStr() {
 
 function autoSummary(x) {
   const s = [];
-  s.push(`조사 기간 중 <em>${x.n}명</em>이 응답하였으며(재원 ${TOTAL_CAPACITY}명 대비 ${pct(x.n, TOTAL_CAPACITY)}%),`
+  s.push(`조사 기간 중 <em>${x.n}명</em>이 응답하였으며(재원 ${TOTAL_ENROLLED}명 대비 ${pct(x.n, TOTAL_ENROLLED)}%),`
     + ` 썸머핫습 전반 만족도는 <em>${x.ovAvg ? x.ovAvg.toFixed(1) : '–'}점</em>,`
     + ` 자습관 만족도는 <em>${x.stAvg ? x.stAvg.toFixed(1) : '–'}점</em>으로 집계되었습니다(5점 만점).`);
   s.push(`아하포인트를 만들어본 학생은 ${x.made.length}명(${pct(x.made.length, x.n)}%),`
@@ -493,7 +493,7 @@ function ahaSentence(made, blk, notMade) {
 
 function lowRoomsSentence() {
   const low = ROOM_ORDER
-    .map(k => ({ k, n: ROWS.filter(r => r.jasup?.room === k).length, cap: ROOM_CAPACITY[k] }))
+    .map(k => ({ k, n: ROWS.filter(r => r.jasup?.room === k).length, cap: ROOM_ENROLLED[k] }))
     .map(x => ({ ...x, p: pct(x.n, x.cap) }))
     .filter(x => x.p < 40).sort((a, b) => a.p - b.p);
   if (!low.length) return '전 자습관에서 40% 이상의 응답률을 확보하였습니다.';
@@ -504,7 +504,7 @@ function lowRoomsSentence() {
 function roomTable() {
   const rows = ROOM_ORDER.map(k => {
     const rs = ROWS.filter(r => r.jasup?.room === k);
-    return { k, n: rs.length, cap: ROOM_CAPACITY[k], sat: avg(rs, r => r.jasup?.satisfaction) };
+    return { k, n: rs.length, cap: ROOM_ENROLLED[k], sat: avg(rs, r => r.jasup?.satisfaction) };
   });
   const etc = ROWS.filter(r => !ROOM_ORDER.includes(r.jasup?.room)).length;
   return `<table>
@@ -514,8 +514,8 @@ function roomTable() {
     <tbody>${rows.map(r => `<tr><td>${esc(r.k)}</td><td class="num">${r.cap}명</td>
       <td class="num">${r.n}명</td>
       <td class="num" style="${r.n / r.cap < 0.4 ? 'color:var(--bad);font-weight:800' : ''}">${pct(r.n, r.cap)}%</td></tr>`).join('')}
-      <tr><td><b>합계</b></td><td class="num"><b>${TOTAL_CAPACITY}명</b></td>
-        <td class="num"><b>${ROWS.length}명</b></td><td class="num"><b>${pct(ROWS.length, TOTAL_CAPACITY)}%</b></td></tr>
+      <tr><td><b>합계</b></td><td class="num"><b>${TOTAL_ENROLLED}명</b></td>
+        <td class="num"><b>${ROWS.length}명</b></td><td class="num"><b>${pct(ROWS.length, TOTAL_ENROLLED)}%</b></td></tr>
     </tbody>
   </table>
   ${etc ? `<p class="tnote">위 목록에 없는 자습관으로 응답한 건이 ${etc}건 있어 합계와 차이가 있습니다.</p>` : ''}`;
