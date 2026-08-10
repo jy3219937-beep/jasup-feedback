@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>썸머핫습 2026 만족도 조사 결과 보고</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --ink:#111827; --ink2:#374151; --ink3:#5b6b7f;
+    --line:#e5e7eb; --line2:#cbd5e1;
+    --navy:#0f2a3d; --blue:#0369a1; --tan:#b58154;
+    --good:#047857; --warn:#b45309; --bad:#be123c;
+  }
+  body {
+    font-family:'Noto Sans KR', -apple-system, sans-serif;
+    background:#f3f4f6; color:var(--ink);
+    line-height:1.75; font-size:15px;
+    padding:26px 16px 80px;
+  }
+
+  /* ── 편집 툴바 (관리자만) ── */
+  .admbar {
+    max-width:900px; margin:0 auto 18px; padding:14px 18px;
+    background:#0f2a3d; color:#e6f4fb; border-radius:12px;
+    display:none; align-items:center; gap:10px; flex-wrap:wrap;
+    font-size:13px; font-weight:600;
+  }
+  .admbar.on { display:flex; }
+  .admbar .sp { margin-left:auto; display:flex; gap:8px; }
+  .abtn {
+    font-family:inherit; font-size:12.5px; font-weight:800; cursor:pointer;
+    padding:10px 14px; min-height:40px; border-radius:8px;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.28); color:#e6f4fb;
+  }
+  .abtn.go { background:#0ea5e9; border-color:#0ea5e9; color:#fff; }
+  .saved { color:#6ee7b7; font-weight:800; opacity:0; transition:.2s; }
+  .saved.show { opacity:1; }
+
+  /* ── 문서 ── */
+  .doc {
+    max-width:900px; margin:0 auto; background:#fff;
+    border:1px solid var(--line); border-radius:4px;
+    padding:44px 48px 56px;
+    box-shadow:0 4px 24px rgba(17,24,39,.07);
+  }
+
+  .head { border-bottom:3px solid var(--navy); padding-bottom:22px; margin-bottom:30px; }
+  .head-top { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .head-top img { height:26px; width:auto; display:block; }
+  .head-meta { font-size:12.5px; color:var(--ink3); text-align:right; line-height:1.6; }
+  h1 { font-size:27px; font-weight:900; letter-spacing:-.035em; margin-top:18px; line-height:1.4; }
+  .head-sub { font-size:14px; color:var(--ink2); margin-top:8px; }
+
+  h2 {
+    font-size:18px; font-weight:900; letter-spacing:-.03em;
+    margin:38px 0 14px; padding-left:11px;
+    border-left:4px solid var(--navy);
+  }
+  h3 { font-size:15px; font-weight:800; margin:22px 0 8px; color:var(--ink); }
+  p { margin-bottom:12px; }
+  p:last-child { margin-bottom:0; }
+  .lead { font-size:15.5px; line-height:1.9; }
+  em { font-style:normal; font-weight:800; }
+
+  /* ── 요약 박스 ── */
+  .summary {
+    background:#f8fafc; border:1px solid var(--line);
+    border-left:4px solid var(--blue);
+    padding:20px 22px; margin-bottom:8px;
+  }
+  /* 6칸이 5+1 로 떨어져 빈 칸이 생기지 않게 3열로 고정합니다 */
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); margin:18px 0 6px; }
+  @media (max-width:720px) { .kpis { grid-template-columns:repeat(2,1fr); } }
+  .kpi { background:#fff; padding:15px 16px; }
+  .kpi-lb { font-size:12px; color:var(--ink3); font-weight:700; }
+  .kpi-v { font-size:24px; font-weight:900; letter-spacing:-.04em; margin-top:2px; }
+  .kpi-v small { font-size:13px; font-weight:700; color:var(--ink3); }
+  .kpi-note { font-size:11.5px; color:var(--ink3); margin-top:2px; }
+
+  /* ── 표 ── */
+  table { width:100%; border-collapse:collapse; font-size:13.5px; margin:10px 0 6px; }
+  caption {
+    caption-side:top; text-align:left; font-size:12.5px; color:var(--ink3);
+    padding-bottom:7px;
+  }
+  th, td { padding:9px 11px; border-bottom:1px solid var(--line); text-align:left; }
+  thead th { background:#f8fafc; font-weight:800; font-size:12.5px; color:var(--ink2); border-bottom:1.5px solid var(--line2); white-space:nowrap; }
+  tbody tr:last-child td { border-bottom:1.5px solid var(--line2); }
+  .num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .bar { display:inline-block; height:8px; border-radius:99px; background:var(--blue); vertical-align:middle; margin-right:7px; }
+  .bar.g { background:var(--good); } .bar.w { background:var(--warn); } .bar.b { background:var(--bad); }
+  .tnote { font-size:12px; color:var(--ink3); margin-top:6px; }
+
+  /* ── 인용 ── */
+  .quotes { margin:10px 0 4px; }
+  .quote {
+    border-left:3px solid var(--line2); padding:3px 0 3px 13px; margin-bottom:11px;
+    font-size:14px; line-height:1.8;
+  }
+  .quote .who { display:block; font-size:12px; color:var(--ink3); font-weight:700; margin-bottom:1px; }
+  .more { font-size:12.5px; color:var(--ink3); margin-top:4px; }
+
+  /* ── 입력 영역 ── */
+  .field { margin-bottom:14px; }
+  .field-lb { font-size:13px; font-weight:800; color:var(--ink2); margin-bottom:6px; display:block; }
+  .ta {
+    width:100%; font-family:inherit; font-size:14.5px; line-height:1.85; color:var(--ink);
+    padding:13px 15px; border:1.5px solid var(--line2); border-radius:6px;
+    background:#fff; outline:none; min-height:120px; resize:vertical;
+  }
+  .ta:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(3,105,161,.1); }
+  .ta[readonly] { border:none; padding:0; background:transparent; resize:none; min-height:0; }
+  .render { white-space:pre-wrap; font-size:14.5px; line-height:1.9; }
+  .render.empty { color:var(--ink3); font-style:italic; }
+  .render li { margin-left:20px; margin-bottom:5px; }
+
+  .foot {
+    margin-top:44px; padding-top:18px; border-top:1px solid var(--line);
+    font-size:12.5px; color:var(--ink3); display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  }
+  .loading { text-align:center; padding:70px 20px; color:var(--ink3); font-weight:700; }
+
+  @media (max-width:720px) {
+    body { padding:16px 10px 60px; }
+    .doc { padding:26px 20px 36px; }
+    h1 { font-size:22px; }
+    .head-meta { text-align:left; }
+  }
+  @media print {
+    body { background:#fff; padding:0; font-size:11pt; }
+    .admbar, .noprint { display:none !important; }
+    .doc { max-width:none; border:none; box-shadow:none; border-radius:0; padding:0; }
+    h2 { page-break-after:avoid; break-after:avoid; }
+    table, .quote, .kpis { page-break-inside:avoid; break-inside:avoid; }
+    .ta[readonly], .render { font-size:11pt; }
+    @page { size:A4 portrait; margin:16mm 15mm; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration:.01ms !important; } }
+</style>
+</head>
+<body>
+
+<div class="admbar" id="admbar">
+  <span>🔧 사감장 편집 모드 — <b>특이사항</b>과 <b>후 조치</b>는 여기서 적으시면 저장됩니다. 대표님 화면에는 이 줄이 보이지 않습니다.</span>
+  <span class="saved" id="saved">저장됐습니다</span>
+  <span class="sp">
+    <button class="abtn go" onclick="saveNotes()">저장</button>
+    <button class="abtn" onclick="window.print()">인쇄 · PDF</button>
+    <button class="abtn" onclick="location.href='summer-admin.html'">대시보드</button>
+  </span>
+</div>
+
+<div class="doc" id="doc">
+  <div class="loading" id="loading">응답을 불러오는 중입니다…</div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, getDoc, setDoc }
+    from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+  const app = initializeApp({
+    apiKey: "AIzaSyCUpVlY5al5uvH4wRv7WQxWrbV_OnvfPQg",
+    authDomain: "jasup-feedback.firebaseapp.com",
+    projectId: "jasup-feedback",
+    storageBucket: "jasup-feedback.firebasestorage.app",
+    messagingSenderId: "242775000792",
+    appId: "1:242775000792:web:78e5c222aa9d7891b479ad"
+  });
+  window.__fb = { db: getFirestore(app), collection, getDocs, doc, getDoc, setDoc };
+  window.dispatchEvent(new Event('fbready'));
+</script>
+
+<script>
+/* ══════════ 설정 ══════════ */
+const COLLECTION = 'summer_survey_2026';
+const NOTE_DOC   = 'summer_report_2026';      // settings/summer_report_2026
+const PERIOD     = '2026년 7월 20일 ~ 8월 16일';
+
+// 자습관 재원 인원 (응답률 분모)
+const ROOM_CAPACITY = {
+  '1관': 41, '2관': 35, '3관': 36, '419관': 11, '420관(블랙관)': 19,
+  'B2관': 49, 'B7관': 28, 'B8관': 31, 'B9관': 56
+};
+const TOTAL_CAPACITY = Object.values(ROOM_CAPACITY).reduce((a, b) => a + b, 0);
+const ROOM_ORDER = Object.keys(ROOM_CAPACITY);
+
+/* ══════════ 라벨 (관리자 대시보드와 동일) ══════════ */
+const L_OVERALL   = { 5:'진짜 좋다', 4:'힘들지만 좋다', 3:'나쁘지 않다', 2:'조금 아쉽다', 1:'힘들기만 하다' };
+const L_ROOM_SAT  = { 5:'아주 만족', 4:'만족', 3:'무난', 2:'조금 아쉽다', 1:'아쉬운 점 많다' };
+const L_COND      = { great:'좋다', ok:'괜찮다', tired:'좀 지쳤다', hard:'많이 힘들다' };
+const L_AHA_MADE  = { many:'여러 개 만들었다', few:'한두 개 만들었다', none:'아직 안 만들었다', idk:'뭔지 잘 모른다' };
+const L_AHA_COUNT = { c1:'1~2개', c3:'3~5개', c6:'6~10개', c10:'10개 넘게' };
+const L_AHA_DIFF  = { easy:'쉬웠다', ok:'할 만했다', hard:'좀 어려웠다', vhard:'많이 어려웠다' };
+const L_AHA_HELP  = { sure:'확실히 도움', some:'좀 도움', unsure:'모르겠다', no:'별로 도움 안 됨' };
+const L_QR_USED   = { many:'여러 번 써봤다', few:'한두 번 써봤다', none:'아직 안 써봤다', idk:'뭔지 잘 모른다' };
+const L_QR_ASK    = { many:'여러 번 올림', few:'한두 번 올림', none:'올린 적 없음' };
+const L_QR_ANSWER = { many:'여러 번 답변', few:'한두 번 답변', none:'답변 안 함' };
+const L_LIFE_IMP  = { class:'수업 내용·난이도', balance:'하루 시간표', rest:'쉬는 시간·회복', grade:'성적 관리·상담',
+                      meal:'밥·간식', comm:'안내·소통', other:'기타', none:'지금도 충분' };
+const L_ROOM_IMP  = { noise:'소음·잡담', seat:'자리·책상', air:'냉난방·환기', facility:'시설',
+                      rule:'규칙·지도', other:'기타', none:'지금이 좋다' };
+
+const ORD_SCORE = [5, 4, 3, 2, 1];
+const ORD_COND  = ['great', 'ok', 'tired', 'hard'];
+const ORD_MADE  = ['many', 'few', 'none', 'idk'];
+const ORD_COUNT = ['c1', 'c3', 'c6', 'c10'];
+const ORD_DIFF  = ['easy', 'ok', 'hard', 'vhard'];
+const ORD_HELP  = ['sure', 'some', 'unsure', 'no'];
+const ORD_FREQ  = ['many', 'few', 'none'];
+
+/* ══════════ 유틸 ══════════ */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const pct = (n, d) => d ? Math.round(n / d * 100) : 0;
+const isAdmin = () => localStorage.getItem('jasupFeedback_auth') === '1';
+
+let ROWS = [];
+let NOTES = { special: '', actions: '', summary: '' };
+
+function avg(rows, get) {
+  const v = rows.map(get).filter(x => typeof x === 'number' && !isNaN(x));
+  return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+}
+function obs(rows, get) {
+  return rows.map(get).filter(x => typeof x === 'number' && !isNaN(x)).length;
+}
+function tally(rows, get) {
+  const m = new Map();
+  rows.forEach(r => {
+    const v = get(r);
+    (Array.isArray(v) ? v : [v]).forEach(x => {
+      if (x === '' || x == null) return;
+      m.set(x, (m.get(x) || 0) + 1);
+    });
+  });
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+// 순서형 문항은 사전 순서를 그대로 지켜야 분포를 읽을 수 있습니다
+function dist(rows, get, dict, order) {
+  const base = rows.filter(r => { const v = get(r); return v !== '' && v != null; });
+  return {
+    total: base.length,
+    items: order.map(k => {
+      const n = base.filter(r => String(get(r)) === String(k)).length;
+      return { k, label: dict[k] || k, n, p: pct(n, base.length) };
+    })
+  };
+}
+
+// 몇 명이 어떻게 답했는지를 인원과 비율로 함께 보여줍니다
+function distTable(d, caption, cls) {
+  if (!d.total) return `<p class="tnote">해당 문항에 응답한 학생이 없습니다.</p>`;
+  return `<table>
+    <caption>${esc(caption)} · 응답 ${d.total}명</caption>
+    <thead><tr><th scope="col">응답</th><th class="num" scope="col">인원</th><th class="num" scope="col">비율</th><th scope="col">분포</th></tr></thead>
+    <tbody>${d.items.map(it => `<tr>
+      <td>${esc(it.label)}</td>
+      <td class="num">${it.n}명</td>
+      <td class="num">${it.p}%</td>
+      <td><span class="bar ${cls || ''}" style="width:${Math.max(it.p * 1.6, it.n ? 3 : 0)}px"></span></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+function rankTable(pairs, total, caption, dict) {
+  if (!pairs.length) return `<p class="tnote">해당 문항에 응답한 학생이 없습니다.</p>`;
+  return `<table>
+    <caption>${esc(caption)}</caption>
+    <thead><tr><th scope="col">항목</th><th class="num" scope="col">인원</th><th class="num" scope="col">비율</th></tr></thead>
+    <tbody>${pairs.map(([k, n]) => `<tr>
+      <td>${esc(dict ? (dict[k] || k) : k)}</td>
+      <td class="num">${n}명</td><td class="num">${pct(n, total)}%</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// 대표님께 공개되는 문서이므로 이름은 싣지 않고 학년·자습관까지만 표기합니다
+function quoteList(rows, get, limit) {
+  const items = rows.map(r => ({ r, v: (get(r) || '').trim() })).filter(x => x.v);
+  if (!items.length) return `<p class="tnote">해당 항목에 적어준 학생이 없습니다.</p>`;
+  const show = limit ? items.slice(0, limit) : items;
+  return `<div class="quotes">${show.map(({ r, v }) => `<div class="quote">
+      <span class="who">${esc(r.grade || '')} · ${esc(r.jasup?.room || '')}</span>${esc(v)}
+    </div>`).join('')}
+    ${limit && items.length > limit ? `<p class="more">이 밖에 ${items.length - limit}건이 더 있습니다. 전문은 관리자 대시보드에서 확인하실 수 있습니다.</p>` : ''}
+  </div>`;
+}
+
+const scoreWord = v =>
+  v >= 4.5 ? '매우 높은 수준' : v >= 4.0 ? '높은 수준' : v >= 3.5 ? '무난한 수준'
+  : v >= 3.0 ? '보통 수준' : '개선이 필요한 수준';
+
+/* ══════════ 본문 ══════════ */
+function render() {
+  const n = ROWS.length;
+  const doc = document.getElementById('doc');
+
+  if (!n) {
+    doc.innerHTML = head(0) + `<h2>집계 결과</h2>
+      <p>아직 접수된 응답이 없습니다. 응답이 들어오면 이 페이지에 자동으로 반영됩니다.</p>` + foot();
+    return;
+  }
+
+  const ovAvg = avg(ROWS, r => r.academy?.overall);
+  const stAvg = avg(ROWS, r => r.jasup?.satisfaction);
+  const tired = ROWS.filter(r => ['tired', 'hard'].includes(r.academy?.condition)).length;
+  const hard  = ROWS.filter(r => r.academy?.condition === 'hard').length;
+  const made  = ROWS.filter(r => ['many', 'few'].includes(r.aha?.made));
+  const notMade = ROWS.filter(r => r.aha?.made === 'none');
+  const qrUsed  = ROWS.filter(r => ['many', 'few'].includes(r.qroom?.used));
+  const qrAns   = ROWS.filter(r => ['many', 'few'].includes(r.qroom?.answer_freq)).length;
+  const neither = ROWS.filter(r => !['many','few'].includes(r.aha?.made)
+                                && !['many','few'].includes(r.qroom?.used)).length;
+
+  const lifeImp = tally(ROWS.filter(r => r.academy?.improve_one && r.academy.improve_one !== 'none'), r => r.academy.improve_one);
+  const roomImp = tally(ROWS.filter(r => r.jasup?.improve_one && r.jasup.improve_one !== 'none'), r => r.jasup.improve_one);
+  const ahaBlk  = tally(notMade, r => r.aha?.blockers);
+  const qrBlk   = tally(ROWS.filter(r => r.qroom?.used === 'none'), r => r.qroom?.blockers);
+
+  doc.innerHTML = head(n)
+
+  /* 1. 요약 */
+  + `<h2>1. 조사 개요와 요약</h2>
+  <div class="summary">
+    <p class="lead">${NOTES.summary ? esc(NOTES.summary).replace(/\n/g, '<br>') : autoSummary({
+        n, ovAvg, stAvg, tired, hard, made, notMade, qrUsed, qrAns, neither, lifeImp, roomImp, ahaBlk })}</p>
+  </div>
+  <div class="kpis">
+    ${kpi('응답 인원', `${n}<small>명</small>`, `재원 ${TOTAL_CAPACITY}명 중 ${pct(n, TOTAL_CAPACITY)}%`)}
+    ${kpi('썸머핫습 만족도', ovAvg ? `${ovAvg.toFixed(1)}<small>/5</small>` : '–', ovAvg ? scoreWord(ovAvg) : '')}
+    ${kpi('자습관 만족도', stAvg ? `${stAvg.toFixed(1)}<small>/5</small>` : '–', stAvg ? scoreWord(stAvg) : '')}
+    ${kpi('아하포인트 제작률', `${pct(made.length, n)}<small>%</small>`, `${made.length}명이 만들어봤다고 응답`)}
+    ${kpi('질문방 이용률', `${pct(qrUsed.length, n)}<small>%</small>`, `그중 ${qrAns}명은 답변까지 작성`)}
+    ${kpi('컨디션 우려', `${tired}<small>명</small>`, `이 중 "많이 힘들다" ${hard}명`)}
+  </div>
+  <p class="tnote">만족도는 5점 만점 평균이며, 무응답은 평균 계산에서 제외했습니다.</p>`
+
+  /* 2. 응답 현황 */
+  + `<h2>2. 응답 현황</h2>
+  <p>재원 ${TOTAL_CAPACITY}명 중 <em>${n}명</em>이 응답하여 응답률은 <em>${pct(n, TOTAL_CAPACITY)}%</em>입니다.
+  ${lowRoomsSentence()}</p>
+  ${roomTable()}
+  ${gradeTable()}`
+
+  /* 3. 만족도 */
+  + `<h2>3. 만족도</h2>
+  <h3>3-1. 썸머핫습 전반</h3>
+  <p>${satSentence(ROWS, r => r.academy?.overall, L_OVERALL, '썸머핫습 전반')}</p>
+  ${distTable(dist(ROWS, r => r.academy?.overall, L_OVERALL, ORD_SCORE), '썸머핫습 전반 만족도 (5점 만점)')}
+  <h3>3-2. 자습관</h3>
+  <p>${satSentence(ROWS, r => r.jasup?.satisfaction, L_ROOM_SAT, '자습관')}</p>
+  ${distTable(dist(ROWS, r => r.jasup?.satisfaction, L_ROOM_SAT, ORD_SCORE), '자습관 만족도 (5점 만점)')}
+  ${roomSatTable()}`
+
+  /* 4. 컨디션 */
+  + `<h2>4. 학생 컨디션</h2>
+  <p>본인의 컨디션에 대해 <em>${tired}명(${pct(tired, n)}%)</em>이 "좀 지쳤다" 이상으로 응답하였고,
+  그중 <em>${hard}명</em>은 "많이 힘들다"고 답하였습니다.
+  ${hard ? '해당 학생은 전원 개별 확인 대상으로 분류하여 사감장이 순차적으로 면담을 진행하고 있습니다.' : '"많이 힘들다"로 응답한 학생은 없었습니다.'}</p>
+  ${distTable(dist(ROWS, r => r.academy?.condition, L_COND, ORD_COND), '요즘 컨디션', 'w')}`
+
+  /* 5. 아하포인트 */
+  + `<h2>5. 아하포인트</h2>
+  <p>아하포인트를 만들어본 학생은 <em>${made.length}명(${pct(made.length, n)}%)</em>이며,
+  아직 만들지 않은 학생은 ${notMade.length}명, 무엇인지 모른다고 답한 학생은
+  ${ROWS.filter(r => r.aha?.made === 'idk').length}명입니다.
+  ${ahaSentence(made, ahaBlk, notMade)}</p>
+  ${distTable(dist(ROWS, r => r.aha?.made, L_AHA_MADE, ORD_MADE), '아하포인트 제작 경험')}
+  ${made.length ? `
+    ${distTable(dist(made, r => r.aha?.count, L_AHA_COUNT, ORD_COUNT), '제작 개수 (만들어본 학생 기준)', 'g')}
+    ${distTable(dist(made, r => r.aha?.difficulty, L_AHA_DIFF, ORD_DIFF), '제작 난이도 체감', 'w')}
+    ${distTable(dist(made, r => r.aha?.helpful, L_AHA_HELP, ORD_HELP), '학습에 도움이 되는지', 'g')}` : ''}
+  ${notMade.length ? `<h3>아직 만들지 않은 이유</h3>
+    <p>미제작 학생 ${notMade.length}명이 응답한 사유입니다(복수 응답). 상위 항목을 해소하는 것이 제작률을 올리는 가장 빠른 방법으로 판단됩니다.</p>
+    ${rankTable(ahaBlk, notMade.length, '아하포인트 미제작 사유 (복수 응답)')}` : ''}`
+
+  /* 6. 질문방 */
+  + `<h2>6. 질문방</h2>
+  <p>질문방을 사용해본 학생은 <em>${qrUsed.length}명(${pct(qrUsed.length, n)}%)</em>이며,
+  이 가운데 질문 등록에 그치지 않고 <em>다른 학생의 질문에 답변까지 작성한 학생은 ${qrAns}명</em>입니다.
+  답변 작성은 본인의 이해도를 함께 끌어올리는 활동이므로, 이 인원의 증감을 별도 지표로 관리하고 있습니다.</p>
+  ${distTable(dist(ROWS, r => r.qroom?.used, L_QR_USED, ORD_MADE), '질문방 이용 경험')}
+  ${qrUsed.length ? `
+    ${distTable(dist(qrUsed, r => r.qroom?.ask_freq, L_QR_ASK, ORD_FREQ), '질문 등록 빈도 (이용 학생 기준)')}
+    ${distTable(dist(qrUsed, r => r.qroom?.answer_freq, L_QR_ANSWER, ORD_FREQ), '답변 작성 빈도 (이용 학생 기준)', 'g')}` : ''}
+  ${qrBlk.length ? `<h3>사용하지 않은 이유</h3>
+    ${rankTable(qrBlk, ROWS.filter(r => r.qroom?.used === 'none').length, '질문방 미사용 사유 (복수 응답)')}` : ''}
+  <p class="tnote">아하포인트와 질문방 모두 이용하지 않은 학생은 ${neither}명(${pct(neither, n)}%)입니다.
+  막히는 상황에서 도움을 요청하지 않고 혼자 해결하려는 학생으로, 별도 안내 대상으로 관리하고 있습니다.</p>`
+
+  /* 7. 개선 요청 */
+  + `<h2>7. 개선 요청 우선순위</h2>
+  <p>"딱 하나만 더 좋아질 수 있다면 어디인가"를 단일 선택으로 물었습니다.
+  불만 항목을 나열해 응답을 유도하지 않고, 개선 요청 형태로만 받았습니다.</p>
+  <h3>7-1. 학원생활</h3>
+  ${rankTable(lifeImp, ROWS.filter(r => r.academy?.improve_one && r.academy.improve_one !== 'none').length,
+      `학원생활 개선 요청 · "지금도 충분하다" ${ROWS.filter(r => r.academy?.improve_one === 'none').length}명 제외`, L_LIFE_IMP)}
+  ${quoteList(ROWS, r => r.academy?.improve_note, 6)}
+  <h3>7-2. 자습관</h3>
+  ${rankTable(roomImp, ROWS.filter(r => r.jasup?.improve_one && r.jasup.improve_one !== 'none').length,
+      `자습관 개선 요청 · "지금이 좋다" ${ROWS.filter(r => r.jasup?.improve_one === 'none').length}명 제외`, L_ROOM_IMP)}
+  ${quoteList(ROWS, r => r.jasup?.improve_note, 6)}`
+
+  /* 8. 학생 의견 */
+  + `<h2>8. 학생이 직접 적어준 의견</h2>
+  <p class="tnote">개인 식별을 피하기 위해 이름은 표기하지 않고 학년과 자습관까지만 적었습니다.</p>
+  <h3>8-1. 하고 싶은 말</h3>
+  ${quoteList(ROWS, r => r.closing?.message, 12)}
+  <h3>8-2. 고맙다고 전하고 싶은 사람</h3>
+  ${quoteList(ROWS, r => r.closing?.thanks_to, 12)}
+  <h3>8-3. 아하포인트 · 기억에 남는 것</h3>
+  ${quoteList(ROWS, r => r.aha?.note, 8)}
+  <h3>8-4. 질문방에 대한 의견</h3>
+  ${quoteList(ROWS, r => r.qroom?.note, 8)}`
+
+  /* 9~10. 특이사항 · 후 조치 */
+  + `<h2>9. 특이사항</h2>
+  ${noteBlock('special', '조사 과정과 응답 중 보고가 필요한 사항')}
+  <h2>10. 후 조치 내역</h2>
+  ${noteBlock('actions', '집계 결과에 대해 실제로 취한 조치')}`
+
+  + foot();
+
+  bindNotes();
+}
+
+/* ══════════ 조각 ══════════ */
+function head(n) {
+  return `<div class="head">
+    <div class="head-top">
+      <img src="jungyoul-logo.png" alt="정율사관학원" width="1131" height="174">
+      <div class="head-meta">
+        조사 기간 ${PERIOD}<br>
+        보고 일자 ${todayStr()} · 응답 ${n}명<br>
+        작성 종합반 자습관 사감장
+      </div>
+    </div>
+    <h1>썸머핫습 2026 만족도 조사 결과 보고</h1>
+    <p class="head-sub">전 학년(고1~고3) 대상 자기기입식 설문 · 익명 응답 · 학년과 자습관만 수집</p>
+  </div>`;
+}
+
+function kpi(lb, v, note) {
+  return `<div class="kpi"><div class="kpi-lb">${esc(lb)}</div>
+    <div class="kpi-v">${v}</div><div class="kpi-note">${esc(note || '')}</div></div>`;
+}
+
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
+
+function autoSummary(x) {
+  const s = [];
+  s.push(`조사 기간 중 <em>${x.n}명</em>이 응답하였으며(재원 ${TOTAL_CAPACITY}명 대비 ${pct(x.n, TOTAL_CAPACITY)}%),`
+    + ` 썸머핫습 전반 만족도는 <em>${x.ovAvg ? x.ovAvg.toFixed(1) : '–'}점</em>,`
+    + ` 자습관 만족도는 <em>${x.stAvg ? x.stAvg.toFixed(1) : '–'}점</em>으로 집계되었습니다(5점 만점).`);
+  s.push(`아하포인트를 만들어본 학생은 ${x.made.length}명(${pct(x.made.length, x.n)}%),`
+    + ` 질문방을 사용해본 학생은 ${x.qrUsed.length}명(${pct(x.qrUsed.length, x.n)}%)이며,`
+    + ` 두 활동 모두 이용하지 않은 학생은 ${x.neither}명입니다.`);
+  if (x.ahaBlk.length) {
+    s.push(`아하포인트를 아직 만들지 않은 학생이 꼽은 가장 큰 이유는`
+      + ` "${esc(x.ahaBlk[0][0])}"(${x.ahaBlk[0][1]}명)이었습니다.`);
+  }
+  if (x.roomImp.length) {
+    s.push(`자습관 개선 요청은 "${esc(L_ROOM_IMP[x.roomImp[0][0]] || x.roomImp[0][0])}"이`
+      + ` ${x.roomImp[0][1]}명으로 가장 많았습니다.`);
+  }
+  s.push(`컨디션에 대해서는 ${x.tired}명이 "좀 지쳤다" 이상으로 응답하였고, 이 중 ${x.hard}명이 "많이 힘들다"고 답하였습니다.`);
+  return s.join(' ');
+}
+
+function satSentence(rows, get, dict, what) {
+  const a = avg(rows, get), k = obs(rows, get);
+  if (a == null) return `${what} 만족도에 응답한 학생이 없습니다.`;
+  const pos = rows.filter(r => get(r) >= 4).length;
+  const neg = rows.filter(r => typeof get(r) === 'number' && get(r) <= 2).length;
+  return `${what} 만족도는 응답 ${k}명 기준 평균 <em>${a.toFixed(1)}점</em>으로 ${scoreWord(a)}입니다. `
+       + `4점 이상 긍정 응답이 ${pos}명(${pct(pos, k)}%), 2점 이하 응답이 ${neg}명(${pct(neg, k)}%)입니다.`;
+}
+
+function ahaSentence(made, blk, notMade) {
+  if (!made.length) return '';
+  const help = made.filter(r => ['sure', 'some'].includes(r.aha?.helpful)).length;
+  const hardN = made.filter(r => ['hard', 'vhard'].includes(r.aha?.difficulty)).length;
+  let t = `만들어본 학생 ${made.length}명 중 <em>${help}명(${pct(help, made.length)}%)</em>이 학습에 도움이 된다고 응답하였습니다.`;
+  if (hardN) t += ` 다만 ${hardN}명은 만드는 과정이 어려웠다고 답하여, 제작 자체의 부담을 낮추는 조치가 필요한 상황입니다.`;
+  return t;
+}
+
+function lowRoomsSentence() {
+  const low = ROOM_ORDER
+    .map(k => ({ k, n: ROWS.filter(r => r.jasup?.room === k).length, cap: ROOM_CAPACITY[k] }))
+    .map(x => ({ ...x, p: pct(x.n, x.cap) }))
+    .filter(x => x.p < 40).sort((a, b) => a.p - b.p);
+  if (!low.length) return '전 자습관에서 40% 이상의 응답률을 확보하였습니다.';
+  return `다만 ${low.slice(0, 3).map(x => `${x.k} ${x.p}%`).join(', ')} 등 ${low.length}개 자습관은 응답률이 40%에 미치지 못하여, `
+       + `해당 자습관의 집계 수치는 참고 자료로만 활용하였습니다.`;
+}
+
+function roomTable() {
+  const rows = ROOM_ORDER.map(k => {
+    const rs = ROWS.filter(r => r.jasup?.room === k);
+    return { k, n: rs.length, cap: ROOM_CAPACITY[k], sat: avg(rs, r => r.jasup?.satisfaction) };
+  });
+  const etc = ROWS.filter(r => !ROOM_ORDER.includes(r.jasup?.room)).length;
+  return `<table>
+    <caption>자습관별 응답 현황</caption>
+    <thead><tr><th scope="col">자습관</th><th class="num" scope="col">재원</th>
+      <th class="num" scope="col">응답</th><th class="num" scope="col">응답률</th></tr></thead>
+    <tbody>${rows.map(r => `<tr><td>${esc(r.k)}</td><td class="num">${r.cap}명</td>
+      <td class="num">${r.n}명</td>
+      <td class="num" style="${r.n / r.cap < 0.4 ? 'color:var(--bad);font-weight:800' : ''}">${pct(r.n, r.cap)}%</td></tr>`).join('')}
+      <tr><td><b>합계</b></td><td class="num"><b>${TOTAL_CAPACITY}명</b></td>
+        <td class="num"><b>${ROWS.length}명</b></td><td class="num"><b>${pct(ROWS.length, TOTAL_CAPACITY)}%</b></td></tr>
+    </tbody>
+  </table>
+  ${etc ? `<p class="tnote">위 목록에 없는 자습관으로 응답한 건이 ${etc}건 있어 합계와 차이가 있습니다.</p>` : ''}`;
+}
+
+function gradeTable() {
+  const gs = [...new Set(ROWS.map(r => r.grade).filter(Boolean))].sort();
+  if (!gs.length) return '';
+  return `<table>
+    <caption>학년별 응답 현황</caption>
+    <thead><tr><th scope="col">학년</th><th class="num" scope="col">응답</th>
+      <th class="num" scope="col">비중</th><th class="num" scope="col">썸머핫습 만족도</th>
+      <th class="num" scope="col">자습관 만족도</th></tr></thead>
+    <tbody>${gs.map(g => {
+      const rs = ROWS.filter(r => r.grade === g);
+      const a = avg(rs, r => r.academy?.overall), b = avg(rs, r => r.jasup?.satisfaction);
+      return `<tr><td>${esc(g)}</td><td class="num">${rs.length}명</td>
+        <td class="num">${pct(rs.length, ROWS.length)}%</td>
+        <td class="num">${a ? a.toFixed(1) : '–'}</td><td class="num">${b ? b.toFixed(1) : '–'}</td></tr>`;
+    }).join('')}</tbody>
+  </table>
+  <p class="tnote">만족도는 5점 만점 평균입니다.</p>`;
+}
+
+function roomSatTable() {
+  const rows = ROOM_ORDER.map(k => {
+    const rs = ROWS.filter(r => r.jasup?.room === k);
+    return { k, n: rs.length, kObs: obs(rs, r => r.jasup?.satisfaction), sat: avg(rs, r => r.jasup?.satisfaction) };
+  }).filter(r => r.n);
+  if (!rows.length) return '';
+  rows.sort((a, b) => (a.sat ?? 9) - (b.sat ?? 9));
+  return `<table>
+    <caption>자습관별 만족도 (낮은 순)</caption>
+    <thead><tr><th scope="col">자습관</th><th class="num" scope="col">응답</th>
+      <th class="num" scope="col">자습관 만족도</th><th scope="col">비고</th></tr></thead>
+    <tbody>${rows.map(r => `<tr><td>${esc(r.k)}</td><td class="num">${r.n}명</td>
+      <td class="num" style="${r.sat != null && r.sat < 3.2 ? 'color:var(--bad);font-weight:800' : ''}">${r.sat != null ? r.sat.toFixed(1) : '–'}</td>
+      <td>${r.kObs < 5 ? '응답 5명 미만으로 참고용' : ''}</td></tr>`).join('')}</tbody>
+  </table>
+  <p class="tnote">5점 만점 평균입니다. 응답 인원이 적은 자습관은 평균의 변동이 크므로 비고에 표시하였습니다.</p>`;
+}
+
+function noteBlock(key, ph) {
+  const v = NOTES[key] || '';
+  if (isAdmin()) {
+    return `<div class="field">
+      <label class="field-lb" for="note-${key}">한 줄에 한 항목씩 적어주세요. 저장 버튼을 누르면 반영됩니다.</label>
+      <textarea class="ta" id="note-${key}" placeholder="${esc(ph)}">${esc(v)}</textarea>
+    </div>`;
+  }
+  if (!v.trim()) return `<p class="render empty">보고할 내용이 아직 정리되지 않았습니다.</p>`;
+  const lines = v.split('\n').map(x => x.trim()).filter(Boolean);
+  return `<ul class="render">${lines.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+}
+
+function foot() {
+  return `<div class="foot">
+    <span>정율사관학원 종합반 · 자습관</span>
+    <span>본 보고서는 응답 데이터로부터 자동 집계되며, 특이사항과 후 조치는 사감장이 직접 작성합니다.</span>
+  </div>`;
+}
+
+/* ══════════ 특이사항 · 후 조치 저장 ══════════ */
+function bindNotes() {
+  document.getElementById('admbar').classList.toggle('on', isAdmin());
+}
+
+async function saveNotes() {
+  if (!isAdmin()) return;
+  const next = {
+    special: (document.getElementById('note-special') || {}).value || '',
+    actions: (document.getElementById('note-actions') || {}).value || '',
+    summary: NOTES.summary || ''
+  };
+  try {
+    await window.__fb.setDoc(
+      window.__fb.doc(window.__fb.db, 'settings', NOTE_DOC),
+      { ...next, updated_at: new Date().toISOString() }
+    );
+    NOTES = next;
+    const el = document.getElementById('saved');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 1800);
+  } catch (e) {
+    alert('저장에 실패했습니다: ' + e.message);
+  }
+}
+window.saveNotes = saveNotes;
+
+/* ══════════ 로드 ══════════ */
+async function load() {
+  if (!window.__fb) { window.addEventListener('fbready', load, { once: true }); return; }
+  try {
+    const [snap, note] = await Promise.all([
+      window.__fb.getDocs(window.__fb.collection(window.__fb.db, COLLECTION)),
+      window.__fb.getDoc(window.__fb.doc(window.__fb.db, 'settings', NOTE_DOC)).catch(() => null)
+    ]);
+    ROWS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (note && note.exists()) NOTES = { ...NOTES, ...note.data() };
+    render();
+  } catch (e) {
+    document.getElementById('doc').innerHTML =
+      `<div class="loading">집계 결과를 불러오지 못했습니다.<br><span style="font-size:12.5px">${esc(e.message)}</span></div>`;
+  }
+}
+load();
+</script>
+</body>
+</html>
