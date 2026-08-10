@@ -215,6 +215,30 @@ const L_LIFE_IMP  = { class:'수업 내용·난이도', balance:'하루 시간�
 const L_ROOM_IMP  = { noise:'소음·잡담', seat:'자리·책상', air:'냉난방·환기', facility:'시설',
                       rule:'규칙·지도', other:'기타', none:'지금이 좋다' };
 
+// 학생들이 적은 호칭을 한 분으로 묶기 위한 명단입니다.
+// 새 선생님이나 별칭이 나오면 aka 에 추가하시면 바로 반영됩니다.
+// 주의: '희성'(최희성)과 '성희'(안성희)는 서로 다른 분이라 분리해 두었습니다.
+const TEACHERS = [
+  { name: '조우제', aka: ['우제'] },
+  { name: '김다슬', aka: ['다슬'] },
+  { name: '김후엽', aka: ['후엽', '후후'] },
+  { name: '황규훈', aka: ['규훈', '규규'] },
+  { name: '최희성', aka: ['희성'] },
+  { name: '이지후', aka: ['지후'] },
+  { name: '이유정', aka: ['유정'] },
+  { name: '남우현', aka: ['우현'] },
+  { name: '지성현', aka: ['성현'] },
+  { name: '황도진', aka: ['도진'] },
+  { name: '안성희', aka: ['성희'] },
+  { name: '곽민규', aka: ['민규'] },
+  { name: '김어랑', aka: ['어랑'], role: '사감장' },
+  { name: '윤동',   aka: ['윤동'] },
+  { name: '우석',   aka: ['우석'] },
+  { name: '승호',   aka: ['승호'] },
+  { name: '규현',   aka: ['규현'] },
+  { name: '제이든', aka: ['제이든'] }
+];
+
 const ORD_SCORE = [5, 4, 3, 2, 1];
 const ORD_COND  = ['great', 'ok', 'tired', 'hard'];
 const ORD_MADE  = ['many', 'few', 'none', 'idk'];
@@ -325,6 +349,35 @@ function quoteList(rows, get, limit, kind) {
     ${limit && items.length > limit ? `<p class="more">이 밖에 ${items.length - limit}건이 더 있습니다. 전문은 관리자 대시보드에서 확인하실 수 있습니다.</p>` : ''}
     ${!isAdmin() && hidCnt ? '' : ''}
   </div>`;
+}
+
+// '고맙다고 전하고 싶은 사람' 문항만 집계합니다.
+// '하고 싶은 말'에는 감사와 불편이 섞여 있어 그대로 세면 불편 언급까지 감사로 잡힙니다.
+function thanksTally() {
+  const rows = ROWS.filter(r => (r.closing?.thanks_to || '').trim());
+  const teacher = new Map();   // 이름 -> 언급한 학생 수
+  let gam = 0;                 // 사감 선생님 일반 언급
+  const etc = [];              // 선생님으로 특정되지 않은 언급 (가족·친구·별칭 등)
+
+  rows.forEach(r => {
+    const raw = r.closing.thanks_to;
+    const txt = raw.replace(/\s+/g, '');
+    let matched = false;
+
+    TEACHERS.forEach(tc => {
+      const keys = [tc.name, ...tc.aka];
+      if (keys.some(k => txt.includes(k))) {
+        teacher.set(tc.name, (teacher.get(tc.name) || 0) + 1);
+        matched = true;
+      }
+    });
+    // 이름 없이 '사감 선생님' 으로만 적은 경우 (4층 사감 선생님들 등)
+    if (/사감|사관/.test(txt)) { gam++; matched = true; }
+    if (!matched) etc.push(raw.trim());
+  });
+
+  const list = [...teacher.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ko'));
+  return { rows, list, gam, etc };
 }
 
 const scoreWord = v =>
@@ -454,10 +507,14 @@ function render() {
   <h3>8-4. 질문방에 대한 의견</h3>
   ${quoteList(ROWS, r => r.qroom?.note, 8, 'qrNote')}`
 
-  /* 9~10. 특이사항 · 후 조치 */
-  + `<h2>9. 특이사항</h2>
+  /* 9. 고마움을 전한 대상 */
+  + `<h2>9. 고마움을 전한 대상</h2>
+  ${thanksSection()}`
+
+  /* 10~11. 특이사항 · 조치 보고 */
+  + `<h2>10. 특이사항</h2>
   ${noteBlock('special', '조사 과정과 응답 중 보고가 필요한 사항')}
-  <h2>10. 조치 보고</h2>
+  <h2>11. 조치 보고</h2>
   ${actionSection()}`
 
   + foot();
@@ -466,6 +523,41 @@ function render() {
 }
 
 /* ══════════ 조각 ══════════ */
+function thanksSection() {
+  const { rows, list, gam, etc } = thanksTally();
+  if (!rows.length) return `<p class="tnote">해당 문항에 적어준 학생이 없습니다.</p>`;
+
+  const top = list.slice(0, 3).map(([nm, c]) => `${nm} 선생님 ${c}회`).join(', ');
+  let out = `<p>"고맙다고 전하고 싶은 사람"에 <em>${rows.length}명</em>이 답하였으며,
+    이름이 확인된 선생님은 <em>${list.length}분</em>입니다.
+    ${top ? `가장 많이 언급된 분은 ${top} 순입니다.` : ''}
+    ${gam ? `이름 없이 사감 선생님으로 적어준 응답은 ${gam}건입니다.` : ''}</p>`;
+
+  if (list.length) {
+    out += `<table>
+      <caption>선생님별 언급 횟수 · 한 학생이 여러 분을 적은 경우 각각 1회로 집계</caption>
+      <thead><tr><th scope="col">선생님</th><th class="num" scope="col">언급</th>
+        <th class="num" scope="col">비율</th><th scope="col">분포</th></tr></thead>
+      <tbody>${list.map(([nm, c]) => {
+        const tc = TEACHERS.find(x => x.name === nm);
+        return `<tr><td>${esc(nm)}${tc && tc.role ? ` <span class="tnote" style="display:inline">(${esc(tc.role)})</span>` : ''}</td>
+          <td class="num">${c}회</td><td class="num">${pct(c, rows.length)}%</td>
+          <td><span class="bar g" style="width:${Math.max(pct(c, rows.length) * 1.6, 3)}px"></span></td></tr>`;
+      }).join('')}
+      ${gam ? `<tr><td>사감 선생님 <span class="tnote" style="display:inline">(이름 미기재)</span></td>
+        <td class="num">${gam}회</td><td class="num">${pct(gam, rows.length)}%</td>
+        <td><span class="bar" style="width:${Math.max(pct(gam, rows.length) * 1.6, 3)}px"></span></td></tr>` : ''}
+      </tbody></table>`;
+  }
+
+  if (etc.length) {
+    out += `<h3>9-1. 선생님 외 언급</h3>
+      <p class="tnote">가족이나 친구, 확인되지 않은 호칭으로 적어준 응답 ${etc.length}건입니다.</p>
+      <div class="quotes">${etc.map(v => `<div class="quote">${esc(v)}</div>`).join('')}</div>`;
+  }
+  return out;
+}
+
 function head(n) {
   return `<div class="head">
     <div class="head-top">
@@ -610,7 +702,7 @@ function actionSection() {
   }
   const filled = ACTION_ITEMS.filter(it => (items[it.k] || '').trim());
   if (!filled.length) return `<p class="render empty">조치 내역이 아직 정리되지 않았습니다.</p>`;
-  return filled.map((it, i) => `<h3>10-${i + 1}. ${esc(it.t)}</h3>
+  return filled.map((it, i) => `<h3>11-${i + 1}. ${esc(it.t)}</h3>
     <div class="render">${esc(items[it.k].trim()).replace(/\n/g, '<br>')}</div>`).join('');
 }
 
