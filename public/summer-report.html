@@ -144,7 +144,7 @@
 <body>
 
 <div class="admbar" id="admbar">
-  <span>🔧 사감장 편집 모드 — <b>특이사항</b>과 <b>후 조치</b>는 여기서 적으시면 저장됩니다. 대표님 화면에는 이 줄이 보이지 않습니다.</span>
+  <span>🔧 사감장 편집 모드 — <b>특이사항</b>과 <b>조치 보고</b>는 여기서 적으시면 저장됩니다. 대표님 화면에는 이 줄이 보이지 않습니다.</span>
   <span class="saved" id="saved">저장됐습니다</span>
   <span class="sp">
     <button class="abtn go" onclick="saveNotes()">저장</button>
@@ -217,7 +217,20 @@ const pct = (n, d) => d ? Math.round(n / d * 100) : 0;
 const isAdmin = () => localStorage.getItem('jasupFeedback_auth') === '1';
 
 let ROWS = [];
-let NOTES = { special: '', actions: '', summary: '' };
+let NOTES = { special: '', actions: '', summary: '', items: {} };
+
+// 조치 보고 항목. 순서와 이름은 사감장이 정한 보고 목차입니다.
+const ACTION_ITEMS = [
+  { k: 'seat',    t: '좌석 불편',          ph: '예) 좌석 불편 요청 건수와 조치 내용, 재배치 시점을 적어주세요.' },
+  { k: 'noise',   t: '복도 소음',          ph: '예) 소음 발생 구간과 순회·안내 조치, 시행 시점을 적어주세요.' },
+  { k: 'violin',  t: '바이올린 학원',      ph: '예) 인접 학원 소음 관련 협의 경과와 결과를 적어주세요.' },
+  { k: 'aircon',  t: '에어컨 누수',        ph: '예) 발생 자습관, 조치 일자, 현재 상태를 적어주세요.' },
+  { k: 'cesco',   t: '세스코',             ph: '예) 방역 일정과 처리 결과, 후속 점검 계획을 적어주세요.' },
+  { k: 'gam',     t: '사감',               ph: '예) 사감 배치·근무 조정 사항과 학생 응답과의 연관을 적어주세요.' },
+  { k: 'parent',  t: '어머니 상담',        ph: '예) 상담 건수와 주요 논의 사항, 후속 조치를 적어주세요.' },
+  { k: 'report',  t: '일일 리포트',        ph: '예) 발송 현황과 개선 사항, 학부모 반응을 적어주세요.' },
+  { k: 'contest', t: '썸머핫습 수기공모전', ph: '예) 진행 방식과 참여 현황, 시상 계획을 적어주세요.' }
+];
 
 function avg(rows, get) {
   const v = rows.map(get).filter(x => typeof x === 'number' && !isNaN(x));
@@ -419,8 +432,8 @@ function render() {
   /* 9~10. 특이사항 · 후 조치 */
   + `<h2>9. 특이사항</h2>
   ${noteBlock('special', '조사 과정과 응답 중 보고가 필요한 사항')}
-  <h2>10. 후 조치 내역</h2>
-  ${noteBlock('actions', '집계 결과에 대해 실제로 취한 조치')}`
+  <h2>10. 조치 보고</h2>
+  ${actionSection()}`
 
   + foot();
 
@@ -558,6 +571,24 @@ function roomSatTable() {
   <p class="tnote">5점 만점 평균입니다. 응답 인원이 적은 자습관은 평균의 변동이 크므로 비고에 표시하였습니다.</p>`;
 }
 
+// 항목이 정해진 보고 목차이므로 항목별 칸을 나눠 적고, 대표님 화면에서는
+// 실제로 적힌 항목만 소제목과 함께 보여드립니다.
+function actionSection() {
+  const items = NOTES.items || {};
+  if (isAdmin()) {
+    return `<p class="tnote">항목별로 적어주세요. 비워두면 대표님 화면에는 그 항목이 나타나지 않습니다.</p>`
+      + ACTION_ITEMS.map(it => `<div class="field">
+          <label class="field-lb" for="item-${it.k}">${esc(it.t)}</label>
+          <textarea class="ta" id="item-${it.k}" style="min-height:88px"
+            placeholder="${esc(it.ph)}">${esc(items[it.k] || '')}</textarea>
+        </div>`).join('');
+  }
+  const filled = ACTION_ITEMS.filter(it => (items[it.k] || '').trim());
+  if (!filled.length) return `<p class="render empty">조치 내역이 아직 정리되지 않았습니다.</p>`;
+  return filled.map((it, i) => `<h3>10-${i + 1}. ${esc(it.t)}</h3>
+    <div class="render">${esc(items[it.k].trim()).replace(/\n/g, '<br>')}</div>`).join('');
+}
+
 function noteBlock(key, ph) {
   const v = NOTES[key] || '';
   if (isAdmin()) {
@@ -574,7 +605,7 @@ function noteBlock(key, ph) {
 function foot() {
   return `<div class="foot">
     <span>정율사관학원 종합반 · 자습관</span>
-    <span>본 보고서는 응답 데이터로부터 자동 집계되며, 특이사항과 후 조치는 사감장이 직접 작성합니다.</span>
+    <span>본 보고서는 응답 데이터로부터 자동 집계되며, 특이사항과 조치 보고는 사감장이 직접 작성합니다.</span>
   </div>`;
 }
 
@@ -585,10 +616,15 @@ function bindNotes() {
 
 async function saveNotes() {
   if (!isAdmin()) return;
+  const items = {};
+  ACTION_ITEMS.forEach(it => {
+    const el = document.getElementById('item-' + it.k);
+    if (el) items[it.k] = el.value;
+  });
   const next = {
     special: (document.getElementById('note-special') || {}).value || '',
-    actions: (document.getElementById('note-actions') || {}).value || '',
-    summary: NOTES.summary || ''
+    summary: NOTES.summary || '',
+    items
   };
   try {
     await window.__fb.setDoc(
