@@ -102,6 +102,15 @@
   }
   .quote .who { display:block; font-size:12px; color:var(--ink3); font-weight:700; margin-bottom:1px; }
   .more { font-size:12.5px; color:var(--ink3); margin-top:4px; }
+  .quote.hid { opacity:.5; }
+  .quote.hid .who { color:var(--bad); }
+  .hidebtn {
+    display:inline-block; margin-left:8px; font-family:inherit;
+    font-size:11.5px; font-weight:800; cursor:pointer;
+    padding:4px 9px; border-radius:6px;
+    background:#fff; border:1.5px solid var(--line2); color:var(--ink3);
+  }
+  .hidebtn:hover { border-color:var(--bad); color:var(--bad); }
 
   /* ── 입력 영역 ── */
   .field { margin-bottom:14px; }
@@ -109,7 +118,8 @@
   .ta {
     width:100%; font-family:inherit; font-size:14.5px; line-height:1.85; color:var(--ink);
     padding:13px 15px; border:1.5px solid var(--line2); border-radius:6px;
-    background:#fff; outline:none; min-height:120px; resize:vertical;
+    background:#fff; outline:none; min-height:96px; resize:vertical;
+    overflow:hidden;   /* 높이를 내용에 맞추므로 내부 스크롤이 생기지 않게 */
   }
   .ta:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(3,105,161,.1); }
   .ta[readonly] { border:none; padding:0; background:transparent; resize:none; min-height:0; }
@@ -135,7 +145,9 @@
     .doc { max-width:none; border:none; box-shadow:none; border-radius:0; padding:0; }
     h2 { page-break-after:avoid; break-after:avoid; }
     table, .quote, .kpis { page-break-inside:avoid; break-inside:avoid; }
-    .ta[readonly], .render { font-size:11pt; }
+    .ta, .render { font-size:11pt; }
+    /* 인쇄에서 입력칸 내용이 잘리지 않게 */
+    textarea.ta { height:auto !important; overflow:visible !important; border:none; padding:0; }
     @page { size:A4 portrait; margin:16mm 15mm; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition-duration:.01ms !important; } }
@@ -144,7 +156,7 @@
 <body>
 
 <div class="admbar" id="admbar">
-  <span>🔧 사감장 편집 모드 — <b>특이사항</b>과 <b>조치 보고</b>는 여기서 적으시면 저장됩니다. 대표님 화면에는 이 줄이 보이지 않습니다.</span>
+  <span>🔧 사감장 편집 모드 — <b>특이사항</b>과 <b>조치 보고</b>는 여기서 적으시면 저장됩니다. 인용 옆 <b>숨기기</b>를 누르면 그 문장만 대표님 화면에서 빠집니다(점수는 집계에 그대로 반영됩니다). 이 줄은 대표님 화면에 보이지 않습니다.</span>
   <span class="saved" id="saved">저장됐습니다</span>
   <span class="sp">
     <button class="abtn go" onclick="saveNotes()">저장</button>
@@ -217,7 +229,7 @@ const pct = (n, d) => d ? Math.round(n / d * 100) : 0;
 const isAdmin = () => localStorage.getItem('jasupFeedback_auth') === '1';
 
 let ROWS = [];
-let NOTES = { special: '', actions: '', summary: '', items: {} };
+let NOTES = { special: '', actions: '', summary: '', items: {}, hidden: [] };
 
 // 조치 보고 항목. 순서와 이름은 사감장이 정한 보고 목차입니다.
 const ACTION_ITEMS = [
@@ -292,15 +304,26 @@ function rankTable(pairs, total, caption, dict) {
   </table>`;
 }
 
-// 대표님께 공개되는 문서이므로 이름은 싣지 않고 학년·자습관까지만 표기합니다
-function quoteList(rows, get, limit) {
-  const items = rows.map(r => ({ r, v: (get(r) || '').trim() })).filter(x => x.v);
+// 대표님께 공개되는 문서이므로 이름은 싣지 않고 학년·자습관까지만 표기합니다.
+// 보고서에 싣기 어려운 인용은 응답을 지우지 않고 여기서만 숨깁니다(점수는 집계에 그대로 반영).
+const hiddenKey = (id, kind) => id + '|' + kind;
+const isHidden = (id, kind) => (NOTES.hidden || []).includes(hiddenKey(id, kind));
+
+function quoteList(rows, get, limit, kind) {
+  const all = rows.map(r => ({ r, v: (get(r) || '').trim() })).filter(x => x.v);
+  const items = isAdmin() ? all : all.filter(x => !isHidden(x.r.id, kind));
+  const hidCnt = all.length - items.length;
   if (!items.length) return `<p class="tnote">해당 항목에 적어준 학생이 없습니다.</p>`;
   const show = limit ? items.slice(0, limit) : items;
-  return `<div class="quotes">${show.map(({ r, v }) => `<div class="quote">
-      <span class="who">${esc(r.grade || '')} · ${esc(r.jasup?.room || '')}</span>${esc(v)}
-    </div>`).join('')}
+  return `<div class="quotes">${show.map(({ r, v }) => {
+    const hid = isHidden(r.id, kind);
+    return `<div class="quote${hid ? ' hid' : ''}">
+      <span class="who">${esc(r.grade || '')} · ${esc(r.jasup?.room || '')}${hid ? ' · 보고서에서 숨김' : ''}</span>${esc(v)}
+      ${isAdmin() ? `<button class="hidebtn" data-hide="${esc(hiddenKey(r.id, kind))}">${hid ? '다시 표시' : '숨기기'}</button>` : ''}
+    </div>`;
+  }).join('')}
     ${limit && items.length > limit ? `<p class="more">이 밖에 ${items.length - limit}건이 더 있습니다. 전문은 관리자 대시보드에서 확인하실 수 있습니다.</p>` : ''}
+    ${!isAdmin() && hidCnt ? '' : ''}
   </div>`;
 }
 
@@ -413,23 +436,23 @@ function render() {
   <h3>7-1. 학원생활</h3>
   ${rankTable(lifeImp, ROWS.filter(r => r.academy?.improve_one && r.academy.improve_one !== 'none').length,
       `학원생활 개선 요청 · "지금도 충분하다" ${ROWS.filter(r => r.academy?.improve_one === 'none').length}명 제외`, L_LIFE_IMP)}
-  ${quoteList(ROWS, r => r.academy?.improve_note, 6)}
+  ${quoteList(ROWS, r => r.academy?.improve_note, 6, 'lifeNote')}
   <h3>7-2. 자습관</h3>
   ${rankTable(roomImp, ROWS.filter(r => r.jasup?.improve_one && r.jasup.improve_one !== 'none').length,
       `자습관 개선 요청 · "지금이 좋다" ${ROWS.filter(r => r.jasup?.improve_one === 'none').length}명 제외`, L_ROOM_IMP)}
-  ${quoteList(ROWS, r => r.jasup?.improve_note, 6)}`
+  ${quoteList(ROWS, r => r.jasup?.improve_note, 6, 'roomNote')}`
 
   /* 8. 학생 의견 */
   + `<h2>8. 학생이 직접 적어준 의견</h2>
   <p class="tnote">개인 식별을 피하기 위해 이름은 표기하지 않고 학년과 자습관까지만 적었습니다.</p>
   <h3>8-1. 하고 싶은 말</h3>
-  ${quoteList(ROWS, r => r.closing?.message, 12)}
+  ${quoteList(ROWS, r => r.closing?.message, 12, 'message')}
   <h3>8-2. 고맙다고 전하고 싶은 사람</h3>
-  ${quoteList(ROWS, r => r.closing?.thanks_to, 12)}
+  ${quoteList(ROWS, r => r.closing?.thanks_to, 12, 'thanks')}
   <h3>8-3. 아하포인트 · 기억에 남는 것</h3>
-  ${quoteList(ROWS, r => r.aha?.note, 8)}
+  ${quoteList(ROWS, r => r.aha?.note, 8, 'ahaNote')}
   <h3>8-4. 질문방에 대한 의견</h3>
-  ${quoteList(ROWS, r => r.qroom?.note, 8)}`
+  ${quoteList(ROWS, r => r.qroom?.note, 8, 'qrNote')}`
 
   /* 9~10. 특이사항 · 후 조치 */
   + `<h2>9. 특이사항</h2>
@@ -581,7 +604,7 @@ function actionSection() {
     return `<p class="tnote">항목별로 적어주세요. 비워두면 대표님 화면에는 그 항목이 나타나지 않습니다.</p>`
       + ACTION_ITEMS.map(it => `<div class="field">
           <label class="field-lb" for="item-${it.k}">${esc(it.t)}</label>
-          <textarea class="ta" id="item-${it.k}" style="min-height:88px"
+          <textarea class="ta" id="item-${it.k}" style="min-height:72px"
             placeholder="${esc(it.ph)}">${esc(items[it.k] || '')}</textarea>
         </div>`).join('');
   }
@@ -612,9 +635,39 @@ function foot() {
 }
 
 /* ══════════ 특이사항 · 후 조치 저장 ══════════ */
+// 입력칸 안에서 스크롤되면 적어둔 내용을 한눈에 못 보므로 높이를 내용에 맞춘다
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight + 4) + 'px';
+}
+
 function bindNotes() {
   document.getElementById('admbar').classList.toggle('on', isAdmin());
+  document.querySelectorAll('textarea.ta').forEach(el => {
+    autoGrow(el);
+    if (!el._grow) { el._grow = true; el.addEventListener('input', () => autoGrow(el)); }
+  });
 }
+
+// 클릭 즉시 저장합니다. 보고서를 열어둔 채로 정리할 수 있게 하려는 목적입니다.
+async function toggleHide(key) {
+  const set = new Set(NOTES.hidden || []);
+  set.has(key) ? set.delete(key) : set.add(key);
+  NOTES.hidden = [...set];
+  render();
+  try {
+    await window.__fb.setDoc(
+      window.__fb.doc(window.__fb.db, 'settings', NOTE_DOC),
+      { hidden: NOTES.hidden, updated_at: new Date().toISOString() },
+      { merge: true }
+    );
+  } catch (e) { alert('숨김 설정 저장에 실패했습니다: ' + e.message); }
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-hide]');
+  if (b) toggleHide(b.dataset.hide);
+});
 
 async function saveNotes() {
   if (!isAdmin()) return;
@@ -631,7 +684,8 @@ async function saveNotes() {
   try {
     await window.__fb.setDoc(
       window.__fb.doc(window.__fb.db, 'settings', NOTE_DOC),
-      { ...next, updated_at: new Date().toISOString() }
+      { ...next, hidden: NOTES.hidden || [], updated_at: new Date().toISOString() },
+      { merge: true }
     );
     NOTES = next;
     const el = document.getElementById('saved');
