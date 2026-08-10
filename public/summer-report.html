@@ -156,7 +156,7 @@
 <body>
 
 <div class="admbar" id="admbar">
-  <span>🔧 사감장 편집 모드 — <b>특이사항</b>과 <b>조치 보고</b>는 여기서 적으시면 저장됩니다. 인용 옆 <b>숨기기</b>를 누르면 그 문장만 대표님 화면에서 빠집니다(점수는 집계에 그대로 반영됩니다). 이 줄은 대표님 화면에 보이지 않습니다.</span>
+  <span>🔧 편집 모드 (주소에 <b>?edit=1</b> 이 붙어 있을 때만 나타납니다) — <b>특이사항</b>과 <b>조치 보고</b>는 여기서 적으시면 저장됩니다. 인용 옆 <b>숨기기</b>를 누르면 그 문장만 대표님 화면에서 빠집니다(점수는 집계에 그대로 반영됩니다). 이 줄은 대표님 화면에 보이지 않습니다.</span>
   <span class="saved" id="saved">저장됐습니다</span>
   <span class="sp">
     <button class="abtn go" onclick="saveNotes()">저장</button>
@@ -251,6 +251,12 @@ const ORD_FREQ  = ['many', 'few', 'none'];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 const pct = (n, d) => d ? Math.round(n / d * 100) : 0;
 const isAdmin = () => localStorage.getItem('jasupFeedback_auth') === '1';
+// 로그인만으로 편집 UI가 뜨면 이 화면을 그대로 보고드릴 때 입력칸과 버튼이 함께 보입니다.
+// 그래서 주소에 ?edit=1 을 붙였을 때만 편집 모드로 들어갑니다.
+const isEdit = () => {
+  try { return isAdmin() && new URLSearchParams(location.search).get('edit') === '1'; }
+  catch (e) { return false; }
+};
 
 let ROWS = [];
 let NOTES = { special: '', actions: '', summary: '', items: {}, hidden: [] };
@@ -335,7 +341,8 @@ const isHidden = (id, kind) => (NOTES.hidden || []).includes(hiddenKey(id, kind)
 
 function quoteList(rows, get, limit, kind) {
   const all = rows.map(r => ({ r, v: (get(r) || '').trim() })).filter(x => x.v);
-  const items = isAdmin() ? all : all.filter(x => !isHidden(x.r.id, kind));
+  // 편집 모드에서만 숨긴 인용을 함께 보여 되돌릴 수 있게 합니다.
+  const items = isEdit() ? all : all.filter(x => !isHidden(x.r.id, kind));
   const hidCnt = all.length - items.length;
   if (!items.length) return `<p class="tnote">해당 항목에 적어준 학생이 없습니다.</p>`;
   const show = limit ? items.slice(0, limit) : items;
@@ -343,11 +350,10 @@ function quoteList(rows, get, limit, kind) {
     const hid = isHidden(r.id, kind);
     return `<div class="quote${hid ? ' hid' : ''}">
       <span class="who">${esc(r.grade || '')} · ${esc(r.jasup?.room || '')}${hid ? ' · 보고서에서 숨김' : ''}</span>${esc(v)}
-      ${isAdmin() ? `<button class="hidebtn" data-hide="${esc(hiddenKey(r.id, kind))}">${hid ? '다시 표시' : '숨기기'}</button>` : ''}
+      ${isEdit() ? `<button class="hidebtn" data-hide="${esc(hiddenKey(r.id, kind))}">${hid ? '다시 표시' : '숨기기'}</button>` : ''}
     </div>`;
   }).join('')}
     ${limit && items.length > limit ? `<p class="more">이 밖에 ${items.length - limit}건이 더 있습니다. 전문은 관리자 대시보드에서 확인하실 수 있습니다.</p>` : ''}
-    ${!isAdmin() && hidCnt ? '' : ''}
   </div>`;
 }
 
@@ -697,7 +703,7 @@ function roomSatTable() {
 // 실제로 적힌 항목만 소제목과 함께 보여드립니다.
 function actionSection() {
   const items = NOTES.items || {};
-  if (isAdmin()) {
+  if (isEdit()) {
     return `<p class="tnote">항목별로 적어주세요. 비워두면 대표님 화면에는 그 항목이 나타나지 않습니다.</p>`
       + ACTION_ITEMS.map(it => `<div class="field">
           <label class="field-lb" for="item-${it.k}">${esc(it.t)}</label>
@@ -713,7 +719,7 @@ function actionSection() {
 
 function noteBlock(key, ph) {
   const v = NOTES[key] || '';
-  if (isAdmin()) {
+  if (isEdit()) {
     return `<div class="field">
       <label class="field-lb" for="note-${key}">한 줄에 한 항목씩 적어주세요. 저장 버튼을 누르면 반영됩니다.</label>
       <textarea class="ta" id="note-${key}" placeholder="${esc(ph)}">${esc(v)}</textarea>
@@ -739,7 +745,7 @@ function autoGrow(el) {
 }
 
 function bindNotes() {
-  document.getElementById('admbar').classList.toggle('on', isAdmin());
+  document.getElementById('admbar').classList.toggle('on', isEdit());
   document.querySelectorAll('textarea.ta').forEach(el => {
     autoGrow(el);
     if (!el._grow) { el._grow = true; el.addEventListener('input', () => autoGrow(el)); }
@@ -767,7 +773,7 @@ document.addEventListener('click', e => {
 });
 
 async function saveNotes() {
-  if (!isAdmin()) return;
+  if (!isEdit()) return;
   const items = {};
   ACTION_ITEMS.forEach(it => {
     const el = document.getElementById('item-' + it.k);
