@@ -556,26 +556,29 @@ const LOW_FIELDS = [
 
 function lowSatSection() {
   const num = v => typeof v === 'number' && !isNaN(v);
-  const low = ROWS
+  const visible = r => LOW_FIELDS
+    .filter(f => (f.get(r) || '').trim() && !isHidden(r.id, f.kind));
+
+  const all = ROWS
     .filter(r => num(r.academy?.overall) && num(r.jasup?.satisfaction)
-              && r.academy.overall <= 2 && r.jasup.satisfaction <= 2)
+              && r.academy.overall <= 2 && r.jasup.satisfaction <= 2);
+
+  // 적어준 의견이 없는 학생은 점수만 남아 보고에 쓸 내용이 없으므로 제외합니다.
+  // '문서ID|low' 로 숨김 처리한 학생도 이 절에서 빼줍니다.
+  const low = all
+    .filter(r => visible(r).length && !isHidden(r.id, 'low'))
     .sort((a, b) => (a.academy.overall + a.jasup.satisfaction)
                   - (b.academy.overall + b.jasup.satisfaction));
 
-  if (!low.length) return `<p class="tnote">두 만족도가 모두 2점 이하인 학생은 없습니다.</p>`;
-
-  const withText = low.filter(r =>
-    LOW_FIELDS.some(f => (f.get(r) || '').trim() && !isHidden(r.id, f.kind)));
+  if (!low.length) return `<p class="tnote">두 만족도가 모두 2점 이하이면서 의견을 적어준 학생은 없습니다.</p>`;
 
   const tiredN = low.filter(r => ['tired', 'hard'].includes(r.academy?.condition)).length;
 
-  return `<p>썸머핫습과 자습관 만족도를 <em>모두 2점 이하</em>로 응답한 학생은 ${low.length}명(전체의 ${pct(low.length, ROWS.length)}%)입니다.
-    이 가운데 ${withText.length}명이 의견을 함께 적어주었으며, ${tiredN}명은 컨디션도 "좀 지쳤다" 이상으로 응답하였습니다.
-    점수가 낮은 순으로 정리하였고, 개별 확인이 필요한 학생은 관리자 화면에서 이름을 확인하여 면담하고 있습니다.</p>
+  return `<p>썸머핫습과 자습관 만족도를 <em>모두 2점 이하</em>로 응답한 학생은 ${all.length}명(전체의 ${pct(all.length, ROWS.length)}%)입니다.
+    그중 의견을 함께 적어준 <em>${low.length}명</em>을 점수가 낮은 순으로 정리하였으며, ${tiredN}명은 컨디션도 "좀 지쳤다" 이상으로 응답하였습니다.
+    개별 확인이 필요한 학생은 관리자 화면에서 이름을 확인하여 면담하고 있습니다.</p>
     ${low.map(r => {
-      const notes = LOW_FIELDS
-        .map(f => ({ f, v: (f.get(r) || '').trim() }))
-        .filter(x => x.v && !isHidden(r.id, x.f.kind));
+      const notes = visible(r).map(f => ({ f, v: (f.get(r) || '').trim() }));
       const imp = [
         r.academy?.improve_one && r.academy.improve_one !== 'none' ? L_LIFE_IMP[r.academy.improve_one] : null,
         r.jasup?.improve_one && r.jasup.improve_one !== 'none' ? L_ROOM_IMP[r.jasup.improve_one] : null
@@ -585,9 +588,7 @@ function lowSatSection() {
           썸머핫습 ${r.academy.overall}점 / 자습관 ${r.jasup.satisfaction}점 ·
           컨디션 ${esc(L_COND[r.academy?.condition] || '–')}</span>
         ${imp.length ? `<div class="lowimp">개선 요청 · ${esc(imp.join(' / '))}</div>` : ''}
-        ${notes.length
-          ? notes.map(x => `<div class="lownote"><b>${esc(x.f.label)}</b> ${esc(x.v)}</div>`).join('')
-          : `<div class="lownote" style="color:var(--ink3)">적어준 의견은 없습니다.</div>`}
+        ${notes.map(x => `<div class="lownote"><b>${esc(x.f.label)}</b> ${esc(x.v)}</div>`).join('')}
       </div>`;
     }).join('')}`;
 }
