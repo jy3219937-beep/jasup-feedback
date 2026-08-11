@@ -337,8 +337,14 @@ function rankTable(pairs, total, caption, dict) {
   </table>`;
 }
 
-// 대표님께 공개되는 문서이므로 이름은 싣지 않고 학년·자습관까지만 표기합니다.
+// 이름을 직접 적어준 학생은 이름까지 표기하고, 익명으로 답한 학생은 학년·자습관까지만 적습니다.
 // 보고서에 싣기 어려운 인용은 응답을 지우지 않고 여기서만 숨깁니다(점수는 집계에 그대로 반영).
+// 이름칸에 마침표 하나만 적은 응답 등은 이름으로 보지 않고 익명으로 둡니다.
+const nameOf = r => {
+  const n = (r.name || '').trim();
+  return (r.is_named && /[가-힣A-Za-z]/.test(n) && n.replace(/[^가-힣A-Za-z]/g, '').length >= 2) ? n : null;
+};
+const whoOf = r => [r.grade || '', r.jasup?.room || '', nameOf(r)].filter(Boolean).join(' · ');
 const hiddenKey = (id, kind) => id + '|' + kind;
 const isHidden = (id, kind) => (NOTES.hidden || []).includes(hiddenKey(id, kind));
 
@@ -354,7 +360,7 @@ function quoteList(rows, get, limit, kind) {
   return `<div class="quotes">${show.map(({ r, v }) => {
     const hid = isHidden(r.id, kind);
     return `<div class="quote${hid ? ' hid' : ''}">
-      <span class="who">${esc(r.grade || '')} · ${esc(r.jasup?.room || '')}${hid ? ' · 보고서에서 숨김' : ''}</span>${esc(v)}
+      <span class="who">${esc(whoOf(r))}${hid ? ' · 보고서에서 숨김' : ''}</span>${esc(v)}
       ${isEdit() ? `<button class="hidebtn" data-hide="${esc(hiddenKey(r.id, kind))}">${hid ? '다시 표시' : '숨기기'}</button>` : ''}
     </div>`;
   }).join('')}
@@ -390,7 +396,7 @@ function thanksTally() {
     if (thanks) {
       const tx = thanks.replace(/\s+/g, '');
       if (/사감|사관/.test(tx)) { gam++; }
-      else if (!named) etc.push(thanks);
+      else if (!named) etc.push({ r, v: thanks });
     }
   });
 
@@ -517,7 +523,7 @@ function render() {
 
   /* 8. 학생 의견 */
   + `<h2>8. 학생이 직접 적어준 의견</h2>
-  <p class="tnote">개인 식별을 피하기 위해 이름은 표기하지 않고 학년과 자습관까지만 적었습니다. 내용이 긴 응답을 앞에 두었으며, 학생들이 적어준 주관식 응답을 항목별로 모두 실었습니다.</p>
+  <p class="tnote">이름을 직접 적어준 학생은 이름까지, 익명으로 답한 학생은 학년과 자습관까지만 표기하였습니다. 내용이 긴 응답을 앞에 두었으며, 학생들이 적어준 주관식 응답을 항목별로 모두 실었습니다.</p>
   <h3>8-1. 하고 싶은 말</h3>
   ${quoteList(ROWS, r => r.closing?.message, 0, 'message')}
   <h3>8-2. 고맙다고 전하고 싶은 사람</h3>
@@ -586,7 +592,7 @@ function lowSatSection() {
         r.jasup?.improve_one && r.jasup.improve_one !== 'none' ? L_ROOM_IMP[r.jasup.improve_one] : null
       ].filter(Boolean);
       return `<div class="quote">
-        <span class="who">${esc(r.grade || '')} · ${esc(r.jasup?.room || '')} ·
+        <span class="who">${esc(whoOf(r))} ·
           썸머핫습 ${r.academy.overall}점 / 자습관 ${r.jasup.satisfaction}점 ·
           컨디션 ${esc(L_COND[r.academy?.condition] || '–')}</span>
         ${imp.length ? `<div class="lowimp">개선 요청 · ${esc(imp.join(' / '))}</div>` : ''}
@@ -622,7 +628,9 @@ function thanksSection() {
   if (etc.length) {
     out += `<h3>9-1. 선생님 외 언급</h3>
       <p class="tnote">가족이나 친구, 확인되지 않은 호칭으로 적어준 응답 ${etc.length}건입니다.</p>
-      <div class="quotes">${etc.map(v => `<div class="quote">${esc(v)}</div>`).join('')}</div>`;
+      <div class="quotes">${etc.map(x => `<div class="quote">
+        <span class="who">${esc(whoOf(x.r))}</span>${esc(x.v)}
+      </div>`).join('')}</div>`;
   }
   return out;
 }
