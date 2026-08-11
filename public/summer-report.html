@@ -504,28 +504,31 @@ function render() {
   /* 7. 개선 요청 */
   + `<h2>7. 개선 요청 우선순위</h2>
   <p>"딱 하나만 더 좋아질 수 있다면 어디인가"를 단일 선택으로 물었습니다.
-  불만 항목을 나열해 응답을 유도하지 않고, 개선 요청 형태로만 받았습니다.</p>
+  불만 항목을 나열해 응답을 유도하지 않고, 개선 요청 형태로만 받았습니다.
+  직접 적어준 내용은 항목별로 전부 실었으며, 내용이 긴 응답을 앞에 두었습니다.</p>
   <h3>7-1. 학원생활</h3>
   ${rankTable(lifeImp, ROWS.filter(r => r.academy?.improve_one && r.academy.improve_one !== 'none').length,
       `학원생활 개선 요청 · "지금도 충분하다" ${ROWS.filter(r => r.academy?.improve_one === 'none').length}명 제외`, L_LIFE_IMP)}
-  ${quoteList(ROWS, r => r.academy?.improve_note, 10, 'lifeNote')}
+  ${quoteList(ROWS, r => r.academy?.improve_note, 0, 'lifeNote')}
   <h3>7-2. 자습관</h3>
   ${rankTable(roomImp, ROWS.filter(r => r.jasup?.improve_one && r.jasup.improve_one !== 'none').length,
       `자습관 개선 요청 · "지금이 좋다" ${ROWS.filter(r => r.jasup?.improve_one === 'none').length}명 제외`, L_ROOM_IMP)}
-  ${quoteList(ROWS, r => r.jasup?.improve_note, 10, 'roomNote')}`
+  ${quoteList(ROWS, r => r.jasup?.improve_note, 0, 'roomNote')}`
 
   /* 8. 학생 의견 */
   + `<h2>8. 학생이 직접 적어준 의견</h2>
-  <p class="tnote">개인 식별을 피하기 위해 이름은 표기하지 않고 학년과 자습관까지만 적었습니다. 내용이 긴 응답을 앞에 두었으며, 아래 네 항목은 적어준 응답을 모두 실었습니다.</p>
+  <p class="tnote">개인 식별을 피하기 위해 이름은 표기하지 않고 학년과 자습관까지만 적었습니다. 내용이 긴 응답을 앞에 두었으며, 학생들이 적어준 주관식 응답을 항목별로 모두 실었습니다.</p>
   <h3>8-1. 하고 싶은 말</h3>
   ${quoteList(ROWS, r => r.closing?.message, 0, 'message')}
   <h3>8-2. 고맙다고 전하고 싶은 사람</h3>
-  ${quoteList(ROWS, r => r.closing?.thanks_to, 12, 'thanks')}
+  ${quoteList(ROWS, r => r.closing?.thanks_to, 0, 'thanks')}
   <h3>8-3. 아하포인트 · 기억에 남는 것</h3>
   ${quoteList(ROWS, r => r.aha?.note, 0, 'ahaNote')}
-  <h3>8-4. 질문방에 대한 의견</h3>
+  <h3>8-4. 아하포인트 · 이렇게 해주면 만들 것 같다</h3>
+  ${quoteList(ROWS, r => r.aha?.wish, 0, 'ahaWish')}
+  <h3>8-5. 질문방에 대한 의견</h3>
   ${quoteList(ROWS, r => r.qroom?.note, 0, 'qrNote')}
-  <h3>8-5. 만족도가 낮은 학생들의 의견</h3>
+  <h3>8-6. 만족도가 낮은 학생들의 의견</h3>
   ${lowSatSection()}`
 
   /* 9. 고마움을 전한 대상 */
@@ -549,6 +552,7 @@ const LOW_FIELDS = [
   { kind: 'lifeNote', label: '학원생활 개선',  get: r => r.academy?.improve_note },
   { kind: 'roomNote', label: '자습관 개선',    get: r => r.jasup?.improve_note },
   { kind: 'ahaNote',  label: '아하포인트',     get: r => r.aha?.note },
+  { kind: 'ahaWish',  label: '아하포인트 제안', get: r => r.aha?.wish },
   { kind: 'qrNote',   label: '질문방',         get: r => r.qroom?.note }
 ];
 
