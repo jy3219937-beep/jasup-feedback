@@ -102,6 +102,9 @@
   }
   .quote .who { display:block; font-size:12px; color:var(--ink3); font-weight:700; margin-bottom:1px; }
   .more { font-size:12.5px; color:var(--ink3); margin-top:4px; }
+  .lowimp { font-size:12.5px; color:var(--ink3); font-weight:700; margin-bottom:3px; }
+  .lownote { font-size:14px; line-height:1.8; margin-bottom:2px; }
+  .lownote b { font-size:12px; color:var(--blue); margin-right:5px; }
   .quote.hid { opacity:.5; }
   .quote.hid .who { color:var(--bad); }
   .hidebtn {
@@ -340,7 +343,9 @@ const hiddenKey = (id, kind) => id + '|' + kind;
 const isHidden = (id, kind) => (NOTES.hidden || []).includes(hiddenKey(id, kind));
 
 function quoteList(rows, get, limit, kind) {
-  const all = rows.map(r => ({ r, v: (get(r) || '').trim() })).filter(x => x.v);
+  const all = rows.map(r => ({ r, v: (get(r) || '').trim() })).filter(x => x.v)
+    // 상한에 걸려 잘릴 때 짧은 단답보다 내용이 충실한 응답이 남도록 긴 순으로 둡니다
+    .sort((a, b) => b.v.length - a.v.length);
   // 편집 모드에서만 숨긴 인용을 함께 보여 되돌릴 수 있게 합니다.
   const items = isEdit() ? all : all.filter(x => !isHidden(x.r.id, kind));
   const hidCnt = all.length - items.length;
@@ -503,23 +508,25 @@ function render() {
   <h3>7-1. 학원생활</h3>
   ${rankTable(lifeImp, ROWS.filter(r => r.academy?.improve_one && r.academy.improve_one !== 'none').length,
       `학원생활 개선 요청 · "지금도 충분하다" ${ROWS.filter(r => r.academy?.improve_one === 'none').length}명 제외`, L_LIFE_IMP)}
-  ${quoteList(ROWS, r => r.academy?.improve_note, 6, 'lifeNote')}
+  ${quoteList(ROWS, r => r.academy?.improve_note, 10, 'lifeNote')}
   <h3>7-2. 자습관</h3>
   ${rankTable(roomImp, ROWS.filter(r => r.jasup?.improve_one && r.jasup.improve_one !== 'none').length,
       `자습관 개선 요청 · "지금이 좋다" ${ROWS.filter(r => r.jasup?.improve_one === 'none').length}명 제외`, L_ROOM_IMP)}
-  ${quoteList(ROWS, r => r.jasup?.improve_note, 6, 'roomNote')}`
+  ${quoteList(ROWS, r => r.jasup?.improve_note, 10, 'roomNote')}`
 
   /* 8. 학생 의견 */
   + `<h2>8. 학생이 직접 적어준 의견</h2>
-  <p class="tnote">개인 식별을 피하기 위해 이름은 표기하지 않고 학년과 자습관까지만 적었습니다.</p>
+  <p class="tnote">개인 식별을 피하기 위해 이름은 표기하지 않고 학년과 자습관까지만 적었습니다. 내용이 긴 응답을 앞에 두었으며, 아래 네 항목은 적어준 응답을 모두 실었습니다.</p>
   <h3>8-1. 하고 싶은 말</h3>
-  ${quoteList(ROWS, r => r.closing?.message, 12, 'message')}
+  ${quoteList(ROWS, r => r.closing?.message, 0, 'message')}
   <h3>8-2. 고맙다고 전하고 싶은 사람</h3>
   ${quoteList(ROWS, r => r.closing?.thanks_to, 12, 'thanks')}
   <h3>8-3. 아하포인트 · 기억에 남는 것</h3>
-  ${quoteList(ROWS, r => r.aha?.note, 8, 'ahaNote')}
+  ${quoteList(ROWS, r => r.aha?.note, 0, 'ahaNote')}
   <h3>8-4. 질문방에 대한 의견</h3>
-  ${quoteList(ROWS, r => r.qroom?.note, 8, 'qrNote')}`
+  ${quoteList(ROWS, r => r.qroom?.note, 0, 'qrNote')}
+  <h3>8-5. 만족도가 낮은 학생들의 의견</h3>
+  ${lowSatSection()}`
 
   /* 9. 고마움을 전한 대상 */
   + `<h2>9. 고마움을 전한 대상</h2>
@@ -537,6 +544,54 @@ function render() {
 }
 
 /* ══════════ 조각 ══════════ */
+// 두 만족도가 모두 낮은 학생은 개별로 짚어볼 필요가 있어 따로 모아 보여드립니다.
+// 숨김 처리한 인용은 여기서도 함께 제외합니다.
+const LOW_FIELDS = [
+  { kind: 'message',  label: '하고 싶은 말',   get: r => r.closing?.message },
+  { kind: 'lifeNote', label: '학원생활 개선',  get: r => r.academy?.improve_note },
+  { kind: 'roomNote', label: '자습관 개선',    get: r => r.jasup?.improve_note },
+  { kind: 'ahaNote',  label: '아하포인트',     get: r => r.aha?.note },
+  { kind: 'qrNote',   label: '질문방',         get: r => r.qroom?.note }
+];
+
+function lowSatSection() {
+  const num = v => typeof v === 'number' && !isNaN(v);
+  const low = ROWS
+    .filter(r => num(r.academy?.overall) && num(r.jasup?.satisfaction)
+              && r.academy.overall <= 2 && r.jasup.satisfaction <= 2)
+    .sort((a, b) => (a.academy.overall + a.jasup.satisfaction)
+                  - (b.academy.overall + b.jasup.satisfaction));
+
+  if (!low.length) return `<p class="tnote">두 만족도가 모두 2점 이하인 학생은 없습니다.</p>`;
+
+  const withText = low.filter(r =>
+    LOW_FIELDS.some(f => (f.get(r) || '').trim() && !isHidden(r.id, f.kind)));
+
+  const tiredN = low.filter(r => ['tired', 'hard'].includes(r.academy?.condition)).length;
+
+  return `<p>썸머핫습과 자습관 만족도를 <em>모두 2점 이하</em>로 응답한 학생은 ${low.length}명(전체의 ${pct(low.length, ROWS.length)}%)입니다.
+    이 가운데 ${withText.length}명이 의견을 함께 적어주었으며, ${tiredN}명은 컨디션도 "좀 지쳤다" 이상으로 응답하였습니다.
+    점수가 낮은 순으로 정리하였고, 개별 확인이 필요한 학생은 관리자 화면에서 이름을 확인하여 면담하고 있습니다.</p>
+    ${low.map(r => {
+      const notes = LOW_FIELDS
+        .map(f => ({ f, v: (f.get(r) || '').trim() }))
+        .filter(x => x.v && !isHidden(r.id, x.f.kind));
+      const imp = [
+        r.academy?.improve_one && r.academy.improve_one !== 'none' ? L_LIFE_IMP[r.academy.improve_one] : null,
+        r.jasup?.improve_one && r.jasup.improve_one !== 'none' ? L_ROOM_IMP[r.jasup.improve_one] : null
+      ].filter(Boolean);
+      return `<div class="quote">
+        <span class="who">${esc(r.grade || '')} · ${esc(r.jasup?.room || '')} ·
+          썸머핫습 ${r.academy.overall}점 / 자습관 ${r.jasup.satisfaction}점 ·
+          컨디션 ${esc(L_COND[r.academy?.condition] || '–')}</span>
+        ${imp.length ? `<div class="lowimp">개선 요청 · ${esc(imp.join(' / '))}</div>` : ''}
+        ${notes.length
+          ? notes.map(x => `<div class="lownote"><b>${esc(x.f.label)}</b> ${esc(x.v)}</div>`).join('')
+          : `<div class="lownote" style="color:var(--ink3)">적어준 의견은 없습니다.</div>`}
+      </div>`;
+    }).join('')}`;
+}
+
 function thanksSection() {
   const { rows, list, gam, etc } = thanksTally();
   if (!rows.length) return `<p class="tnote">해당 문항에 적어준 학생이 없습니다.</p>`;
